@@ -1,0 +1,1559 @@
+{
+  "aatrox": {
+    "passive": "aatrox_passive.png",
+    "spells": [
+      "aatrox_q.png",
+      "aatrox_w.png",
+      "aatrox_e.png",
+      "aatrox_r.png"
+    ]
+  },
+  "ahri": {
+    "passive": "icons_ahri_passive.png",
+    "spells": [
+      "icons_ahri_q.png",
+      "icons_ahri_w.png",
+      "icons_ahri_e.png",
+      "icons_ahri_r.png"
+    ]
+  },
+  "akali": {
+    "passive": "akali_p.png",
+    "spells": [
+      "akali_q.png",
+      "akali_w.png",
+      "akali_e.png",
+      "akali_r.png"
+    ]
+  },
+  "akshan": {
+    "passive": "akshan_p.png",
+    "spells": [
+      "akshan_q.png",
+      "akshan_w.png",
+      "akshan_e.png",
+      "akshan_r.png"
+    ]
+  },
+  "alistar": {
+    "passive": "alistar_passive.png",
+    "spells": [
+      "alistar_q.png",
+      "alistar_w.png",
+      "alistar_passive.png",
+      "alistar_r.png"
+    ]
+  },
+  "ambessa": {
+    "passive": "icon_ambessa_passive.png",
+    "spells": [
+      "icon_ambessa_q1.png",
+      "icon_ambessa_w.png",
+      "icon_ambessa_e.png",
+      "icon_ambessa_r.png"
+    ]
+  },
+  "amumu": {
+    "passive": "amumu_passive.png",
+    "spells": [
+      "amumu_q.png",
+      "amumu_w.png",
+      "amumu_e.png",
+      "amumu_r.png"
+    ]
+  },
+  "anivia": {
+    "passive": "anivia_p.png",
+    "spells": [
+      "anivia_q.png",
+      "anivia_w.png",
+      "anivia_e.png",
+      "anivia_r.png"
+    ]
+  },
+  "annie": {
+    "passive": "annie_passive.png",
+    "spells": [
+      "annie_q.png",
+      "annie_w.png",
+      "annie_e.png",
+      "annie_r1.png"
+    ]
+  },
+  "aphelios": {
+    "passive": "apheliosp.png",
+    "spells": [
+      "apheliosq.png",
+      "apheliosw.png",
+      "calibrum_l.png",
+      "apheliosr.png"
+    ]
+  },
+  "ashe": {
+    "passive": "ashe_p.png",
+    "spells": [
+      "ashe_q.png",
+      "ashe_w.png",
+      "ashe_e.png",
+      "ashe_r.png"
+    ]
+  },
+  "aurelionsol": {
+    "passive": "aurelionsolp.png",
+    "spells": [
+      "aurelionsolq.png",
+      "aurelionsolw1.png",
+      "aurelionsole.png",
+      "aurelionsolr1.png"
+    ]
+  },
+  "aurora": {
+    "passive": "aurorapassive.png",
+    "spells": [
+      "auroraq.png",
+      "auroraw.png",
+      "aurorae.png",
+      "aurorar.png"
+    ]
+  },
+  "azir": {
+    "passive": "azir_passive.png",
+    "spells": [
+      "azir_q.png",
+      "azir_w.png",
+      "azir_e.png",
+      "azir_r.png"
+    ]
+  },
+  "bard": {
+    "passive": "bard_passive.png",
+    "spells": [
+      "bard_q.png",
+      "bard_w.png",
+      "bard_e.png",
+      "bard_r.png"
+    ]
+  },
+  "belveth": {
+    "passive": "belveth_passive.png",
+    "spells": [
+      "bv_q_1.png",
+      "belvethw.png",
+      "belvethe.png",
+      "belvethr.png"
+    ]
+  },
+  "blitzcrank": {
+    "passive": "blitzcrankp.png",
+    "spells": [
+      "blitzcrankq.png",
+      "blitzcrankw.png",
+      "blitzcranke.png",
+      "blitzcrankr.png"
+    ]
+  },
+  "brand": {
+    "passive": "brandp.png",
+    "spells": [
+      "brandq.png",
+      "brandw.png",
+      "brande.png",
+      "brandr.png"
+    ]
+  },
+  "braum": {
+    "passive": "braum_passive.png",
+    "spells": [
+      "braum_q.png",
+      "braum_w.png",
+      "braum_e.png",
+      "braum_r.png"
+    ]
+  },
+  "briar": {
+    "passive": "briarp.png",
+    "spells": [
+      "briarq.png",
+      "briarw.png",
+      "briare.png",
+      "briarr.png"
+    ]
+  },
+  "caitlyn": {
+    "passive": "caitlynp.png",
+    "spells": [
+      "caitlynq.png",
+      "caitlynw.png",
+      "caitlyne.png",
+      "caitlynr.png"
+    ]
+  },
+  "camille": {
+    "passive": "camille_passive.png",
+    "spells": [
+      "camille_q1.png",
+      "camille_w.png",
+      "camille_e.png",
+      "camille_r.png"
+    ]
+  },
+  "cassiopeia": {
+    "passive": "cassiopeia_passive.png",
+    "spells": [
+      "cassiopeia_q.png",
+      "cassiopeia_w.png",
+      "cassiopeia_e.png",
+      "cassiopeia_r.png"
+    ]
+  },
+  "chogath": {
+    "passive": "greenterror_chitinousexoplates.png",
+    "spells": [
+      "greenterror_spikeslam.png",
+      "greenterror_feralscream.png",
+      "greenterror_chitinousexoplates.png",
+      "greenterror_feast.png"
+    ]
+  },
+  "corki": {
+    "passive": "corki_gatlinggun.png",
+    "spells": [
+      "corki_phosphorusbomb.png",
+      "corki_valkyrie.png",
+      "corki_gatlinggun.png",
+      "corki_missilebarrage.png"
+    ]
+  },
+  "darius": {
+    "passive": "darius_icon_axe_grab.png",
+    "spells": [
+      "darius_icon_decimate.png",
+      "darius_icon_hamstring.png",
+      "darius_icon_axe_grab.png",
+      "darius_icon_sudden_death.png"
+    ]
+  },
+  "diana": {
+    "passive": "diana_passive_lunarblade.png",
+    "spells": [
+      "diana_q_moonsedge.png",
+      "diana_w_lunarshower.png",
+      "diana_e_fasterthanlight.png",
+      "diana_r_moonfall.png"
+    ]
+  },
+  "draven": {
+    "passive": "draven_passive.png",
+    "spells": [
+      "draven_spinningaxe.png",
+      "draven_bloodrage.png",
+      "draven_twinaxe.png",
+      "draven_whirlingdeath.png"
+    ]
+  },
+  "drmundo": {
+    "passive": "drmundo_p.png",
+    "spells": [
+      "drmundo_q.png",
+      "drmundo_w.png",
+      "drmundo_e.png",
+      "drmundo_r.png"
+    ]
+  },
+  "ekko": {
+    "passive": "ekko_p.png",
+    "spells": [
+      "ekko_q.png",
+      "ekko_w.png",
+      "ekko_e.png",
+      "ekko_r.png"
+    ]
+  },
+  "elise": {
+    "passive": "elisepassive.png",
+    "spells": [
+      "elisehumanq.png",
+      "elisehumanw.png",
+      "elisehumane.png",
+      "eliser.png"
+    ]
+  },
+  "evelynn": {
+    "passive": "evelynn_passive.png",
+    "spells": [
+      "evelynn_q1.png",
+      "evelynn_w.png",
+      "evelynn_e1.png",
+      "evelynn_r.png"
+    ]
+  },
+  "ezreal": {
+    "passive": "ezreal_passive.png",
+    "spells": [
+      "ezreal_q.png",
+      "ezreal_w.png",
+      "ezreal_e.png",
+      "ezreal_r.png"
+    ]
+  },
+  "fiddlesticks": {
+    "passive": "fiddlesticksp.png",
+    "spells": [
+      "fiddlesticksq.png",
+      "fiddlesticksw.png",
+      "fiddlestickse.png",
+      "fiddlesticksr.png"
+    ]
+  },
+  "fiora": {
+    "passive": "fiora_p.png",
+    "spells": [
+      "fiora_q.png",
+      "fiora_w.png",
+      "fiora_e.png",
+      "fiora_r.png"
+    ]
+  },
+  "fizz": {
+    "passive": "fizz_p.png",
+    "spells": [
+      "fizz_q.png",
+      "fizz_w.png",
+      "fizz_e1.png",
+      "fizz_r.png"
+    ]
+  },
+  "galio": {
+    "passive": "galio_passive.png",
+    "spells": [
+      "galio_q.png",
+      "galio_w.png",
+      "galio_e.png",
+      "galio_r.png"
+    ]
+  },
+  "gangplank": {
+    "passive": "gangplank_passive.png",
+    "spells": [
+      "gangplank_q.png",
+      "gangplank_w.png",
+      "gangplank_e.png",
+      "gangplank_r.png"
+    ]
+  },
+  "garen": {
+    "passive": "garen_passive.png",
+    "spells": [
+      "garen_q.png",
+      "garen_w.png",
+      "garen_e1.png",
+      "garen_r.png"
+    ]
+  },
+  "gnar": {
+    "passive": "gnar_passive.png",
+    "spells": [
+      "gnar_q.png",
+      "gnar_w.png",
+      "gnar_e.png",
+      "gnarbig_r.png"
+    ]
+  },
+  "gragas": {
+    "passive": "gragaspassiveheal.png",
+    "spells": [
+      "gragasbarrelroll.png",
+      "gragasdrunkenrage.png",
+      "gragasbodyslam.png",
+      "gragasexplosivecask.png"
+    ]
+  },
+  "graves": {
+    "passive": "gravesp.png",
+    "spells": [
+      "gravesq.png",
+      "gravesw.png",
+      "gravese.png",
+      "gravesr.png"
+    ]
+  },
+  "gwen": {
+    "passive": "gwen_passive.png",
+    "spells": [
+      "gwen_q.png",
+      "gwen_w.png",
+      "gwen_e.png",
+      "gwen_r.png"
+    ]
+  },
+  "hecarim": {
+    "passive": "hecarim_passive.png",
+    "spells": [
+      "hecarim_rampage.png",
+      "hecarim_spiritofdread.png",
+      "hecarim_devastingcharge.png",
+      "hecarim_onslaughtofshadows.png"
+    ]
+  },
+  "heimerdinger": {
+    "passive": "heimerdinger_passive.png",
+    "spells": [
+      "heimerdinger_q1.png",
+      "heimerdinger_w1.png",
+      "heimerdinger_e1.png",
+      "heimerdinger_r.png"
+    ]
+  },
+  "hwei": {
+    "passive": "hweipassive.png",
+    "spells": [
+      "hweiq.png",
+      "hweiw.png",
+      "hweie.png",
+      "hweir.png"
+    ]
+  },
+  "illaoi": {
+    "passive": "illaoi_p.png",
+    "spells": [
+      "illaoi_q.png",
+      "illaoi_w.png",
+      "illaoi_e.png",
+      "illaoi_r.png"
+    ]
+  },
+  "irelia": {
+    "passive": "irelia_passive.png",
+    "spells": [
+      "irelia_q.png",
+      "irelia_w.png",
+      "irelia_e.png",
+      "irelia_r.png"
+    ]
+  },
+  "ivern": {
+    "passive": "ivernp.png",
+    "spells": [
+      "ivernq.png",
+      "ivernw.png",
+      "iverne.png",
+      "ivernr.png"
+    ]
+  },
+  "janna": {
+    "passive": "jannap.png",
+    "spells": [
+      "jannaq.png",
+      "jannaw.png",
+      "jannae.png",
+      "jannar.png"
+    ]
+  },
+  "jarvaniv": {
+    "passive": "jarvanivp.png",
+    "spells": [
+      "jarvanivq.png",
+      "jarvanivw.png",
+      "jarvanive.png",
+      "jarvanivr.png"
+    ]
+  },
+  "jax": {
+    "passive": "jaxp.png",
+    "spells": [
+      "jaxq.png",
+      "jaxw.png",
+      "jaxe.png",
+      "jaxr.png"
+    ]
+  },
+  "jayce": {
+    "passive": "jaycee_melee.png",
+    "spells": [
+      "jayceq_melee.png",
+      "jaycew_melee.png",
+      "jaycee_melee.png",
+      "jaycer_ranged.png"
+    ]
+  },
+  "jhin": {
+    "passive": "jhin_p.png",
+    "spells": [
+      "jhin_q.png",
+      "jhin_w.png",
+      "jhin_e.png",
+      "jhin_r.png"
+    ]
+  },
+  "jinx": {
+    "passive": "jinx_passive.png",
+    "spells": [
+      "jinx_q1.png",
+      "jinx_w.png",
+      "jinx_e.png",
+      "jinx_r.png"
+    ]
+  },
+  "kaisa": {
+    "passive": "kaisa_passive.png",
+    "spells": [
+      "kaisa_q.png",
+      "kaisa_w.png",
+      "kaisa_e.png",
+      "kaisa_r.png"
+    ]
+  },
+  "kalista": {
+    "passive": "kalista_passive.png",
+    "spells": [
+      "kalista_q.png",
+      "kalista_w.png",
+      "kalista_e.png",
+      "kalista_r.png"
+    ]
+  },
+  "karma": {
+    "passive": "karma_passive.png",
+    "spells": [
+      "karma_q1.png",
+      "karma_w1.png",
+      "karma_e1.png",
+      "karma_r.png"
+    ]
+  },
+  "karthus": {
+    "passive": "karthus_passive.png",
+    "spells": [
+      "karthus_q.png",
+      "karthus_w.png",
+      "karthus_e.png",
+      "karthus_r.png"
+    ]
+  },
+  "kassadin": {
+    "passive": "kassadin_passive.png",
+    "spells": [
+      "kassadin_q.png",
+      "kassadin_w.png",
+      "kassadin_e.png",
+      "kassadin_r.png"
+    ]
+  },
+  "katarina": {
+    "passive": "katarina_passive.png",
+    "spells": [
+      "katarina_q.png",
+      "katarina_w.png",
+      "katarina_e.png",
+      "katarina_r.png"
+    ]
+  },
+  "kayle": {
+    "passive": "kayle_p.png",
+    "spells": [
+      "kayle_q.png",
+      "kayle_w.png",
+      "kayle_e.png",
+      "kayle_r.png"
+    ]
+  },
+  "kayn": {
+    "passive": "kayn_passive_primary.png",
+    "spells": [
+      "kayn_q_primary.png",
+      "kayn_w_primary.png",
+      "kayn_e_primary.png",
+      "kayn_r1_primary.png"
+    ]
+  },
+  "kennen": {
+    "passive": "kennen_passive.png",
+    "spells": [
+      "kennen_q.png",
+      "kennen_w.png",
+      "kennen_e.png",
+      "kennen_r.png"
+    ]
+  },
+  "khazix": {
+    "passive": "khazix_p.png",
+    "spells": [
+      "khazix_q.png",
+      "khazix_w.png",
+      "khazix_e.png",
+      "khazix_r.png"
+    ]
+  },
+  "kindred": {
+    "passive": "kindred_passive.png",
+    "spells": [
+      "kindred_q.png",
+      "kindred_w.png",
+      "kindred_e.png",
+      "kindred_r.png"
+    ]
+  },
+  "kled": {
+    "passive": "kled_p.png",
+    "spells": [
+      "kled_q1.png",
+      "kled_w.png",
+      "kled_e1.png",
+      "kled_r.png"
+    ]
+  },
+  "kogmaw": {
+    "passive": "kogmaw_bioarcanebarrage.png",
+    "spells": [
+      "kogmaw_causticspittle.png",
+      "kogmaw_bioarcanebarrage.png",
+      "kogmaw_voidooze.png",
+      "kogmaw_livingartillery.png"
+    ]
+  },
+  "ksante": {
+    "passive": "icons_ksante_p.png",
+    "spells": [
+      "icons_ksante_q1.png",
+      "icons_ksante_w.png",
+      "icons_ksante_e.png",
+      "icons_ksante_r1.png"
+    ]
+  },
+  "leblanc": {
+    "passive": "leblancp.png",
+    "spells": [
+      "leblancq.png",
+      "leblancw.png",
+      "leblance.png",
+      "leblancr.png"
+    ]
+  },
+  "leesin": {
+    "passive": "leesinp.png",
+    "spells": [
+      "leesinq1.png",
+      "leesinw1.png",
+      "leesine1.png",
+      "leesinr.png"
+    ]
+  },
+  "leona": {
+    "passive": "leonap.png",
+    "spells": [
+      "leonaq.png",
+      "leonaw.png",
+      "leonae.png",
+      "leonar.png"
+    ]
+  },
+  "lillia": {
+    "passive": "lillia_icon_passive.png",
+    "spells": [
+      "lillia_icon_q.png",
+      "lillia_icon_w.png",
+      "lillia_icon_e.png",
+      "lillia_icon_r.png"
+    ]
+  },
+  "lissandra": {
+    "passive": "lissandra_passive.png",
+    "spells": [
+      "lissandra_q.png",
+      "lissandra_w.png",
+      "lissandra_e.png",
+      "lissandra_r.png"
+    ]
+  },
+  "locke": {
+    "passive": "locke_passive.locke.png",
+    "spells": [
+      "locke_q.locke.png",
+      "locke_w.locke.png",
+      "locke_e.locke.png",
+      "locke_r.locke.png"
+    ]
+  },
+  "lucian": {
+    "passive": "lucian_passive.png",
+    "spells": [
+      "lucian_q.png",
+      "lucian_w.png",
+      "lucian_e.png",
+      "lucian_r.png"
+    ]
+  },
+  "lulu": {
+    "passive": "lulu_commandpix.png",
+    "spells": [
+      "lulu_glitterbolt.png",
+      "lulu_whimsy.png",
+      "lulu_commandpix.png",
+      "lulu_giantgrowth.png"
+    ]
+  },
+  "lux": {
+    "passive": "luxprismawrap.png",
+    "spells": [
+      "luxcrashingblitz2.png",
+      "luxprismawrap.png",
+      "luxlightstrikekugel.png",
+      "luxfinalefunkeln.png"
+    ]
+  },
+  "malphite": {
+    "passive": "malphite_passive.png",
+    "spells": [
+      "malphite_q.png",
+      "malphite_w.png",
+      "malphite_e.png",
+      "malphite_r.png"
+    ]
+  },
+  "malzahar": {
+    "passive": "malzahar_passive.png",
+    "spells": [
+      "malzahar_q.png",
+      "malzahar_w.png",
+      "malzahar_e.png",
+      "malzahar_r.png"
+    ]
+  },
+  "maokai": {
+    "passive": "maokai_passive.png",
+    "spells": [
+      "maokai_q.png",
+      "maokai_w.png",
+      "maokai_e.png",
+      "maokai_r.png"
+    ]
+  },
+  "masteryi": {
+    "passive": "masteryi_passive1.png",
+    "spells": [
+      "masteryi_q.png",
+      "masteryi_w.png",
+      "masteryi_e1.png",
+      "masteryi_r.png"
+    ]
+  },
+  "mel": {
+    "passive": "mel_passive.png",
+    "spells": [
+      "mel_q.png",
+      "mel_w.png",
+      "mel_e.png",
+      "mel_r.png"
+    ]
+  },
+  "milio": {
+    "passive": "milio_p.png",
+    "spells": [
+      "milio_q.png",
+      "milio_w.png",
+      "milio_e.png",
+      "milio_r.png"
+    ]
+  },
+  "missfortune": {
+    "passive": "missfortune_passive.png",
+    "spells": [
+      "missfortune_q.png",
+      "missfortune_passive.png",
+      "missfortune_e.png",
+      "missfortune_r.png"
+    ]
+  },
+  "monkeyking": {
+    "passive": "monkeykingcrushingblow.png",
+    "spells": [
+      "monkeykingcrushingblow.png",
+      "monkeykingdecoy.png",
+      "monkeykingnimbusstrike.png",
+      "monkeykingcyclone.png"
+    ]
+  },
+  "mordekaiser": {
+    "passive": "mordekaiserpassive.png",
+    "spells": [
+      "mordekaiserq.png",
+      "mordekaiserw.png",
+      "mordekaisere.png",
+      "mordekaiserr.png"
+    ]
+  },
+  "morgana": {
+    "passive": "fallenangel_blackshield.png",
+    "spells": [
+      "fallenangel_darkbinding.png",
+      "fallenangel_tormentedsoil.png",
+      "fallenangel_blackshield.png",
+      "fallenangel_purgatory.png"
+    ]
+  },
+  "naafiri": {
+    "passive": "icons_naafiri_p.png",
+    "spells": [
+      "icons_naafiri_q.png",
+      "icons_naafiri_r.png",
+      "icons_naafiri_e.png",
+      "icons_naafiri_w.png"
+    ]
+  },
+  "nami": {
+    "passive": "namipassive.png",
+    "spells": [
+      "namiq.png",
+      "namiw.png",
+      "namie.png",
+      "namir.png"
+    ]
+  },
+  "nasus": {
+    "passive": "nasus_passive.png",
+    "spells": [
+      "nasus_q.png",
+      "nasus_w.png",
+      "nasus_e.png",
+      "nasus_r.png"
+    ]
+  },
+  "nautilus": {
+    "passive": "nautilus_anchorchain.png",
+    "spells": [
+      "nautilus_anchorchain.png",
+      "nautilus_wrath.png",
+      "nautilus_rippleeffect.png",
+      "nautilus_grandline.png"
+    ]
+  },
+  "neeko": {
+    "passive": "neeko_p.png",
+    "spells": [
+      "neeko_q.png",
+      "neeko_w.png",
+      "neeko_e.png",
+      "neeko_r.png"
+    ]
+  },
+  "nidalee": {
+    "passive": "nidalee_passive.png",
+    "spells": [
+      "nidalee_q1.png",
+      "nidalee_w1.png",
+      "nidalee_e1.png",
+      "nidalee_r1.png"
+    ]
+  },
+  "nilah": {
+    "passive": "nilahp.png",
+    "spells": [
+      "nilahq.png",
+      "nilahw.png",
+      "nilahe.png",
+      "nilahr.png"
+    ]
+  },
+  "nocturne": {
+    "passive": "nocturne_duskbringer.png",
+    "spells": [
+      "nocturne_duskbringer.png",
+      "nocturne_shroudofdarkness.png",
+      "nocturne_unspeakablehorror.png",
+      "nocturne_paranoia.png"
+    ]
+  },
+  "nunu": {
+    "passive": "nunupassive.png",
+    "spells": [
+      "nunuq.png",
+      "nunuw1.png",
+      "nunue.png",
+      "nunu_r.png"
+    ]
+  },
+  "olaf": {
+    "passive": "olafp.png",
+    "spells": [
+      "olafq.png",
+      "olafw.png",
+      "olafe.png",
+      "olafr.png"
+    ]
+  },
+  "orianna": {
+    "passive": "oriannap.png",
+    "spells": [
+      "oriannaq.png",
+      "oriannaw.png",
+      "oriannae.png",
+      "oriannar.png"
+    ]
+  },
+  "ornn": {
+    "passive": "ornnp.png",
+    "spells": [
+      "ornnq.png",
+      "ornnw.png",
+      "ornne.png",
+      "ornnr1.png"
+    ]
+  },
+  "pantheon": {
+    "passive": "pantheon_passive.png",
+    "spells": [
+      "pantheon_q1.png",
+      "pantheon_w1.png",
+      "pantheon_e1.png",
+      "pantheon_r.png"
+    ]
+  },
+  "poppy": {
+    "passive": "poppy_passive.png",
+    "spells": [
+      "poppy_q.png",
+      "poppy_w.png",
+      "poppy_e.png",
+      "poppy_r.png"
+    ]
+  },
+  "pyke": {
+    "passive": "pykepassive.png",
+    "spells": [
+      "pykeq.png",
+      "pykew.png",
+      "pykee.png",
+      "pyker.png"
+    ]
+  },
+  "qiyana": {
+    "passive": "qiyana_passive.png",
+    "spells": [
+      "qiyana_q2_red.png",
+      "qiyana_w.png",
+      "qiyana_e.png",
+      "qiyana_r.png"
+    ]
+  },
+  "quinn": {
+    "passive": "quinn_passive.png",
+    "spells": [
+      "quinn_q.png",
+      "quinn_w.png",
+      "quinn_e.png",
+      "quinn_r1.png"
+    ]
+  },
+  "rakan": {
+    "passive": "rakan_p.png",
+    "spells": [
+      "rakan_q.png",
+      "rakan_w.png",
+      "rakan_e.png",
+      "rakan_r.png"
+    ]
+  },
+  "rammus": {
+    "passive": "armordillo_powerball.png",
+    "spells": [
+      "armordillo_powerball.png",
+      "armordillo_shellbash.png",
+      "armordillo_scaledplating.png",
+      "armordillo_recklesscharge.png"
+    ]
+  },
+  "reksai": {
+    "passive": "reksai_passive.png",
+    "spells": [
+      "reksai_q1.png",
+      "reksai_w1.png",
+      "reksai_e1.png",
+      "reksai_r.png"
+    ]
+  },
+  "rell": {
+    "passive": "rellp.png",
+    "spells": [
+      "rellq.png",
+      "rellw.png",
+      "relle.png",
+      "rellr.png"
+    ]
+  },
+  "renata": {
+    "passive": "renata_p.png",
+    "spells": [
+      "renata_q.png",
+      "renata_w.png",
+      "renata_e.png",
+      "renata_r.png"
+    ]
+  },
+  "renekton": {
+    "passive": "renekton_passive.png",
+    "spells": [
+      "renekton_q.png",
+      "renekton_w.png",
+      "renekton_e.png",
+      "renekton_r.png"
+    ]
+  },
+  "rengar": {
+    "passive": "rengar_p.png",
+    "spells": [
+      "rengarq.png",
+      "rengar_w.png",
+      "rengar_e.png",
+      "rengar_r.png"
+    ]
+  },
+  "riven": {
+    "passive": "rivenbladeoftheexile.png",
+    "spells": [
+      "rivenbrokenwings.png",
+      "rivenkishout.png",
+      "rivenpathoftheexile.png",
+      "rivenbladeoftheexile.png"
+    ]
+  },
+  "rumble": {
+    "passive": "rumble_electroharpoon.png",
+    "spells": [
+      "rumble_flamespitter.png",
+      "rumble_scrapshield.png",
+      "rumble_electroharpoon.png",
+      "rumble_r.png"
+    ]
+  },
+  "ryze": {
+    "passive": "ryze_p.png",
+    "spells": [
+      "ryze_q.png",
+      "ryze_w.png",
+      "ryze_e.png",
+      "ryze_r.png"
+    ]
+  },
+  "samira": {
+    "passive": "samirap.png",
+    "spells": [
+      "samiraq.png",
+      "samiraw.png",
+      "samirae.png",
+      "samirar1.png"
+    ]
+  },
+  "sejuani": {
+    "passive": "sejuani_passive.png",
+    "spells": [
+      "sejuani_q.png",
+      "sejuani_w.png",
+      "sejuani_e.png",
+      "sejuani_r.png"
+    ]
+  },
+  "senna": {
+    "passive": "senna_passive.png",
+    "spells": [
+      "senna_q.png",
+      "senna_w.png",
+      "senna_e.png",
+      "senna_r.png"
+    ]
+  },
+  "seraphine": {
+    "passive": "seraphine_passive.png",
+    "spells": [
+      "seraphine_q1.png",
+      "seraphine_w1.png",
+      "seraphine_e1.png",
+      "seraphine_r.png"
+    ]
+  },
+  "sett": {
+    "passive": "sett_p.png",
+    "spells": [
+      "sett_q.png",
+      "sett_w.png",
+      "sett_e.png",
+      "sett_r.png"
+    ]
+  },
+  "shaco": {
+    "passive": "jester_carefulstrikes.png",
+    "spells": [
+      "jester_maniacalcloak2.png",
+      "jester_deathward.png",
+      "jester_incrediblyprecise.png",
+      "jester_hallucinogenbomb.png"
+    ]
+  },
+  "shen": {
+    "passive": "shen_passive.png",
+    "spells": [
+      "shen_q.png",
+      "shen_w.png",
+      "shen_e.png",
+      "shen_r.png"
+    ]
+  },
+  "shyvana": {
+    "passive": "shyvana_passive.shyvana_rework.png",
+    "spells": [
+      "shyvana_q1.shyvana_rework.png",
+      "shyvana_w1.shyvana_rework.png",
+      "shyvana_e.shyvana_rework.png",
+      "shyvana_r.shyvana_rework.png"
+    ]
+  },
+  "singed": {
+    "passive": "singed_passive.png",
+    "spells": [
+      "singed_q.png",
+      "singed_w.png",
+      "singed_e.png",
+      "singed_r.png"
+    ]
+  },
+  "sion": {
+    "passive": "sion_passive1.png",
+    "spells": [
+      "sion_q.png",
+      "sion_w1.png",
+      "sion_e.png",
+      "sion_r1.png"
+    ]
+  },
+  "sivir": {
+    "passive": "sivir_passive.png",
+    "spells": [
+      "sivir_q.png",
+      "sivir_w.png",
+      "sivir_e.png",
+      "sivir_r.png"
+    ]
+  },
+  "skarner": {
+    "passive": "skarner_passive.png",
+    "spells": [
+      "skarner_q.png",
+      "skarner_w.png",
+      "skarner_e.png",
+      "skarner_r.png"
+    ]
+  },
+  "smolder": {
+    "passive": "icons_smolder_passive.png",
+    "spells": [
+      "icons_smolder_q1.png",
+      "icons_smolder_w.png",
+      "icons_smolder_e.png",
+      "icons_smolder_r.png"
+    ]
+  },
+  "sona": {
+    "passive": "sona_passive_charged.png",
+    "spells": [
+      "sona_q.png",
+      "sona_w.png",
+      "sona_e.png",
+      "sona_r.png"
+    ]
+  },
+  "soraka": {
+    "passive": "soraka_passive.png",
+    "spells": [
+      "soraka_q.png",
+      "soraka_w.png",
+      "soraka_e.png",
+      "soraka_r.png"
+    ]
+  },
+  "swain": {
+    "passive": "swain_p.png",
+    "spells": [
+      "swain_q.png",
+      "swain_w.png",
+      "swain_e.png",
+      "swain_r.png"
+    ]
+  },
+  "sylas": {
+    "passive": "sylasp.png",
+    "spells": [
+      "sylasq.png",
+      "sylasw.png",
+      "sylase.png",
+      "sylasr.png"
+    ]
+  },
+  "syndra": {
+    "passive": "syndra_p1.png",
+    "spells": [
+      "syndra_q1.png",
+      "syndra_w1.png",
+      "syndra_e1.png",
+      "syndra_r1.png"
+    ]
+  },
+  "tahmkench": {
+    "passive": "tahmkenchp.png",
+    "spells": [
+      "tahmkenchq.png",
+      "tahmkenchw.png",
+      "tahmkenche.png",
+      "tahmkenchrwrapper.png"
+    ]
+  },
+  "taliyah": {
+    "passive": "taliyah_passive.png",
+    "spells": [
+      "taliyah_q.png",
+      "taliyah_w.png",
+      "taliyah_e.png",
+      "taliyah_r.png"
+    ]
+  },
+  "talon": {
+    "passive": "talonp.png",
+    "spells": [
+      "talonq.png",
+      "talonw.png",
+      "talone.png",
+      "talonr.png"
+    ]
+  },
+  "taric": {
+    "passive": "taric_passive.png",
+    "spells": [
+      "taric_q.png",
+      "taric_w.png",
+      "taric_e.png",
+      "taric_r.png"
+    ]
+  },
+  "teemo": {
+    "passive": "teemopassive.png",
+    "spells": [
+      "teemoq.png",
+      "teemow.png",
+      "teemoe.png",
+      "teemor.png"
+    ]
+  },
+  "thresh": {
+    "passive": "thresh_passive.png",
+    "spells": [
+      "thresh_q.png",
+      "thresh_w.png",
+      "thresh_e.png",
+      "thresh_r.png"
+    ]
+  },
+  "tristana": {
+    "passive": "tristana_passive.png",
+    "spells": [
+      "tristana_q.png",
+      "tristana_w.png",
+      "tristana_e.png",
+      "tristana_r.png"
+    ]
+  },
+  "trundle": {
+    "passive": "trundle_passive.png",
+    "spells": [
+      "trundle_q.png",
+      "trundle_w.png",
+      "trundle_e.png",
+      "trundle_r.png"
+    ]
+  },
+  "tryndamere": {
+    "passive": "tryndamere_passive.png",
+    "spells": [
+      "tryndamere_q.png",
+      "tryndamere_w.png",
+      "tryndamere_e.png",
+      "tryndamere_r.png"
+    ]
+  },
+  "twistedfate": {
+    "passive": "destiny_temp.png",
+    "spells": [
+      "cardmaster_powercard.png",
+      "cardmaster_fatesgambit.png",
+      "cardmaster_rapidtoss.png",
+      "destiny_temp.png"
+    ]
+  },
+  "twitch": {
+    "passive": "twitch_passive.png",
+    "spells": [
+      "twitch_q.png",
+      "twitch_w.png",
+      "twitch_e.png",
+      "twitch_r.png"
+    ]
+  },
+  "udyr": {
+    "passive": "udyr_p.png",
+    "spells": [
+      "udyr_q.png",
+      "udyr_w.png",
+      "udyr_e.png",
+      "udyr_r.png"
+    ]
+  },
+  "urgot": {
+    "passive": "urgot_passive.png",
+    "spells": [
+      "urgot_q.png",
+      "urgot_w.png",
+      "urgot_e.png",
+      "urgot_r.png"
+    ]
+  },
+  "varus": {
+    "passive": "varuspassive.png",
+    "spells": [
+      "varusq.png",
+      "varusw.png",
+      "varuse.png",
+      "varusr.png"
+    ]
+  },
+  "vayne": {
+    "passive": "vayne_p.png",
+    "spells": [
+      "vayne_q.png",
+      "vayne_w.png",
+      "vayne_e.png",
+      "vayne_r.png"
+    ]
+  },
+  "veigar": {
+    "passive": "veigarbalefulstrike.png",
+    "spells": [
+      "veigarbalefulstrike.png",
+      "veigardarkmatter.png",
+      "veigareventhorizon.png",
+      "veigarprimordialburst.png"
+    ]
+  },
+  "velkoz": {
+    "passive": "velkoz_passive.png",
+    "spells": [
+      "velkoz_q1.png",
+      "velkoz_w.png",
+      "velkoz_e.png",
+      "velkoz_r.png"
+    ]
+  },
+  "vex": {
+    "passive": "icons_vex_passive.png",
+    "spells": [
+      "icons_vex_q01.png",
+      "icons_vex_w01.png",
+      "icons_vex_e01.png",
+      "icons_vex_r01.png"
+    ]
+  },
+  "vi": {
+    "passive": "vipassive.png",
+    "spells": [
+      "viq.png",
+      "viw.png",
+      "vie.png",
+      "vir.png"
+    ]
+  },
+  "viego": {
+    "passive": "viego_passive.png",
+    "spells": [
+      "viego_q.png",
+      "viego_w.png",
+      "viego_e.png",
+      "viego_r.png"
+    ]
+  },
+  "viktor": {
+    "passive": "viktor_passive.png",
+    "spells": [
+      "viktor_q1.png",
+      "viktor_w1.png",
+      "viktor_e1.png",
+      "viktor_r1.png"
+    ]
+  },
+  "vladimir": {
+    "passive": "vladimirp.png",
+    "spells": [
+      "vladimirq.png",
+      "vladimirw.png",
+      "vladimire.png",
+      "vladimirr.png"
+    ]
+  },
+  "volibear": {
+    "passive": "volibear_icon_p.png",
+    "spells": [
+      "volibear_icon_q.png",
+      "volibear_icon_w.png",
+      "volibear_icon_e.png",
+      "volibear_icon_r.png"
+    ]
+  },
+  "warwick": {
+    "passive": "warwickp.png",
+    "spells": [
+      "warwickq.png",
+      "warwickw.png",
+      "warwicke.png",
+      "warwickr.png"
+    ]
+  },
+  "xayah": {
+    "passive": "xayahpassive.png",
+    "spells": [
+      "xayahq.png",
+      "xayahw.png",
+      "xayahe.png",
+      "xayahr.png"
+    ]
+  },
+  "xerath": {
+    "passive": "xerath_passive1.png",
+    "spells": [
+      "xerath_q1.png",
+      "xerath_w1.png",
+      "xerath_e1.png",
+      "xerath_r1.png"
+    ]
+  },
+  "xinzhao": {
+    "passive": "xinzhaoreworkp.png",
+    "spells": [
+      "xinzhaoreworkq.png",
+      "xinzhaoreworkw.png",
+      "xinzhaoreworke.png",
+      "xinzhaoreworkr.png"
+    ]
+  },
+  "yasuo": {
+    "passive": "yasuo_passive.png",
+    "spells": [
+      "yasuo_q1.png",
+      "yasuo_w.png",
+      "yasuo_e.png",
+      "yasuo_r.png"
+    ]
+  },
+  "yone": {
+    "passive": "yonepassive.png",
+    "spells": [
+      "yoneq.png",
+      "yonew.png",
+      "yonee.png",
+      "yoner.png"
+    ]
+  },
+  "yorick": {
+    "passive": "yorick_p.png",
+    "spells": [
+      "yorick_q.png",
+      "yorick_w.png",
+      "yorick_e.png",
+      "yorick_r.png"
+    ]
+  },
+  "yunara": {
+    "passive": "yunara_passive.png",
+    "spells": [
+      "yunara_q.png",
+      "yunara_w.png",
+      "yunara_e.png",
+      "yunara_r.png"
+    ]
+  },
+  "yuumi": {
+    "passive": "yuumip.png",
+    "spells": [
+      "yuumiq.png",
+      "yuumiw.png",
+      "yuumip.png",
+      "yuumir.png"
+    ]
+  },
+  "zaahen": {
+    "passive": "zaahenp.png",
+    "spells": [
+      "zaahenq.png",
+      "zaahenw.png",
+      "zaahene.png",
+      "zaahenr.png"
+    ]
+  },
+  "zac": {
+    "passive": "zacpassive.png",
+    "spells": [
+      "zacq.png",
+      "zacw.png",
+      "zace.png",
+      "zacr.png"
+    ]
+  },
+  "zed": {
+    "passive": "zedp.png",
+    "spells": [
+      "zedq.png",
+      "zedw.png",
+      "zede.png",
+      "zedr.png"
+    ]
+  },
+  "zeri": {
+    "passive": "zeriqpassivecharged.png",
+    "spells": [
+      "zeriq.png",
+      "zeriw.png",
+      "zerie.png",
+      "zerir.png"
+    ]
+  },
+  "ziggs": {
+    "passive": "ziggspassiveready.png",
+    "spells": [
+      "ziggsq.png",
+      "ziggsw.png",
+      "ziggse.png",
+      "ziggsr.png"
+    ]
+  },
+  "zilean": {
+    "passive": "zilean_passive.png",
+    "spells": [
+      "zilean_q.png",
+      "zilean_w.png",
+      "zilean_e.png",
+      "zilean_r.png"
+    ]
+  },
+  "zoe": {
+    "passive": "zoe_p.png",
+    "spells": [
+      "zoe_q.png",
+      "zoe_w.png",
+      "zoe_e.png",
+      "zoe_r.png"
+    ]
+  },
+  "zyra": {
+    "passive": "zyrap.png",
+    "spells": [
+      "zyraq.png",
+      "zyraw.png",
+      "zyrae.png",
+      "zyrar.png"
+    ]
+  }
+}
