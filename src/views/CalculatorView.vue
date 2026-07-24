@@ -55,7 +55,7 @@
             :key="s.id"
             @click="toggleAttackerSlot(s.id)"
             class="flex items-center gap-2 px-4 py-2 rounded-lg border font-mono text-base cursor-pointer transition-all"
-            :class="selectedAttackerSlotIds.includes(s.id) ? 'bg-cyan-950/80 text-cyan-300 border-cyan-500/80 font-bold shadow' : 'bg-slate-900 text-slate-400 border-slate-850 hover:border-slate-700'"
+            :class="selectedAttackerSlotIds.includes(s.id) ? 'bg-cyan-950/80 text-cyan-300 border-cyan-500/80 font-bold shadow' : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'"
           >
             <span class="h-2.5 w-2.5 rounded-full" :class="selectedAttackerSlotIds.includes(s.id) ? 'bg-cyan-400' : 'bg-slate-600'"></span>
             <span>{{ s.role }}</span>
@@ -80,7 +80,7 @@
             :key="s.id"
             @click="toggleDefenderSlot(s.id)"
             class="flex items-center gap-2 px-4 py-2 rounded-lg border font-mono text-base cursor-pointer transition-all"
-            :class="selectedDefenderSlotIds.includes(s.id) ? 'bg-rose-950/80 text-rose-300 border-rose-500/80 font-bold shadow' : 'bg-slate-900 text-slate-400 border-slate-850 hover:border-slate-700'"
+            :class="selectedDefenderSlotIds.includes(s.id) ? 'bg-rose-950/80 text-rose-300 border-rose-500/80 font-bold shadow' : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'"
           >
             <span class="h-2.5 w-2.5 rounded-full" :class="selectedDefenderSlotIds.includes(s.id) ? 'bg-rose-400' : 'bg-slate-600'"></span>
             <span>{{ s.role }}</span>
@@ -200,7 +200,7 @@
           </div>
 
           <!-- Stats Grid -->
-          <div v-if="getCalculatedStatsForSlot(slot)" class="grid grid-cols-3 gap-2 text-base font-mono bg-slate-950 p-3 rounded-lg border border-slate-850">
+          <div v-if="getCalculatedStatsForSlot(slot)" class="grid grid-cols-3 gap-2 text-base font-mono bg-slate-950 p-3 rounded-lg border border-slate-800">
             <div><span class="text-slate-500 block text-base">AD</span><span class="text-orange-400 font-bold text-lg">{{ getCalculatedStatsForSlot(slot)?.ad }}</span></div>
             <div><span class="text-slate-500 block text-base">AP</span><span class="text-cyan-400 font-bold text-lg">{{ getCalculatedStatsForSlot(slot)?.ap }}</span></div>
             <div><span class="text-slate-500 block text-base">Crit</span><span class="text-amber-300 font-bold text-lg">{{ getCalculatedStatsForSlot(slot)?.crit }}%</span></div>
@@ -232,7 +232,7 @@
             <div 
               v-for="(step, idx) in teamfightSimulationResults.logSteps" 
               :key="idx" 
-              class="bg-slate-950/80 p-4 rounded-xl border border-slate-850 flex flex-col gap-3 transition-all hover:border-slate-700"
+              class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 flex flex-col gap-3 transition-all hover:border-slate-700"
             >
               <!-- Step Header -->
               <div class="flex items-center justify-between">
@@ -248,7 +248,7 @@
               </div>
 
               <!-- Target Damage Breakdown Pills -->
-              <div class="flex flex-col gap-2 bg-slate-900/60 p-3 rounded-lg border border-slate-850">
+              <div class="flex flex-col gap-2 bg-slate-900/60 p-3 rounded-lg border border-slate-800">
                 <div 
                   v-for="(res, tIdx) in step.targetResults" 
                   :key="tIdx"
@@ -304,7 +304,7 @@
           </div>
 
           <!-- Live HP Bar -->
-          <div class="flex flex-col gap-1.5 font-mono text-base bg-slate-950 p-3 rounded-lg border border-slate-850">
+          <div class="flex flex-col gap-1.5 font-mono text-base bg-slate-950 p-3 rounded-lg border border-slate-800">
             <div class="flex items-center justify-between font-bold">
               <span class="text-slate-400">Health</span>
               <span :class="getDefenderEndState(slot.id).isKo ? 'text-rose-500 font-extrabold' : 'text-emerald-400'">
@@ -322,7 +322,7 @@
           </div>
 
           <!-- Live Effective Armor & MR after Shred -->
-          <div class="grid grid-cols-2 gap-3 font-mono text-base bg-slate-950 p-3 rounded-lg border border-slate-850">
+          <div class="grid grid-cols-2 gap-3 font-mono text-base bg-slate-950 p-3 rounded-lg border border-slate-800">
             <div class="flex flex-col">
               <span class="text-slate-500">Armor (Shred)</span>
               <span class="text-amber-400 font-bold text-lg">
@@ -359,7 +359,7 @@
           <span class="text-base text-slate-400">Total Teamfight Damage Dealt: <strong class="text-amber-400 text-lg">{{ teamfightSimulationResults.totalTeamDamage }}</strong></span>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-          <div v-for="slot in selectedDefenderSlots" :key="slot.id" class="bg-slate-950 p-3 rounded-xl border border-slate-850 flex flex-col gap-2">
+          <div v-for="slot in selectedDefenderSlots" :key="slot.id" class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col gap-2">
             <div class="flex items-center justify-between">
               <span class="font-bold text-white text-base">{{ slot.champion?.name || slot.role }}</span>
               <span v-if="getDefenderEndState(slot.id).isKo" class="text-base text-rose-400 font-extrabold">K.O.</span>
@@ -405,7 +405,7 @@
           </div>
 
           <!-- Target Cards Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-850">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
             <div 
               v-for="(res, tIdx) in step.targetResults" 
               :key="tIdx"
