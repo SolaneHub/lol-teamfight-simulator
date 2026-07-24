@@ -563,6 +563,7 @@ const getCalculatedStatsForSlot = (slot: DraftSlot) => {
   return {
     ad: Math.round((base.ad.total + mStats.bonusAD) * mStats.adMultiplier),
     ap: Math.round((base.ap.total + mStats.bonusAP) * mStats.apMultiplier),
+    mana: base.mp.total,
     hp: base.hp.total + mStats.bonusShield,
     armor: Math.round(base.armor.total * mStats.armorMultiplier),
     mr: Math.round(base.mr.total * mStats.mrMultiplier),
@@ -638,6 +639,7 @@ const teamfightSimulationResults = computed(() => {
     const actorName = actorSlot.champion.name
     const action = actStep.action
 
+    const hasMuramana = actorSlot.items.some(i => i && (i.name.toLowerCase().includes("muramana") || i.id === '3004' || i.id === '3042')) || false
     const hasBlackCleaver = actorSlot.items.some(i => i && (i.name.toLowerCase().includes("black cleaver") || i.id === '3071')) || false
     const hasBloodletter = actorSlot.items.some(i => i && (i.name.toLowerCase().includes("bloodletter's curse") || i.id === '8010' || i.id === '4010')) || false
     const hasAbyssalMask = actorSlot.items.some(i => i && (i.name.toLowerCase().includes("abyssal mask") || i.id === '8020' || i.id === '3001')) || false
@@ -742,6 +744,41 @@ const teamfightSimulationResults = computed(() => {
           isKo: defState.isKo,
           remainingHp: defState.currentHp,
         })
+
+        // Muramana Shock Passive
+        if (hasMuramana && ['Q', 'W', 'E', 'R', 'AA'].includes(action) && !defState.isKo) {
+          const maxMana = att.mana || 0
+          let shockRawDmg = 0
+          if (action === 'AA') {
+            shockRawDmg = maxMana * 0.015
+          } else {
+            const isRanged = (actorSlot.champion?.stats?.attackrange || 125) > 300
+            const manaPct = isRanged ? 0.027 : 0.035
+            shockRawDmg = maxMana * manaPct + att.ad * 0.06
+          }
+
+          const shockFinalDmg = Math.round(shockRawDmg * physMult)
+          if (shockFinalDmg > 0) {
+            defState.currentHp = Math.max(0, defState.currentHp - shockFinalDmg)
+            if (defState.currentHp === 0) defState.isKo = true
+
+            stepTotalDmg += shockFinalDmg
+            totalTeamDamage += shockFinalDmg
+
+            targetResults.push({
+              targetSlotId: targetId,
+              targetName: isEcho ? `${defState.name} (Echo + Muramana)` : `${defState.name} (Muramana)`,
+              amount: shockFinalDmg,
+              type: 'physical',
+              effectiveArmor: Math.round(effArmor),
+              effectiveMr: Math.round(effMr),
+              blackCleaverStacks: defState.blackCleaverStacks,
+              vileDecayStacks: defState.vileDecayStacks,
+              isKo: defState.isKo,
+              remainingHp: defState.currentHp,
+            })
+          }
+        }
       })
     }
 
