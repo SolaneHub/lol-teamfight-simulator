@@ -1561,21 +1561,21 @@
     "AuraofDespair": {
       "basedamage": {
         "base": [
-          10
+          5
         ],
-        "type": "status"
+        "type": "magic"
       },
       "totalhealthdamage": {
         "base": [
-          1,
-          1.25,
-          1.5,
-          1.75,
-          2
+          0.5,
+          0.625,
+          0.75,
+          0.875,
+          1
         ],
         "scalings": [
           {
-            "ratio": 0,
+            "ratio": 0.0025,
             "stat": "totalAp"
           }
         ],

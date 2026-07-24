@@ -175,7 +175,8 @@ export const championSplashPositions: Record<string, string> = {
 export const getChampionSplashUrl = (champId: string): string => {
   if (!champId) return ''
   const folder = champId.toLowerCase()
-  return `/out/champions/${folder}/assets/${folder}_splash_centered_0.jpg`
+  const fileName = folder === 'xinzhao' ? 'xinzhaorework' : folder
+  return `/out/champions/${folder}/assets/${fileName}_splash_centered_0.jpg`
 }
 
 export const getChampionIconUrl = (champ: any): string => {
@@ -290,7 +291,7 @@ export const formatTooltipTags = (text: string): string => {
     .replace(/<\/gold>/gi, '</span>')
     .replace(/<rules>/gi, '<span class="block mt-2 text-slate-400 text-xs italic font-mono border-t border-slate-800/80 pt-1.5">')
     .replace(/<\/rules>/gi, '</span>')
-    .replace(/<i>/gi, '<span class="block mt-2 text-amber-300/80 text-xs italic font-mono">')
+    .replace(/<i>/gi, '<span class="text-amber-300/80 italic">')
     .replace(/<\/i>/gi, '</span>')
     .replace(/<\/?(pathBonus|pathResolve|pathSorcery|pathPrecision|pathDomination|pathInspiration)>/gi, '')
     // Damage & Stat tags

@@ -58,12 +58,21 @@
               <input type="range" min="1" :max="activeCustomizerSlot.role === 'Top' ? 20 : 18"
                 v-model.number="activeCustomizerSlot.level"
                 class="w-full h-1.5 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-cyan-500 focus:outline-none" />
-              <div class="flex justify-between text-base text-slate-500 font-mono px-0.5">
-                <span>1</span>
-                <span>6</span>
-                <span>11</span>
-                <span>16</span>
-                <span>{{ activeCustomizerSlot.role === 'Top' ? 20 : 18 }}</span>
+              <div class="relative w-full h-5 text-base text-slate-500 font-mono mt-1">
+                <span
+                  v-for="val in [1, 6, 11, 16, activeCustomizerSlot.role === 'Top' ? 20 : 18]"
+                  :key="val"
+                  class="absolute top-0"
+                  :style="
+                    val === 1
+                      ? { left: '0%' }
+                      : val === (activeCustomizerSlot.role === 'Top' ? 20 : 18)
+                      ? { right: '0%' }
+                      : { left: `${((val - 1) / ((activeCustomizerSlot.role === 'Top' ? 20 : 18) - 1)) * 100}%`, transform: 'translateX(-50%)' }
+                  "
+                >
+                  {{ val }}
+                </span>
               </div>
             </div>
 
@@ -121,8 +130,8 @@
 
           <!-- Items Workbench Grid -->
           <div class="flex flex-col gap-2">
-            <label class="text-base text-slate-400 uppercase tracking-widest font-mono font-bold">ITEM INVENTORY (6 SLOTS)</label>
-            <div class="grid grid-cols-6 gap-3">
+            <label class="text-base text-slate-400 uppercase tracking-widest font-mono font-bold">ITEM INVENTORY ({{ activeCustomizerSlot.items.length }} SLOTS)</label>
+            <div :class="['grid gap-3', activeCustomizerSlot.items.length === 7 ? 'grid-cols-7' : 'grid-cols-6']">
               <div v-for="(item, idx) in activeCustomizerSlot.items" :key="idx"
                 @click="!item ? openItemPicker(idx) : null"
                 :class="[
@@ -133,7 +142,10 @@
                 ]">
                 <!-- If item slot is occupied -->
                 <div v-if="item" class="w-full h-full flex items-center justify-center relative cursor-pointer"
-                  @click="openItemPicker(idx)">
+                  @click="openItemPicker(idx)"
+                  @mouseenter="showItemTooltip(item)"
+                  @mouseleave="hideItemTooltip"
+                  @mousemove="onMouseMove">
                   <img :src="getItemIconUrl(item)" :alt="item.name" class="w-full h-full object-cover shrink-0" />
                   
                   <!-- Ornn Masterwork Badge & Toggle Button -->
@@ -376,6 +388,9 @@
 
     <!-- FLOATING RUNE TOOLTIP -->
     <RuneTooltip :rune="hoveredRune" :mousePos="mousePos" />
+
+    <!-- FLOATING ITEM TOOLTIP -->
+    <ItemTooltip :item="hoveredItem" :mousePos="mousePos" />
   </div>
 </template>
 
@@ -400,6 +415,7 @@ import StatsTable from '@/components/customizer/StatsTable.vue'
 import ItemSelectorModal from '@/components/customizer/ItemSelectorModal.vue'
 import RuneBuilderModal from '@/components/customizer/RuneBuilderModal.vue'
 import RuneTooltip from '@/components/customizer/RuneTooltip.vue'
+import ItemTooltip from '@/components/customizer/ItemTooltip.vue'
 
 const draftStore = useDraftStore()
 
@@ -412,6 +428,7 @@ const {
 } = draftStore
 
 const hoveredRune = ref<any>(null)
+const hoveredItem = ref<any>(null)
 const mousePos = ref({ x: 0, y: 0 })
 
 const shardInfoMap: Record<string, any> = {
@@ -442,6 +459,15 @@ const showRuneTooltip = (rune: any, category: string) => {
 
 const hideRuneTooltip = () => {
   hoveredRune.value = null
+}
+
+const showItemTooltip = (item: any) => {
+  if (!item) return
+  hoveredItem.value = item
+}
+
+const hideItemTooltip = () => {
+  hoveredItem.value = null
 }
 
 const selectedRunesList = computed(() => {
@@ -601,10 +627,12 @@ const interpolateSpellTooltip = (spell: any, lvl: number, stats: any, champId: s
             scalingBonus += statValue * ratioVal
 
             const statLabel = getStatLabel(scale.stat)
-            scalingDetails.push(`${Math.round(ratioVal * 100)}% ${statLabel}`)
+            const ratioPct = Math.round(ratioVal * 10000) / 100
+            scalingDetails.push(`${ratioPct}% ${statLabel}`)
           }
 
-          const totalValue = Math.round(base + scalingBonus)
+          const rawTotal = base + scalingBonus
+          const totalValue = Number.isInteger(rawTotal) ? rawTotal : Math.round(rawTotal * 1000) / 1000
 
           let detailsText = base.toString()
           if (scalingDetails.length > 0) {

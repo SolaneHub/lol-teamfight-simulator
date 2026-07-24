@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import BrowserView from '../views/BrowserView.vue'
 import CustomizerView from '../views/CustomizerView.vue'
+import CalculatorView from '../views/CalculatorView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,6 +15,11 @@ const router = createRouter({
       path: '/workbench',
       name: 'workbench',
       component: CustomizerView,
+    },
+    {
+      path: '/calculator',
+      name: 'calculator',
+      component: CalculatorView,
     },
     {
       path: '/:pathMatch(.*)*',

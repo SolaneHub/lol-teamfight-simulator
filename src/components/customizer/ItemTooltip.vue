@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div
-      v-if="rune"
+      v-if="item"
       ref="tooltipRef"
       :style="{
         top: `${computedPos.y}px`,
@@ -11,16 +11,16 @@
     >
       <!-- Header -->
       <div class="flex items-center gap-3 p-4 border-b border-slate-800 bg-slate-950/50">
-        <!-- Rune Icon -->
-        <div class="h-11 w-11 rounded-full bg-slate-950 border border-slate-800 p-0.5 shrink-0 flex items-center justify-center">
-          <img :src="getRuneIconUrl(rune.icon)" class="h-full w-full object-contain select-none pointer-events-none" />
+        <!-- Item Icon -->
+        <div class="h-11 w-11 rounded-lg bg-slate-950 border border-slate-800 p-0.5 shrink-0 flex items-center justify-center">
+          <img :src="getItemIconUrl(item)" class="h-full w-full object-contain select-none pointer-events-none" />
         </div>
         <div class="flex flex-col min-w-0">
           <h4 class="text-base font-bold text-white tracking-wide truncate leading-tight">
-            {{ rune.name }}
+            {{ item.name }}
           </h4>
-          <span class="text-base px-2 py-0.5 rounded font-mono border uppercase tracking-wider font-semibold mt-1 inline-block w-fit bg-cyan-950/40 text-cyan-400 border-cyan-900/30">
-            {{ rune.category || 'Rune' }}
+          <span class="text-base px-2 py-0.5 rounded font-mono border uppercase tracking-wider font-semibold mt-1 inline-block w-fit bg-amber-950/40 text-amber-400 border-amber-900/30">
+            💰 {{ item.gold?.total || 0 }} Gold
           </span>
         </div>
       </div>
@@ -28,7 +28,7 @@
       <!-- Description -->
       <div
         class="p-4 text-base text-slate-300 font-sans leading-relaxed max-h-[75vh] overflow-y-auto custom-scrollbar"
-        v-html="formatTooltipTags(rune.longDesc || rune.shortDesc || rune.desc || '')"
+        v-html="formatTooltipTags(item.description || '')"
       ></div>
     </div>
   </Teleport>
@@ -36,10 +36,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { getRuneIconUrl, formatTooltipTags } from '@/services'
+import { getItemIconUrl, formatTooltipTags } from '@/services'
+import type { Item } from '@/types'
 
 const props = defineProps<{
-  rune: any
+  item: Item | null
   mousePos: { x: number; y: number }
 }>()
 

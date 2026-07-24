@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import type { Champion, Item, RuneKeystone, Rune, DraftSlot } from '@/types'
 
 export const useDraftStore = defineStore('draft', () => {
@@ -418,6 +418,29 @@ export const useDraftStore = defineStore('draft', () => {
       activeCustomizerSlot.value.items[idx] = item
     }
   }
+
+  // LocalStorage Persistence
+  const savedDraft = typeof localStorage !== 'undefined' ? localStorage.getItem('lol_sim_draft') : null
+  if (savedDraft) {
+    try {
+      const parsed = JSON.parse(savedDraft)
+      if (parsed.blueDraft && Array.isArray(parsed.blueDraft)) blueDraft.value = parsed.blueDraft
+      if (parsed.redDraft && Array.isArray(parsed.redDraft)) redDraft.value = parsed.redDraft
+      if (parsed.selectedSlotId) selectedSlotId.value = parsed.selectedSlotId
+    } catch (e) {
+      console.error('Failed to restore draft state', e)
+    }
+  }
+
+  watch([blueDraft, redDraft, selectedSlotId], () => {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('lol_sim_draft', JSON.stringify({
+        blueDraft: blueDraft.value,
+        redDraft: redDraft.value,
+        selectedSlotId: selectedSlotId.value
+      }))
+    }
+  }, { deep: true, immediate: true })
 
   const removeItemFromSlot = (idx: number) => {
     if (activeCustomizerSlot.value) {

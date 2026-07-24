@@ -198,35 +198,35 @@ export const calculateStats = (slot: DraftSlot) => {
 
     // --- PRECISION ---
     // Legend: Alacrity — 3% AS base + 1.5% per stack (max 10) = 18% AS
-    if (key === 'LegendAlacrity') {
+    if (key === 'LegendAlacrity' || rune.id === 9104) {
       bonusAsPercent += 0.03 + (0.015 * 10)
     }
 
     // Legend: Haste — 1.5 AH per stack (max 10) = 15 basic AH (only basic abilities)
-    if (key === 'LegendHaste') {
+    if (key === 'LegendHaste' || rune.id === 9105) {
       basicAbilityHaste += 1.5 * 10
     }
 
     // Legend: Bloodline — 0.45% LS per stack (max 15) = 6.75% LS + 85 HP at full
-    if (key === 'LegendBloodline') {
+    if (key === 'LegendBloodline' || rune.id === 9103) {
       bonusLifeSteal += 0.45 * 15
       bonusHp += 85
     }
 
     // --- SORCERY ---
     // Transcendence — +5 AH at level 5, +5 AH at level 8
-    if (key === 'Transcendence') {
+    if (key === 'Transcendence' || rune.id === 8210) {
       if (lvl >= 5) bonusHaste += 5
       if (lvl >= 8) bonusHaste += 5
     }
 
     // Celerity — +1% MS + 7% amplification of MS bonuses
-    if (key === 'Celerity') {
+    if (key === 'Celerity' || rune.id === 8234) {
       bonusMsPercent += 0.01
     }
 
     // Absolute Focus — up to 18 AD or 30 AP (based on level, assume >70% HP active)
-    if (key === 'AbsoluteFocus') {
+    if (key === 'AbsoluteFocus' || rune.id === 8233) {
       const adBonus = 1.8 + (16.2 * (lvl - 1)) / 17
       const apBonus = 3 + (27 * (lvl - 1)) / 17
       if (isApAdaptive) bonusAp += apBonus
@@ -234,38 +234,38 @@ export const calculateStats = (slot: DraftSlot) => {
     }
 
     // Manaflow Band — +250 max mana at full stacks (only for Mana champions)
-    if (key === 'ManaflowBand' && slot.champion?.partype === 'Mana') {
+    if ((key === 'ManaflowBand' || rune.id === 8226) && slot.champion?.partype === 'Mana') {
       bonusMp += 250
     }
 
     // --- RESOLVE ---
     // Conditioning — +8 Armor, +8 MR, +3% both (after 12 min, assume active)
-    if (key === 'Conditioning') {
+    if (key === 'Conditioning' || rune.id === 8429) {
       bonusArmor += 8
       bonusMr += 8
       hasConditioning = true
     }
 
     // Overgrowth — +3 HP per 8 absorbed, max 120 = 45 HP + 3.5% max HP at full
-    if (key === 'Overgrowth') {
+    if (key === 'Overgrowth' || rune.id === 8451) {
       bonusHp += 45
       hasOvergrowth = true
     }
 
     // --- INSPIRATION ---
     // Magical Footwear — +10 MS (only if wearing boots)
-    if (key === 'MagicalFootwear') {
+    if (key === 'MagicalFootwear' || rune.id === 8304) {
       const hasBoot = slot.items.some(item => item && item.tags.includes('Boots'))
       if (hasBoot) bonusMsFlat += 10
     }
 
     // Biscuit Delivery — +30 HP per biscuit consumed, 3 biscuits = +90 HP
-    if (key === 'BiscuitDelivery') {
+    if (key === 'BiscuitDelivery' || rune.id === 8345) {
       bonusHp += 90
     }
 
     // Jack Of All Trades — 1 AH per unique item stat, +10 AF at 5 stacks, +25 AF at 10 stacks
-    if (key === 'JackOfAllTrades') {
+    if (key === 'JackOfAllTrades' || rune.id === 8316) {
       const uniqueStats = new Set<string>()
       for (const item of slot.items) {
         if (!item) continue
@@ -351,6 +351,29 @@ export const calculateStats = (slot: DraftSlot) => {
     if (name.includes("titanic hydra")) {
       const maxHp = baseHp + bonusHp
       bonusAdFromHp += maxHp * 0.015
+    }
+
+    // 7. Dawncore: AP from Base Mana Regen (10 AP per 100% Base Mana Regen)
+    if (name.includes("dawncore")) {
+      let totalManaRegenPct = 0
+      for (const it of slot.items) {
+        if (!it) continue
+        const p = parseStatsFromDescription(it.description)
+        totalManaRegenPct += p.manaRegenPercent
+      }
+      const stacks = Math.floor(totalManaRegenPct / 100)
+      bonusAp += stacks * 10
+    }
+
+    // 8. Jak'Sho, The Protean: +30% bonus Armor & MR
+    if (name.includes("jak'sho")) {
+      bonusArmor = bonusArmor * 1.30
+      bonusMr = bonusMr * 1.30
+    }
+
+    // 9. Blackfire Torch: +4% AP per enemy champion affected
+    if (name.includes("blackfire torch")) {
+      apMultiplier += 0.04
     }
   }
 

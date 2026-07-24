@@ -52,6 +52,7 @@ const serveAndCopyOutPlugin = () => {
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/lol-teamfight-simulator/',
   plugins: [
     vue(),
     vueDevTools(),

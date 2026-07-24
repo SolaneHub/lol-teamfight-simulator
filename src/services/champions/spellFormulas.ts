@@ -194,5 +194,92 @@ export const spellFormulas: Record<string, Record<string, SpellCalculator>> = {
         }
       }
     }
+  },
+  Seraphine: {
+    SeraphineQ: (stats, rank) => {
+      const base = [60, 85, 110, 135, 160][rank - 1] || 60
+      const ratio = [0.50, 0.55, 0.60, 0.65, 0.70][rank - 1] || 0.50
+      const totalAp = stats?.ap?.total || 0
+      const minDmg = Math.round(base + totalAp * ratio)
+      const maxDmg = Math.round(minDmg * 1.75)
+      return {
+        details: {
+          qmin: `<span class="text-cyan-400 font-semibold">${minDmg}</span> <span class="text-slate-400 text-xs">(${base} + ${Math.round(ratio*100)}% AP)</span>`,
+          qmax: `<span class="text-cyan-400 font-semibold">${maxDmg}</span> <span class="text-slate-400 text-xs">(Max +75% at 75% missing HP)</span>`,
+        }
+      }
+    },
+    SeraphineE: (stats, rank) => {
+      const base = [70, 100, 130, 160, 190][rank - 1] || 70
+      const totalAp = stats?.ap?.total || 0
+      const dmg = Math.round(base + totalAp * 0.50)
+      return {
+        details: {
+          damage: `<span class="text-cyan-400 font-semibold">${dmg}</span> <span class="text-slate-400 text-xs">(${base} + 50% AP)</span>`,
+        }
+      }
+    },
+    SeraphineR: (stats, rank) => {
+      const base = [150, 200, 250][rank - 1] || 150
+      const totalAp = stats?.ap?.total || 0
+      const dmg = Math.round(base + totalAp * 0.60)
+      return {
+        details: {
+          damage: `<span class="text-cyan-400 font-semibold">${dmg}</span> <span class="text-slate-400 text-xs">(${base} + 60% AP)</span>`,
+        }
+      }
+    }
+  },
+  Amumu: {
+    BandageToss: (stats, rank) => {
+      const base = [70, 95, 120, 145, 170][rank - 1] || 70
+      const totalAp = stats?.ap?.total || 0
+      const dmg = Math.round(base + (totalAp * 0.85))
+      return {
+        details: {
+          totaldamage: `<span class="text-cyan-400 font-semibold">${dmg}</span> <span class="text-slate-400 text-xs">(${base} + 85% AP)</span>`,
+          stunduration: '1.5',
+        }
+      }
+    },
+    AuraofDespair: (stats, rank) => {
+      const baseDmgTick = 5
+      const baseHpPctTick = [0.5, 0.625, 0.75, 0.875, 1][rank - 1] || 0.5
+      const totalAp = stats?.ap?.total || 0
+      const apBonusPctTick = totalAp * 0.0025
+      const totalHpPctTick = (baseHpPctTick + apBonusPctTick).toFixed(3).replace(/\.?0+$/, '')
+      return {
+        details: {
+          basedamage: `<span class="text-cyan-400 font-semibold">${baseDmgTick}</span> <span class="text-slate-400 text-xs">(5 magic damage/tick)</span>`,
+          totalhealthdamage: `<span class="text-cyan-400 font-semibold">${totalHpPctTick}%</span> <span class="text-slate-400 text-xs">(${baseHpPctTick}% + 0.25% per 100 AP /tick)</span>`,
+        }
+      }
+    },
+    Tantrum: (stats, rank) => {
+      const base = [65, 100, 135, 170, 205][rank - 1] || 65
+      const totalAp = stats?.ap?.total || 0
+      const dmg = Math.round(base + (totalAp * 0.50))
+      const bonusArmor = stats?.armor?.bonus || 0
+      const bonusMr = stats?.mr?.bonus || 0
+      const baseRed = [5, 7, 9, 11, 13][rank - 1] || 5
+      const totalRed = Math.round(baseRed + (bonusArmor * 0.03) + (bonusMr * 0.03))
+      return {
+        details: {
+          totaldamage: `<span class="text-cyan-400 font-semibold">${dmg}</span> <span class="text-slate-400 text-xs">(${base} + 50% AP)</span>`,
+          damagereduction: `<span class="text-green-400 font-semibold">${totalRed}</span> <span class="text-slate-400 text-xs">(${baseRed} + 3% bonus Armor + 3% bonus MR)</span>`,
+        }
+      }
+    },
+    CurseoftheSadMummy: (stats, rank) => {
+      const base = [150, 250, 350][rank - 1] || 150
+      const totalAp = stats?.ap?.total || 0
+      const dmg = Math.round(base + (totalAp * 0.80))
+      return {
+        details: {
+          totaldamage: `<span class="text-cyan-400 font-semibold">${dmg}</span> <span class="text-slate-400 text-xs">(${base} + 80% AP)</span>`,
+          stunduration: '1.5',
+        }
+      }
+    }
   }
 };

@@ -1,0 +1,123 @@
+================================================================================
+         COMPARATIVE AP PENETRATION TEST: VOID STAFF vs CRYPTBLOOM vs BLOODLETTER
+================================================================================
+
+[ INDIVIDUAL TEST PARAMETERS ]
+- Target: 100 MR, 2000 HP
+- Attacker Base Stats: 300 Base AP + Equipped Item
+- Combo Sequence (5 Spells): Q1 -> E1 -> R1 -> Q2 -> W1
+
+--------------------------------------------------------------------------------
+1) VOID STAFF (80 AP | 40% Instant Magic Penetration)
+--------------------------------------------------------------------------------
+- Total AP: 380 AP
+- Effective Target MR: 60 MR (40% Pen from spell #1)
+- Magic Damage Multiplier: 62.5%
+
+  Spell #1 (Q1) : Raw Dmg = 466  ->  Damage Dealt = 291 HP  |  Cumulative =  291 HP
+  Spell #2 (E1) : Raw Dmg = 340  ->  Damage Dealt = 213 HP  |  Cumulative =  504 HP
+  Spell #3 (R1) : Raw Dmg = 704  ->  Damage Dealt = 440 HP  |  Cumulative =  944 HP
+  Spell #4 (Q2) : Raw Dmg = 466  ->  Damage Dealt = 291 HP  |  Cumulative = 1235 HP
+  Spell #5 (W1) : Raw Dmg = 408  ->  Damage Dealt = 255 HP  |  Cumulative = 1490 HP
+
+  >>> TOTAL CUMULATIVE INDIVIDUAL DAMAGE: 1,490 HP <<<
+
+
+--------------------------------------------------------------------------------
+2) CRYPTBLOOM (70 AP | 30% Instant Magic Penetration + 15 Haste + Takedown Heal)
+--------------------------------------------------------------------------------
+- Total AP: 370 AP
+- Effective Target MR: 70 MR (30% Pen from spell #1)
+- Magic Damage Multiplier: 58.8%
+
+  Spell #1 (Q1) : Raw Dmg = 459  ->  Damage Dealt = 270 HP  |  Cumulative =  270 HP
+  Spell #2 (E1) : Raw Dmg = 335  ->  Damage Dealt = 197 HP  |  Cumulative =  467 HP
+  Spell #3 (R1) : Raw Dmg = 696  ->  Damage Dealt = 409 HP  |  Cumulative =  876 HP
+  Spell #4 (Q2) : Raw Dmg = 459  ->  Damage Dealt = 270 HP  |  Cumulative = 1146 HP
+  Spell #5 (W1) : Raw Dmg = 402  ->  Damage Dealt = 236 HP  |  Cumulative = 1382 HP
+
+  >>> TOTAL CUMULATIVE INDIVIDUAL DAMAGE: 1,382 HP <<<
+
+
+--------------------------------------------------------------------------------
+3) BLOODLETTER'S CURSE (65 AP | 400 HP | 15 Haste | 0% -> 30% Ramping MR Shred)
+--------------------------------------------------------------------------------
+- Total AP: 365 AP
+- Effective Target MR: Recalculated hit by hit (-7.5% MR per stack)
+
+  Spell #1 (Q1) : Stack 0 (-0.0% MR)  | Eff MR: 100.0  -> Damage: 228 HP  | Cumul:  228 HP
+  Spell #2 (E1) : Stack 1 (-7.5% MR)  | Eff MR:  92.5  -> Damage: 173 HP  | Cumul:  401 HP
+  Spell #3 (R1) : Stack 2 (-15.0% MR) | Eff MR:  85.0  -> Damage: 374 HP  | Cumul:  775 HP
+  Spell #4 (Q2) : Stack 3 (-22.5% MR) | Eff MR:  77.5  -> Damage: 257 HP  | Cumul: 1032 HP
+  Spell #5 (W1) : Stack 4 (-30.0% MR) | Eff MR:  70.0  -> Damage: 235 HP  | Cumul: 1267 HP
+
+  >>> TOTAL CUMULATIVE INDIVIDUAL DAMAGE: 1,267 HP <<<
+
+
+================================================================================
+                    INDIVIDUAL SOLO DAMAGE SUMMARY
+================================================================================
+  1. Void Staff         : 1,490 HP  (Best Instant Solo Damage)
+  2. Cryptbloom         : 1,382 HP  (-108 HP vs Void Staff)
+  3. Bloodletter's Curse: 1,267 HP  (-223 HP vs Void Staff / -115 HP vs Cryptbloom)
+
+
+================================================================================
+       COMBINED TEAMWIDE DAMAGE TEST (TEAMWIDE DAMAGE BY AP COMPOSITION)
+================================================================================
+- Target: 100 MR
+- Main Caster: 5-Spell Combo
+- AP Allies (250 AP each): 4-Spell Combo
+
+--- [ 1 AP IN TEAM (SOLO AP) ] ---
+- Void Staff Team Total      : 1,490 HP  [WINNER]
+- Cryptbloom Team Total      : 1,382 HP
+- Bloodletter Team Total     : 1,267 HP
+* Bloodletter vs Void Staff Diff: -223 Dmg
+
+--- [ 2 AP IN TEAM (e.g. AP Mid + AP Jungler) ] ---
+- Void Staff Team Total      : 2,222 HP  [WINNER]
+- Cryptbloom Team Total      : 2,114 HP
+- Bloodletter Team Total     : 2,127 HP
+* Bloodletter vs Void Staff Diff: -95 Dmg
+* Bloodletter vs Cryptbloom Diff: +13 Dmg
+
+--- [ 3 AP IN TEAM (e.g. AP Top/Jg + AP Mid + AP Supp) ] ---
+- Void Staff Team Total      : 2,954 HP
+- Cryptbloom Team Total      : 2,846 HP
+- Bloodletter Team Total     : 2,987 HP  [THEORETICAL WINNER]
+* Bloodletter vs Void Staff Diff: +33 Dmg
+* Bloodletter vs Cryptbloom Diff: +141 Dmg
+
+--- [ 4 AP IN TEAM ] ---
+- Void Staff Team Total      : 3,686 HP
+- Cryptbloom Team Total      : 3,578 HP
+- Bloodletter Team Total     : 3,847 HP  [THEORETICAL WINNER]
+* Bloodletter vs Void Staff Diff: +161 Dmg
+* Bloodletter vs Cryptbloom Diff: +269 Dmg
+
+--- [ 5 AP IN TEAM (FULL AP COMP) ] ---
+- Void Staff Team Total      : 4,418 HP
+- Cryptbloom Team Total      : 4,310 HP
+- Bloodletter Team Total     : 4,707 HP  [THEORETICAL WINNER]
+* Bloodletter vs Void Staff Diff: +289 Dmg
+* Bloodletter vs Cryptbloom Diff: +397 Dmg
+
+
+================================================================================
+                     FINAL SOLOQUEUE CONSIDERATIONS
+================================================================================
+1. SOLO DAMAGE / BURST:
+   Void Staff and Cryptbloom outperform Bloodletter because they penetrate 40%/30%
+   MR immediately from second 0 (no ramping stack delay).
+
+2. SOLOQUEUE REALITY:
+   SoloQueue teamfights erupt chaotically in 1-2 seconds with simultaneous spellcasts.
+   AP teammates dump their burst BEFORE Bloodletter reaches 4 stacks, making
+   Cryptbloom or Void Staff strictly superior in real matches.
+
+3. PRACTICAL RECOMMENDATION:
+   - Build CRYPTBLOOM for the best balance of Instant Damage, Haste, and Takedown Healing.
+   - Build VOID STAFF against high-MR super tanks.
+   - Build BLOODLETTER only on DoT / Spammer champions (Cassiopeia, Swain, Singed, Lillia).
+================================================================================

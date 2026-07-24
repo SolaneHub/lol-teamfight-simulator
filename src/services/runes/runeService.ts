@@ -61,7 +61,7 @@ export const runeService = {
                   : ''
                 return {
                   id: perkId,
-                  key: perk?.name ? perk.name.replace(/\s+/g, '') : '',
+                  key: perk?.name ? perk.name.replace(/[^a-zA-Z0-9]/g, '') : '',
                   icon: iconPathClean,
                   name: perk?.name || '',
                   shortDesc: perk?.shortDesc || '',
