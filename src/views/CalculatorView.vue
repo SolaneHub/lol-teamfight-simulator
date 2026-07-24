@@ -602,6 +602,7 @@ const teamfightSimulationResults = computed(() => {
   }> = {}
 
   const castCounters: Record<number, number> = {}
+  const aatroxQSeqMap: Record<number, number> = {}
 
   // Initialize Defender States
   selectedDefenderSlots.value.forEach(slot => {
@@ -667,6 +668,14 @@ const teamfightSimulationResults = computed(() => {
       }
     }
 
+    // Aatrox Q sequence (Q1 -> Q2 -> Q3)
+    let aatroxQSeq = 1
+    if (actorSlot.champion.id === 'Aatrox' && action === 'Q') {
+      const prev = aatroxQSeqMap[actorSlot.id] || 0
+      aatroxQSeq = (prev % 3) + 1
+      aatroxQSeqMap[actorSlot.id] = aatroxQSeq
+    }
+
     let stepTotalDmg = 0
     const targetResults: any[] = []
 
@@ -695,7 +704,24 @@ const teamfightSimulationResults = computed(() => {
         // Missing HP ratio for execution / Seraphine Q spells
         const missingHpPct = Math.max(0, Math.min(100, ((defState.maxHp - defState.currentHp) / defState.maxHp) * 100))
 
-        if (actorSlot.champion?.id === 'Seraphine' && action === 'Q') {
+        if (actorSlot.champion?.id === 'Aatrox' && action === 'Q') {
+          const qRank = actorSlot.spellRanks?.q || (actorSlot.level >= 9 ? 5 : Math.max(1, Math.min(5, Math.ceil(actorSlot.level / 2))))
+          const base = [10, 30, 50, 70, 90][qRank - 1] || 10
+          const ratio = [0.60, 0.65, 0.70, 0.75, 0.80][qRank - 1] || 0.60
+
+          const seqMult = aatroxQSeq === 1 ? 1.0 : aatroxQSeq === 2 ? 1.25 : 1.50
+          const sweetspotMult = 1.60 // Sweetspot edge bonus (+60%)
+
+          rawDmg = (base + att.ad * ratio) * seqMult * sweetspotMult
+          dmgType = 'physical'
+          hitMult = physMult
+        } else if (actorSlot.champion?.id === 'Aatrox' && action === 'W') {
+          const wRank = actorSlot.spellRanks?.w || (actorSlot.level >= 9 ? 5 : Math.max(1, Math.min(5, Math.ceil(actorSlot.level / 2))))
+          const base = [30, 60, 90, 120, 150][wRank - 1] || 30
+          rawDmg = base + att.ad * 0.40
+          dmgType = 'physical'
+          hitMult = physMult
+        } else if (actorSlot.champion?.id === 'Seraphine' && action === 'Q') {
           const missingAmp = (Math.min(75, missingHpPct) / 75) * 0.75
           rawDmg = (120 + att.ap * 0.60) * (1 + missingAmp)
           dmgType = 'magic'
@@ -801,11 +827,18 @@ const teamfightSimulationResults = computed(() => {
       executeActionForTargets(true)
     }
 
+    let stepActionName: string = action
+    if (actorSlot.champion.id === 'Aatrox' && action === 'Q') {
+      stepActionName = `Q${aatroxQSeq} (Sweetspot)`
+    } else if (isEchoCast) {
+      stepActionName = `${action} + 🎶 Echo`
+    }
+
     logSteps.push({
       stepIndex: idx + 1,
       actorSlotId: actStep.actorSlotId,
       actorName,
-      action: isEchoCast ? `${action} + 🎶 Echo` : action,
+      action: stepActionName,
       targetResults,
       totalStepDamage: stepTotalDmg,
     })
