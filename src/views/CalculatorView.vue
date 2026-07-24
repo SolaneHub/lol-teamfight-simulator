@@ -107,7 +107,7 @@
         <!-- 1. Actor Selector -->
         <div class="md:col-span-3 flex flex-col gap-2">
           <label class="text-base font-bold text-slate-400 uppercase">1. Attacking Champion</label>
-          <select v-model="actionCreatorActorId" class="w-full bg-slate-950 text-white text-base font-mono px-3.5 py-3 rounded-lg border border-slate-800 cursor-pointer focus:outline-none focus:border-cyan-500">
+          <select v-model="actionCreatorActorId" class="w-full h-12 bg-slate-950 text-white text-base font-mono px-3.5 rounded-lg border border-slate-800 cursor-pointer focus:outline-none focus:border-cyan-500">
             <option v-for="s in selectedAttackerSlots" :key="s.id" :value="s.id">
               [{{ s.side.toUpperCase() }} {{ s.role }}] {{ s.champion ? s.champion.name : 'Empty' }} (Lvl {{ s.level }})
             </option>
@@ -117,12 +117,12 @@
         <!-- 2. Spell / AA Selector -->
         <div class="md:col-span-3 flex flex-col gap-2">
           <label class="text-base font-bold text-slate-400 uppercase">2. Action / Spell</label>
-          <div class="flex items-center gap-1.5">
+          <div class="h-12 flex items-center gap-1.5">
             <button 
               v-for="act in ['Q', 'W', 'E', 'R', 'P', 'AA']" 
               :key="act"
               @click="actionCreatorSpell = act as any"
-              class="flex-1 py-2.5 rounded font-mono text-base font-bold transition-all border cursor-pointer"
+              class="flex-1 h-full flex items-center justify-center rounded font-mono text-base font-bold transition-all border cursor-pointer"
               :class="actionCreatorSpell === act ? 'bg-amber-500 text-slate-950 border-amber-400 font-extrabold shadow-md' : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'"
             >
               {{ act }}
@@ -138,11 +138,11 @@
               {{ isAllTargetsSelected ? 'Deselect All' : 'Select All Enemies (AOE)' }}
             </button>
           </div>
-          <div class="flex items-center gap-2 flex-wrap bg-slate-950 p-2.5 rounded-lg border border-slate-800 min-h-[48px]">
+          <div class="h-12 bg-slate-950 px-2.5 rounded-lg border border-slate-800 flex items-center gap-1.5 overflow-x-auto">
             <label 
               v-for="s in selectedDefenderSlots" 
               :key="s.id"
-              class="flex items-center gap-1.5 px-3 py-1.5 rounded text-base border cursor-pointer transition-all"
+              class="h-8 flex items-center gap-1.5 px-2.5 rounded text-xs font-bold border cursor-pointer transition-all whitespace-nowrap"
               :class="actionCreatorTargetIds.includes(s.id) ? 'bg-rose-950 text-rose-300 border-rose-600 font-bold' : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'"
             >
               <input type="checkbox" :value="s.id" v-model="actionCreatorTargetIds" class="hidden" />
@@ -152,10 +152,11 @@
         </div>
 
         <!-- Add Button -->
-        <div class="md:col-span-2">
+        <div class="md:col-span-2 flex flex-col gap-2">
+          <label class="text-base font-bold text-transparent uppercase select-none">&nbsp;</label>
           <button 
             @click="submitTeamfightAction"
-            class="w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold rounded-lg font-mono text-base transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2"
+            class="h-12 w-full px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold rounded-lg font-mono text-base transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2"
           >
             <span>➕ Add Action</span>
           </button>
