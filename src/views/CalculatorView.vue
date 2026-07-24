@@ -103,27 +103,36 @@
         </button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-end font-mono">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end font-mono">
         <!-- 1. Actor Selector -->
         <div class="md:col-span-3 flex flex-col gap-2">
-          <label class="text-base font-bold text-slate-400 uppercase">1. Attacking Champion</label>
-          <select v-model="actionCreatorActorId" class="w-full h-12 bg-slate-950 text-white text-base font-mono px-3.5 rounded-lg border border-slate-800 cursor-pointer focus:outline-none focus:border-cyan-500">
-            <option v-for="s in selectedAttackerSlots" :key="s.id" :value="s.id">
-              [{{ s.side.toUpperCase() }} {{ s.role }}] {{ s.champion ? s.champion.name : 'Empty' }} (Lvl {{ s.level }})
-            </option>
-          </select>
+          <label class="text-base font-bold text-slate-400 uppercase tracking-wide">1. Attacking Champion</label>
+          <div class="min-h-[56px] bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-1.5">
+            <button
+              v-for="s in selectedAttackerSlots"
+              :key="s.id"
+              @click="actionCreatorActorId = s.id"
+              class="h-10 flex items-center gap-1.5 px-2.5 rounded-lg text-base font-bold font-mono border cursor-pointer transition-all"
+              :class="actionCreatorActorId === s.id
+                ? 'bg-cyan-600 text-white border-cyan-400 font-extrabold shadow-md shadow-cyan-600/30'
+                : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'"
+            >
+              <img v-if="s.champion" :src="getChampionIconUrl(s.champion)" class="w-6 h-6 rounded-md object-cover border border-cyan-500/30" />
+              <span>{{ s.champion ? s.champion.name : s.role }}</span>
+            </button>
+          </div>
         </div>
 
         <!-- 2. Spell / AA Selector -->
         <div class="md:col-span-3 flex flex-col gap-2">
-          <label class="text-base font-bold text-slate-400 uppercase">2. Action / Spell</label>
-          <div class="h-12 flex items-center gap-1.5">
+          <label class="text-base font-bold text-slate-400 uppercase tracking-wide">2. Action / Spell</label>
+          <div class="h-14 bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex items-center gap-1.5">
             <button 
               v-for="act in ['Q', 'W', 'E', 'R', 'P', 'AA']" 
               :key="act"
               @click="actionCreatorSpell = act as any"
-              class="flex-1 h-full flex items-center justify-center rounded font-mono text-base font-bold transition-all border cursor-pointer"
-              :class="actionCreatorSpell === act ? 'bg-amber-500 text-slate-950 border-amber-400 font-extrabold shadow-md' : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'"
+              class="flex-1 h-full flex items-center justify-center rounded-lg font-mono text-base font-extrabold transition-all border cursor-pointer"
+              :class="actionCreatorSpell === act ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/20' : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-white'"
             >
               {{ act }}
             </button>
@@ -133,19 +142,20 @@
         <!-- 3. Target Picker (AOE Checkboxes) -->
         <div class="md:col-span-4 flex flex-col gap-2">
           <div class="flex items-center justify-between">
-            <label class="text-base font-bold text-slate-400 uppercase">3. Hit Targets (AOE Multi-Select)</label>
-            <button @click="toggleSelectAllTargets" class="text-base text-cyan-400 hover:underline cursor-pointer font-bold">
+            <label class="text-base font-bold text-slate-400 uppercase tracking-wide">3. Hit Targets (AOE Multi-Select)</label>
+            <button @click="toggleSelectAllTargets" class="text-base text-cyan-400 hover:text-cyan-300 hover:underline cursor-pointer font-bold">
               {{ isAllTargetsSelected ? 'Deselect All' : 'Select All Enemies (AOE)' }}
             </button>
           </div>
-          <div class="h-12 bg-slate-950 px-2.5 rounded-lg border border-slate-800 flex items-center gap-1.5 overflow-x-auto">
+          <div class="min-h-[56px] bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-1.5">
             <label 
               v-for="s in selectedDefenderSlots" 
               :key="s.id"
-              class="h-8 flex items-center gap-1.5 px-2.5 rounded text-xs font-bold border cursor-pointer transition-all whitespace-nowrap"
-              :class="actionCreatorTargetIds.includes(s.id) ? 'bg-rose-950 text-rose-300 border-rose-600 font-bold' : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'"
+              class="h-10 flex items-center gap-1.5 px-2.5 rounded-lg text-base font-bold border cursor-pointer transition-all"
+              :class="actionCreatorTargetIds.includes(s.id) ? 'bg-rose-950 text-rose-300 border-rose-600 font-bold shadow-md shadow-rose-900/30' : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'"
             >
               <input type="checkbox" :value="s.id" v-model="actionCreatorTargetIds" class="hidden" />
+              <img v-if="s.champion" :src="getChampionIconUrl(s.champion)" class="w-6 h-6 rounded-md object-cover border border-rose-500/30" />
               <span>{{ s.champion ? s.champion.name : s.role }}</span>
             </label>
           </div>
@@ -156,7 +166,7 @@
           <label class="text-base font-bold text-transparent uppercase select-none">&nbsp;</label>
           <button 
             @click="submitTeamfightAction"
-            class="h-12 w-full px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold rounded-lg font-mono text-base transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2"
+            class="h-14 w-full px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold rounded-xl font-mono text-base transition-all shadow-lg shadow-orange-500/20 cursor-pointer flex items-center justify-center gap-2"
           >
             <span>➕ Add Action</span>
           </button>
