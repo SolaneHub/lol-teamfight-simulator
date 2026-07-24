@@ -9,7 +9,7 @@ export const getRuneIconUrl = (iconPath: string): string => {
   const cleanPath = path
     .replace('v1/perk-images/', 'runes/images/')
     .replace('perk-images/', 'runes/images/')
-  return `/out/${cleanPath}`
+  return `${import.meta.env.BASE_URL}out/${cleanPath}`
 }
 
 export const mapRune = (raw: any): Rune => ({
@@ -37,8 +37,8 @@ export const runeService = {
   async getRunes(): Promise<RuneKeystone[]> {
     try {
       const [perksRes, stylesRes] = await Promise.all([
-        fetch('/out/runes/perks.json'),
-        fetch('/out/runes/perkstyles.json')
+        fetch(`${import.meta.env.BASE_URL}out/runes/perks.json`),
+        fetch(`${import.meta.env.BASE_URL}out/runes/perkstyles.json`)
       ])
       const perksData = await perksRes.json()
       const perkstylesData = await stylesRes.json()

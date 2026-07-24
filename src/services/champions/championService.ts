@@ -176,13 +176,13 @@ export const getChampionSplashUrl = (champId: string): string => {
   if (!champId) return ''
   const folder = champId.toLowerCase()
   const fileName = folder === 'xinzhao' ? 'xinzhaorework' : folder
-  return `/out/champions/${folder}/assets/${fileName}_splash_centered_0.jpg`
+  return `${import.meta.env.BASE_URL}out/champions/${folder}/assets/${fileName}_splash_centered_0.jpg`
 }
 
 export const getChampionIconUrl = (champ: any): string => {
   if (!champ) return ''
   const folder = (champ.id || '').toLowerCase()
-  return `/out/champions/${folder}/assets/icon.png`
+  return `${import.meta.env.BASE_URL}out/champions/${folder}/assets/icon.png`
 }
 
 export const getChampionPassiveUrl = (champId: string): string => {
@@ -190,9 +190,9 @@ export const getChampionPassiveUrl = (champId: string): string => {
   const folder = champId.toLowerCase()
   const hud = (championHudMap as Record<string, any>)[folder]
   if (hud?.passive) {
-    return `/out/champions/${folder}/assets/hud/${hud.passive}`
+    return `${import.meta.env.BASE_URL}out/champions/${folder}/assets/hud/${hud.passive}`
   }
-  return `/out/champions/${folder}/assets/hud/${folder}_passive.png`
+  return `${import.meta.env.BASE_URL}out/champions/${folder}/assets/hud/${folder}_passive.png`
 }
 
 export const getChampionSpellUrl = (champId: string, spellIndex: number): string => {
@@ -200,10 +200,10 @@ export const getChampionSpellUrl = (champId: string, spellIndex: number): string
   const folder = champId.toLowerCase()
   const hud = (championHudMap as Record<string, any>)[folder]
   if (hud?.spells?.[spellIndex]) {
-    return `/out/champions/${folder}/assets/hud/${hud.spells[spellIndex]}`
+    return `${import.meta.env.BASE_URL}out/champions/${folder}/assets/hud/${hud.spells[spellIndex]}`
   }
   const letters = ['q', 'w', 'e', 'r']
-  return `/out/champions/${folder}/assets/hud/${folder}_${letters[spellIndex]}.png`
+  return `${import.meta.env.BASE_URL}out/champions/${folder}/assets/hud/${folder}_${letters[spellIndex]}.png`
 }
 
 export const getChampionPosition = (champId: string): string => {
@@ -349,7 +349,7 @@ export const championService = {
 
       try {
         const folder = championId.toLowerCase()
-        const res = await fetch(`/out/champions/${folder}/data/${folder}.bin.json`)
+        const res = await fetch(`${import.meta.env.BASE_URL}out/champions/${folder}/data/${folder}.bin.json`)
         if (res.ok) {
           const binData = await res.json()
           const rootKey = Object.keys(binData).find(k => k.endsWith('/CharacterRecords/Root'))

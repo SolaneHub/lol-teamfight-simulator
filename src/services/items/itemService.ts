@@ -141,10 +141,10 @@ export const getItemIconUrl = (item: Item): string => {
   if (!item) return ''
   if (item.iconPath) {
     const filename = item.iconPath.split('/').pop()?.toLowerCase() || ''
-    return `/out/items/icons/${filename}`
+    return `${import.meta.env.BASE_URL}out/items/icons/${filename}`
   }
   if (item.image?.full) {
-    return `/out/items/icons/${item.image.full.toLowerCase()}`
+    return `${import.meta.env.BASE_URL}out/items/icons/${item.image.full.toLowerCase()}`
   }
   return ''
 }
@@ -262,7 +262,7 @@ export const getItemTier = (item: Item): 'starter' | 'basic' | 'epic' | 'legenda
 export const itemService = {
   async getItems(): Promise<Item[]> {
     try {
-      const res = await fetch('/out/items/items.json')
+      const res = await fetch(`${import.meta.env.BASE_URL}out/items/items.json`)
       const itemData = await res.json()
 
       const upgradedItemIds = [3040, 3042, 3121, 3002, 6701, 3010, 3013, 3866, 3867, 3168, 3170, 3171, 3172, 3173, 3174, 3175]
