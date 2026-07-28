@@ -11,9 +11,9 @@ describe('Item Stat Extraction', () => {
     let unparsedStatsCount = 0
     const unparsedLines: string[] = []
 
-    itemsData.forEach((item: any) => {
-      if (!item.inStore && item.id > 10000) return
-      const desc = item.description || ''
+    itemsData.forEach((item: Record<string, unknown>) => {
+      if (!item.inStore && (item.id as number) > 10000) return
+      const desc = (item.description as string) || ''
       if (!desc.includes('<stats>')) return
 
       parseItemStatsFromDescription(desc)

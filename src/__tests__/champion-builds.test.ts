@@ -2,27 +2,30 @@ import { describe, it, expect } from 'vitest'
 import fs from 'fs'
 import path from 'path'
 import { calculateStats, parseItemStatsFromDescription } from '../services'
-import type { DraftSlot, Champion, Item } from '../types'
+import type { DraftSlot, Item } from '../types'
 
 describe('Champion Build Stat Computations', () => {
   it('should compute builds for standard champions and verify stats', () => {
     // Resolve paths
-    const champPath = path.resolve(__dirname, '../../public/ddragon/16.14.1/data/en_US/championFull.json')
+    const champPath = path.resolve(
+      __dirname,
+      '../../public/ddragon/16.14.1/data/en_US/championFull.json',
+    )
     const itemsPath = path.resolve(__dirname, '../../out/items/items.json')
 
     const championsData = JSON.parse(fs.readFileSync(champPath, 'utf8')).data
-    const itemsData: any[] = JSON.parse(fs.readFileSync(itemsPath, 'utf8'))
+    const itemsData: Record<string, unknown>[] = JSON.parse(fs.readFileSync(itemsPath, 'utf8'))
 
     // Map items by ID, and process their descriptions to set stats
     const itemsMap = new Map<string, Item>()
-    itemsData.forEach(rawItem => {
+    itemsData.forEach((rawItem) => {
       const item: Item = {
-        id: rawItem.id.toString(),
-        name: rawItem.name || '',
-        description: rawItem.description || '',
+        id: String(rawItem.id),
+        name: (rawItem.name as string) || '',
+        description: (rawItem.description as string) || '',
         colloq: '',
         image: {
-          full: rawItem.iconPath?.split('/').pop()?.toLowerCase() || '',
+          full: (rawItem.iconPath as string)?.split('/').pop()?.toLowerCase() || '',
           sprite: '',
           group: 'item',
           x: 0,
@@ -31,17 +34,17 @@ describe('Champion Build Stat Computations', () => {
           h: 48,
         },
         gold: {
-          base: rawItem.price || 0,
-          total: rawItem.priceTotal || 0,
-          sell: rawItem.price || 0,
-          purchasable: rawItem.inStore ?? false,
+          base: (rawItem.price as number) || 0,
+          total: (rawItem.priceTotal as number) || 0,
+          sell: (rawItem.price as number) || 0,
+          purchasable: (rawItem.inStore as boolean) ?? false,
         },
-        tags: rawItem.categories || [],
-        stats: parseItemStatsFromDescription(rawItem.description),
+        tags: (rawItem.categories as string[]) || [],
+        stats: parseItemStatsFromDescription((rawItem.description as string) || ''),
         maps: {},
-        inStore: rawItem.inStore,
-        from: (rawItem.from || []).map((x: any) => x.toString()),
-        into: (rawItem.to || []).map((x: any) => x.toString()),
+        inStore: rawItem.inStore as boolean,
+        from: ((rawItem.from as (string | number)[]) || []).map((x) => x.toString()),
+        into: ((rawItem.to as (string | number)[]) || []).map((x) => x.toString()),
       }
       itemsMap.set(item.id, item)
     })
@@ -56,13 +59,13 @@ describe('Champion Build Stat Computations', () => {
       { champ: 'Aatrox', level: 18, items: ['3047', '6610', '3071', '3053', '6333', '3065'] },
     ]
 
-    testBuilds.forEach(t => {
+    testBuilds.forEach((t) => {
       const rawChamp = championsData[t.champ]
       expect(rawChamp).toBeDefined()
 
       // Map raw champion structure to what DraftSlot expects
-      const slotItems = t.items.map(id => itemsMap.get(id)).filter((item): item is Item => !!item)
-      
+      const slotItems = t.items.map((id) => itemsMap.get(id)).filter((item): item is Item => !!item)
+
       const mockSlot: DraftSlot = {
         champion: {
           id: rawChamp.id,
@@ -95,7 +98,7 @@ describe('Champion Build Stat Computations', () => {
             attackspeed: rawChamp.stats.attackspeed,
             attackspeedratio: rawChamp.stats.attackspeedratio || rawChamp.stats.attackspeed,
           },
-          spells: []
+          spells: [],
         },
         level: t.level,
         items: slotItems,
