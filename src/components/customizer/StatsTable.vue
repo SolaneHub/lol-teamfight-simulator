@@ -1,9 +1,11 @@
 <template>
   <div v-if="activeCustomizerStats" class="flex flex-col gap-2 border-t border-slate-800/80 pt-5">
     <slot name="label">
-      <label class="text-base text-slate-400 uppercase tracking-widest font-mono font-bold">Computed Custom Stats</label>
+      <label class="text-base text-slate-400 uppercase tracking-widest font-mono font-bold"
+        >Computed Custom Stats</label
+      >
     </slot>
-    
+
     <div class="bg-slate-950 border border-slate-900 rounded-xl overflow-hidden">
       <table class="w-full text-left text-base font-mono">
         <thead class="bg-slate-900/60 text-slate-400 border-b border-slate-900">
@@ -78,7 +80,11 @@
               {{ activeCustomizerStats.armor.base }}
             </td>
             <td class="px-4 py-2 text-right text-emerald-500">
-              {{ activeCustomizerStats.armor.bonus > 0 ? '+' + activeCustomizerStats.armor.bonus : '-' }}
+              {{
+                activeCustomizerStats.armor.bonus > 0
+                  ? '+' + activeCustomizerStats.armor.bonus
+                  : '-'
+              }}
             </td>
             <td class="px-4 py-2 text-right font-bold text-white">
               {{ activeCustomizerStats.armor.total }}
@@ -106,7 +112,11 @@
               {{ activeCustomizerStats.as.base.toFixed(3) }}
             </td>
             <td class="px-4 py-2 text-right text-emerald-500">
-              {{ activeCustomizerStats.as.bonus > 0 ? '+' + activeCustomizerStats.as.bonus.toFixed(3) : '-' }}
+              {{
+                activeCustomizerStats.as.bonus > 0
+                  ? '+' + activeCustomizerStats.as.bonus.toFixed(3)
+                  : '-'
+              }}
             </td>
             <td class="px-4 py-2 text-right font-bold text-white">
               {{ activeCustomizerStats.as.total.toFixed(3) }}
@@ -132,13 +142,21 @@
             <td class="px-4 py-2 font-semibold text-slate-300">Ability Haste (AH)</td>
             <td class="px-4 py-2 text-right text-slate-400">0</td>
             <td class="px-4 py-2 text-right text-emerald-500">
-              {{ activeCustomizerStats.abilityHaste.bonus > 0 ? '+' + activeCustomizerStats.abilityHaste.bonus : '-' }}
+              {{
+                activeCustomizerStats.abilityHaste.bonus > 0
+                  ? '+' + activeCustomizerStats.abilityHaste.bonus
+                  : '-'
+              }}
             </td>
             <td class="px-4 py-2 text-right font-bold text-white">
               {{ activeCustomizerStats.abilityHaste.total }}
-              <span v-if="activeCustomizerStats.abilityHaste.total > 0"
-                class="text-slate-400 text-base font-normal ml-1">
-                ({{ Math.round((1 - 100 / (100 + activeCustomizerStats.abilityHaste.total)) * 100) }}% CDR)
+              <span
+                v-if="activeCustomizerStats.abilityHaste.total > 0"
+                class="text-slate-400 text-base font-normal ml-1"
+              >
+                ({{
+                  Math.round((1 - 100 / (100 + activeCustomizerStats.abilityHaste.total)) * 100)
+                }}% CDR)
               </span>
             </td>
           </tr>
@@ -148,7 +166,11 @@
             <td class="px-4 py-2 font-semibold text-slate-300">Critical Strike Chance</td>
             <td class="px-4 py-2 text-right text-slate-400">0%</td>
             <td class="px-4 py-2 text-right text-emerald-500">
-              {{ activeCustomizerStats.crit.bonus > 0 ? '+' + activeCustomizerStats.crit.bonus + '%' : '-' }}
+              {{
+                activeCustomizerStats.crit.bonus > 0
+                  ? '+' + activeCustomizerStats.crit.bonus + '%'
+                  : '-'
+              }}
             </td>
             <td class="px-4 py-2 text-right font-bold text-white">
               {{ activeCustomizerStats.crit.total }}%
@@ -160,7 +182,11 @@
             <td class="px-4 py-2 font-semibold text-slate-300">Lethality</td>
             <td class="px-4 py-2 text-right text-slate-400">0</td>
             <td class="px-4 py-2 text-right text-emerald-500">
-              {{ activeCustomizerStats.lethality.bonus > 0 ? '+' + activeCustomizerStats.lethality.bonus : '-' }}
+              {{
+                activeCustomizerStats.lethality.bonus > 0
+                  ? '+' + activeCustomizerStats.lethality.bonus
+                  : '-'
+              }}
             </td>
             <td class="px-4 py-2 text-right font-bold text-white">
               {{ activeCustomizerStats.lethality.total }}
@@ -172,7 +198,11 @@
             <td class="px-4 py-2 font-semibold text-slate-300">Armor Penetration (%)</td>
             <td class="px-4 py-2 text-right text-slate-400">0%</td>
             <td class="px-4 py-2 text-right text-emerald-500">
-              {{ activeCustomizerStats.armorPen.bonus > 0 ? '+' + activeCustomizerStats.armorPen.bonus + '%' : '-' }}
+              {{
+                activeCustomizerStats.armorPen.bonus > 0
+                  ? '+' + activeCustomizerStats.armorPen.bonus + '%'
+                  : '-'
+              }}
             </td>
             <td class="px-4 py-2 text-right font-bold text-white">
               {{ activeCustomizerStats.armorPen.total }}%
@@ -184,7 +214,11 @@
             <td class="px-4 py-2 font-semibold text-slate-300">Magic Penetration (Flat)</td>
             <td class="px-4 py-2 text-right text-slate-400">0</td>
             <td class="px-4 py-2 text-right text-emerald-500">
-              {{ activeCustomizerStats.magicPenFlat.bonus > 0 ? '+' + activeCustomizerStats.magicPenFlat.bonus : '-' }}
+              {{
+                activeCustomizerStats.magicPenFlat.bonus > 0
+                  ? '+' + activeCustomizerStats.magicPenFlat.bonus
+                  : '-'
+              }}
             </td>
             <td class="px-4 py-2 text-right font-bold text-white">
               {{ activeCustomizerStats.magicPenFlat.total }}
@@ -196,7 +230,11 @@
             <td class="px-4 py-2 font-semibold text-slate-300">Magic Penetration (%)</td>
             <td class="px-4 py-2 text-right text-slate-400">0%</td>
             <td class="px-4 py-2 text-right text-emerald-500">
-              {{ activeCustomizerStats.magicPenPercent.bonus > 0 ? '+' + activeCustomizerStats.magicPenPercent.bonus + '%' : '-' }}
+              {{
+                activeCustomizerStats.magicPenPercent.bonus > 0
+                  ? '+' + activeCustomizerStats.magicPenPercent.bonus + '%'
+                  : '-'
+              }}
             </td>
             <td class="px-4 py-2 text-right font-bold text-white">
               {{ activeCustomizerStats.magicPenPercent.total }}%
@@ -208,7 +246,11 @@
             <td class="px-4 py-2 font-semibold text-slate-300">Life Steal</td>
             <td class="px-4 py-2 text-right text-slate-400">0%</td>
             <td class="px-4 py-2 text-right text-emerald-500">
-              {{ activeCustomizerStats.lifeSteal.bonus > 0 ? '+' + activeCustomizerStats.lifeSteal.bonus + '%' : '-' }}
+              {{
+                activeCustomizerStats.lifeSteal.bonus > 0
+                  ? '+' + activeCustomizerStats.lifeSteal.bonus + '%'
+                  : '-'
+              }}
             </td>
             <td class="px-4 py-2 text-right font-bold text-white">
               {{ activeCustomizerStats.lifeSteal.total }}%
@@ -220,7 +262,11 @@
             <td class="px-4 py-2 font-semibold text-slate-300">Omnivamp</td>
             <td class="px-4 py-2 text-right text-slate-400">0%</td>
             <td class="px-4 py-2 text-right text-emerald-500">
-              {{ activeCustomizerStats.omnivamp.bonus > 0 ? '+' + activeCustomizerStats.omnivamp.bonus + '%' : '-' }}
+              {{
+                activeCustomizerStats.omnivamp.bonus > 0
+                  ? '+' + activeCustomizerStats.omnivamp.bonus + '%'
+                  : '-'
+              }}
             </td>
             <td class="px-4 py-2 text-right font-bold text-white">
               {{ activeCustomizerStats.omnivamp.total }}%
@@ -232,7 +278,11 @@
             <td class="px-4 py-2 font-semibold text-slate-300">Tenacity & Slow Res.</td>
             <td class="px-4 py-2 text-right text-slate-400">0%</td>
             <td class="px-4 py-2 text-right text-emerald-500">
-              {{ activeCustomizerStats.tenacity.bonus > 0 ? '+' + activeCustomizerStats.tenacity.bonus + '%' : '-' }}
+              {{
+                activeCustomizerStats.tenacity.bonus > 0
+                  ? '+' + activeCustomizerStats.tenacity.bonus + '%'
+                  : '-'
+              }}
             </td>
             <td class="px-4 py-2 text-right font-bold text-white">
               {{ activeCustomizerStats.tenacity.total }}%
@@ -257,7 +307,9 @@
 </template>
 
 <script setup lang="ts">
+import type { calculateStats } from '@/services'
+
 defineProps<{
-  activeCustomizerStats: any
+  activeCustomizerStats: ReturnType<typeof calculateStats> | null
 }>()
 </script>

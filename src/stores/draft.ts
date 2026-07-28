@@ -256,7 +256,7 @@ export const useDraftStore = defineStore('draft', () => {
     slot.shardOffensive = null
     slot.shardFlex = null
     slot.shardDefensive = null
-    
+
     // Sync customized slot
     if (activeCustomizerSlot.value?.id === slot.id) {
       activeCustomizerSlot.value = null
@@ -272,7 +272,7 @@ export const useDraftStore = defineStore('draft', () => {
   }
 
   const resetDraft = () => {
-    blueDraft.value.forEach(slot => {
+    blueDraft.value.forEach((slot) => {
       slot.champion = null
       slot.level = 1
       slot.items = Array(slot.role === 'Bot' ? 7 : 6).fill(null)
@@ -290,7 +290,7 @@ export const useDraftStore = defineStore('draft', () => {
       slot.shardDefensive = null
     })
 
-    redDraft.value.forEach(slot => {
+    redDraft.value.forEach((slot) => {
       slot.champion = null
       slot.level = 1
       slot.items = Array(slot.role === 'Bot' ? 7 : 6).fill(null)
@@ -315,9 +315,12 @@ export const useDraftStore = defineStore('draft', () => {
   const toggleMasterwork = (itemIndex: number) => {
     if (!activeCustomizerSlot.value) return
     if (!activeCustomizerSlot.value.masterworkItems) {
-      activeCustomizerSlot.value.masterworkItems = Array(activeCustomizerSlot.value.items.length).fill(false)
+      activeCustomizerSlot.value.masterworkItems = Array(
+        activeCustomizerSlot.value.items.length,
+      ).fill(false)
     }
-    activeCustomizerSlot.value.masterworkItems[itemIndex] = !activeCustomizerSlot.value.masterworkItems[itemIndex]
+    activeCustomizerSlot.value.masterworkItems[itemIndex] =
+      !activeCustomizerSlot.value.masterworkItems[itemIndex]
   }
 
   const setSpellRank = (spellIdx: number, rank: number) => {
@@ -420,7 +423,8 @@ export const useDraftStore = defineStore('draft', () => {
   }
 
   // LocalStorage Persistence
-  const savedDraft = typeof localStorage !== 'undefined' ? localStorage.getItem('lol_sim_draft') : null
+  const savedDraft =
+    typeof localStorage !== 'undefined' ? localStorage.getItem('lol_sim_draft') : null
   if (savedDraft) {
     try {
       const parsed = JSON.parse(savedDraft)
@@ -432,15 +436,22 @@ export const useDraftStore = defineStore('draft', () => {
     }
   }
 
-  watch([blueDraft, redDraft, selectedSlotId], () => {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('lol_sim_draft', JSON.stringify({
-        blueDraft: blueDraft.value,
-        redDraft: redDraft.value,
-        selectedSlotId: selectedSlotId.value
-      }))
-    }
-  }, { deep: true, immediate: true })
+  watch(
+    [blueDraft, redDraft, selectedSlotId],
+    () => {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(
+          'lol_sim_draft',
+          JSON.stringify({
+            blueDraft: blueDraft.value,
+            redDraft: redDraft.value,
+            selectedSlotId: selectedSlotId.value,
+          }),
+        )
+      }
+    },
+    { deep: true, immediate: true },
+  )
 
   const removeItemFromSlot = (idx: number) => {
     if (activeCustomizerSlot.value) {

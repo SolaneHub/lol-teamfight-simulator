@@ -5,67 +5,83 @@ import { parseStatsFromDescription } from '../items/itemService'
 /**
  * Formula ufficiale di Riot Games per il calcolo delle statistiche in base al livello.
  */
-export const calculateStatForLevel = (base: number, growth: number, level: number): number => {
-  if (level === 1) return base
+export const calculateStatForLevel = (
+  base?: number,
+  growth?: number,
+  level: number = 1,
+): number => {
+  const safeBase = typeof base === 'number' && !isNaN(base) ? base : 0
+  const safeGrowth = typeof growth === 'number' && !isNaN(growth) ? growth : 0
+  if (level === 1) return safeBase
   const modifier = (level - 1) * (0.7025 + 0.0175 * (level - 1))
-  return Math.round((base + growth * modifier) * 100) / 100
+  return Math.round((safeBase + safeGrowth * modifier) * 100) / 100
 }
 
 /**
  * Calcola l'Attack Speed totale al livello specificato secondo la formula di Riot Games.
  */
 export const calculateAttackSpeedForLevel = (
-  base: number,
-  ratio: number,
-  growth: number,
-  level: number,
+  base?: number,
+  ratio?: number,
+  growth?: number,
+  level: number = 1,
   bonus: number = 0,
 ): number => {
+  const safeBase = typeof base === 'number' && !isNaN(base) ? base : 0.625
+  const safeRatio = typeof ratio === 'number' && !isNaN(ratio) ? ratio : safeBase
+  const safeGrowth = typeof growth === 'number' && !isNaN(growth) ? growth : 0
+  const safeBonus = typeof bonus === 'number' && !isNaN(bonus) ? bonus : 0
+
   if (level === 1) {
-    return Math.round((base + bonus * ratio) * 1000) / 1000
+    return Math.round((safeBase + safeBonus * safeRatio) * 1000) / 1000
   }
   const modifier = (level - 1) * (0.7025 + 0.0175 * (level - 1))
-  const growthBonus = (growth / 100) * modifier
-  const totalAs = base + (bonus + growthBonus) * ratio
+  const growthBonus = (safeGrowth / 100) * modifier
+  const totalAs = safeBase + (safeBonus + growthBonus) * safeRatio
   return Math.round(totalAs * 1000) / 1000
 }
 
 /**
  * Calcola l'incremento di una statistica ottenuto salendo a un determinato livello (es. da 9 a 10).
  */
-export const calculateStatIncreaseForLevel = (growth: number, level: number): number => {
+export const calculateStatIncreaseForLevel = (growth?: number, level: number = 1): number => {
   if (level < 2) return 0
+  const safeGrowth = typeof growth === 'number' && !isNaN(growth) ? growth : 0
   const coef = 0.65 + 0.035 * level
-  return Math.round(growth * coef * 100) / 100
+  return Math.round(safeGrowth * coef * 100) / 100
 }
 
 /**
  * Calcola le statistiche totali per un DraftSlot.
  */
 export const calculateStats = (slot: DraftSlot) => {
-  if (!slot.champion) return null
+  if (!slot || !slot.champion) return null
 
   const champ = slot.champion
-  const stats = champ.stats
-  const lvl = slot.level
+  const stats = champ.stats || {}
+  const lvl = slot.level || 1
 
   const usesMana = champ.partype === 'Mana'
 
   // Calculate Base Stats at Level L using the custom formulas
   const baseHp = calculateStatForLevel(stats.hp, stats.hpperlevel, lvl)
-  const baseMp = usesMana ? calculateStatForLevel(stats.mp, stats.mpperlevel, lvl) : (stats.mp || 0)
+  const baseMp = usesMana ? calculateStatForLevel(stats.mp, stats.mpperlevel, lvl) : stats.mp || 0
   const baseArmor = calculateStatForLevel(stats.armor, stats.armorperlevel, lvl)
-  const baseMr = calculateStatForLevel(stats.magicResist, stats.magicResistPerLevel, lvl)
+  const baseMr = calculateStatForLevel(
+    stats.spellblock ?? stats.magicResist,
+    stats.spellblockperlevel ?? stats.magicResistPerLevel,
+    lvl,
+  )
   const baseAd = calculateStatForLevel(stats.attackdamage, stats.attackdamageperlevel, lvl)
   const baseAs = calculateAttackSpeedForLevel(
     stats.attackspeed,
-    stats.attackspeedratio,
+    stats.attackspeedratio ?? stats.attackspeed,
     stats.attackspeedperlevel,
     lvl,
     0,
   )
-  const baseMs = stats.movespeed
-  const baseRange = stats.attackrange
+  const baseMs = stats.movespeed || 330
+  const baseRange = stats.attackrange || 125
 
   // Sum Item Bonuses
   let bonusHp = 0
@@ -89,11 +105,11 @@ export const calculateStats = (slot: DraftSlot) => {
   let bonusOmnivamp = 0
   let bonusTenacity = 0
 
-  for (let i = 0; i < slot.items.length; i++) {
+  for (let i = 0; i < (slot.items || []).length; i++) {
     const item = slot.items[i]
     if (!item) continue
     const isMasterwork = slot.masterworkItems && slot.masterworkItems[i] === true
-    const s = item.stats
+    const s = item.stats || {}
 
     if (s.FlatHPPoolMod) bonusHp += s.FlatHPPoolMod + (isMasterwork ? 150 : 0)
     if (usesMana && s.FlatMPPoolMod) bonusMp += s.FlatMPPoolMod
@@ -113,13 +129,13 @@ export const calculateStats = (slot: DraftSlot) => {
 
     // Parse advanced stats from description
     const parsed = parseStatsFromDescription(item.description)
-    bonusCrit += s.FlatCritChanceMod ? (s.FlatCritChanceMod * 100) : parsed.critChance
+    bonusCrit += s.FlatCritChanceMod ? s.FlatCritChanceMod * 100 : parsed.critChance
     bonusLethality += parsed.lethality
     bonusArmorPen += parsed.armorPenPercent
     bonusMagicPenFlat += parsed.magicPenFlat
     bonusMagicPenPercent += parsed.magicPenPercent
     bonusHaste += parsed.abilityHaste + (isMasterwork && parsed.abilityHaste > 0 ? 10 : 0)
-    bonusLifeSteal += s.PercentLifeStealMod ? (s.PercentLifeStealMod * 100) : parsed.lifeSteal
+    bonusLifeSteal += s.PercentLifeStealMod ? s.PercentLifeStealMod * 100 : parsed.lifeSteal
     bonusOmnivamp += parsed.omnivamp
   }
 
@@ -129,174 +145,71 @@ export const calculateStats = (slot: DraftSlot) => {
   let shardMr = 0
   let shardAd = 0
   let shardAp = 0
-  let shardAsPercent = 0
   let shardHaste = 0
+  let shardMsPct = 0
   let shardTenacity = 0
 
+  if (slot.statShards && Array.isArray(slot.statShards)) {
+    for (const shard of slot.statShards) {
+      if (!shard) continue
+      if (shard === 'health') shardHp += 65
+      else if (shard === 'scalingHealth') shardHp += 10 + (lvl - 1) * 9
+      else if (shard === 'armor') shardArmor += 6
+      else if (shard === 'magicResist') shardMr += 8
+      else if (shard === 'adaptive') {
+        shardAd += 5.4
+        shardAp += 9
+      } else if (shard === 'attackSpeed') bonusAsPercent += 0.1
+      else if (shard === 'abilityHaste') shardHaste += 8
+      else if (shard === 'moveSpeed') shardMsPct += 0.02
+      else if (shard === 'tenacity') shardTenacity += 10
+    }
+  }
+
+  bonusHp += shardHp
+  bonusArmor += shardArmor
+  bonusMr += shardMr
+  bonusHaste += shardHaste
+  bonusMsPercent += shardMsPct
+  bonusTenacity += shardTenacity
+
+  // Determine Adaptive Type (AP vs AD)
   let isApAdaptive = false
-  if (bonusAp > 0 || bonusAd > 0) {
-    isApAdaptive = bonusAp > bonusAd
+  if (bonusAp > bonusAd) {
+    isApAdaptive = true
+  } else if (bonusAd > bonusAp) {
+    isApAdaptive = false
   } else if (slot.champion) {
     isApAdaptive = getChampionDefaultAdaptiveType(slot.champion.id, slot.champion.tags) === 'AP'
   }
 
-  // Row 1: Offensive
-  if (slot.shardOffensive === 'as') {
-    shardAsPercent += 0.1
-  } else if (slot.shardOffensive === 'adaptive') {
-    if (isApAdaptive) shardAp += 9
-    else shardAd += 5.4
-  } else if (slot.shardOffensive === 'haste') {
-    shardHaste += 8
+  if (isApAdaptive) {
+    bonusAp += shardAp
+  } else {
+    bonusAd += shardAd
   }
 
-  // Row 2: Flex
-  if (slot.shardFlex === 'adaptive') {
-    if (isApAdaptive) shardAp += 9
-    else shardAd += 5.4
-  } else if (slot.shardFlex === 'ms') {
-    bonusMsPercent += 0.02
-  } else if (slot.shardFlex === 'scaling_hp') {
-    shardHp += Math.round(10 + (170 * (lvl - 1)) / 17)
-  }
-
-  // Row 3: Defensive
-  if (slot.shardDefensive === 'scaling_hp') {
-    shardHp += Math.round(10 + (170 * (lvl - 1)) / 17)
-  } else if (slot.shardDefensive === 'tenacity') {
-    shardTenacity += 10
-  } else if (slot.shardDefensive === 'flat_hp') {
-    shardHp += 65
-  }
-
-  // Apply shards to totals
-  bonusHp += shardHp
-  bonusArmor += shardArmor
-  bonusMr += shardMr
-  bonusAd += shardAd
-  bonusAp += shardAp
-  bonusAsPercent += shardAsPercent
-  bonusHaste += shardHaste
-  bonusTenacity += shardTenacity
-
-  // --- APPLY RUNE PASSIVES (Full stacks assumed for stacking runes) ---
-  let basicAbilityHaste = 0
-  let hasConditioning = false
+  // Sum Rune Passives
   let hasOvergrowth = false
-  const allSelectedRunes = [
-    slot.primaryKeystone,
-    slot.primaryRune1,
-    slot.primaryRune2,
-    slot.primaryRune3,
-    slot.secondaryRune1,
-    slot.secondaryRune2,
-  ]
-
-  for (const rune of allSelectedRunes) {
-    if (!rune) continue
-    const key = rune.key
-
-    // --- PRECISION ---
-    // Legend: Alacrity — 3% AS base + 1.5% per stack (max 10) = 18% AS
-    if (key === 'LegendAlacrity' || rune.id === 9104) {
-      bonusAsPercent += 0.03 + (0.015 * 10)
-    }
-
-    // Legend: Haste — 1.5 AH per stack (max 10) = 15 basic AH (only basic abilities)
-    if (key === 'LegendHaste' || rune.id === 9105) {
-      basicAbilityHaste += 1.5 * 10
-    }
-
-    // Legend: Bloodline — 0.45% LS per stack (max 15) = 6.75% LS + 85 HP at full
-    if (key === 'LegendBloodline' || rune.id === 9103) {
-      bonusLifeSteal += 0.45 * 15
-      bonusHp += 85
-    }
-
-    // --- SORCERY ---
-    // Transcendence — +5 AH at level 5, +5 AH at level 8
-    if (key === 'Transcendence' || rune.id === 8210) {
-      if (lvl >= 5) bonusHaste += 5
-      if (lvl >= 8) bonusHaste += 5
-    }
-
-    // Celerity — +1% MS + 7% amplification of MS bonuses
-    if (key === 'Celerity' || rune.id === 8234) {
-      bonusMsPercent += 0.01
-    }
-
-    // Absolute Focus — up to 18 AD or 30 AP (based on level, assume >70% HP active)
-    if (key === 'AbsoluteFocus' || rune.id === 8233) {
-      const adBonus = 1.8 + (16.2 * (lvl - 1)) / 17
-      const apBonus = 3 + (27 * (lvl - 1)) / 17
-      if (isApAdaptive) bonusAp += apBonus
-      else bonusAd += adBonus
-    }
-
-    // Manaflow Band — +250 max mana at full stacks (only for Mana champions)
-    if ((key === 'ManaflowBand' || rune.id === 8226) && slot.champion?.partype === 'Mana') {
-      bonusMp += 250
-    }
-
-    // --- RESOLVE ---
-    // Conditioning — +8 Armor, +8 MR, +3% both (after 12 min, assume active)
-    if (key === 'Conditioning' || rune.id === 8429) {
-      bonusArmor += 8
-      bonusMr += 8
-      hasConditioning = true
-    }
-
-    // Overgrowth — +3 HP per 8 absorbed, max 120 = 45 HP + 3.5% max HP at full
-    if (key === 'Overgrowth' || rune.id === 8451) {
-      bonusHp += 45
-      hasOvergrowth = true
-    }
-
-    // --- INSPIRATION ---
-    // Magical Footwear — +10 MS (only if wearing boots)
-    if (key === 'MagicalFootwear' || rune.id === 8304) {
-      const hasBoot = slot.items.some(item => item && item.tags.includes('Boots'))
-      if (hasBoot) bonusMsFlat += 10
-    }
-
-    // Biscuit Delivery — +30 HP per biscuit consumed, 3 biscuits = +90 HP
-    if (key === 'BiscuitDelivery' || rune.id === 8345) {
-      bonusHp += 90
-    }
-
-    // Jack Of All Trades — 1 AH per unique item stat, +10 AF at 5 stacks, +25 AF at 10 stacks
-    if (key === 'JackOfAllTrades' || rune.id === 8316) {
-      const uniqueStats = new Set<string>()
-      for (const item of slot.items) {
-        if (!item) continue
-        const s = item.stats
-        if (s.FlatHPPoolMod) uniqueStats.add('hp')
-        if (s.FlatMPPoolMod) uniqueStats.add('mp')
-        if (s.FlatArmorMod) uniqueStats.add('armor')
-        if (s.FlatSpellBlockMod) uniqueStats.add('mr')
-        if (s.FlatPhysicalDamageMod) uniqueStats.add('ad')
-        if (s.FlatMagicDamageMod) uniqueStats.add('ap')
-        if (s.PercentAttackSpeedMod) uniqueStats.add('as')
-        if (s.FlatMovementSpeedMod) uniqueStats.add('ms')
-        if (s.FlatCritChanceMod) uniqueStats.add('crit')
-        if (s.PercentMovementSpeedMod) uniqueStats.add('ms%')
-      }
-      const stacks = uniqueStats.size
-      bonusHaste += stacks // 1 AH per stack
-      if (stacks >= 10) {
-        if (isApAdaptive) bonusAp += 25
-        else bonusAd += 25 * 0.6
-      } else if (stacks >= 5) {
-        if (isApAdaptive) bonusAp += 10
-        else bonusAd += 10 * 0.6
+  if (slot.runes && Array.isArray(slot.runes)) {
+    for (const rune of slot.runes) {
+      if (!rune) continue
+      const runeName = (rune.name || '').toLowerCase()
+      if (runeName.includes('overgrowth')) {
+        hasOvergrowth = true
+      } else if (runeName.includes('conditioning') && lvl >= 12) {
+        bonusArmor += 8
+        bonusMr += 8
+        bonusArmor = bonusArmor * 1.03
+        bonusMr = bonusMr * 1.03
+      } else if (runeName.includes('legend: alacrity')) {
+        bonusAsPercent += 0.18
+      } else if (runeName.includes('legend: bloodline')) {
+        bonusLifeSteal += 5.35
+      } else if (runeName.includes('legend: haste')) {
+        bonusHaste += 15
       }
     }
-  }
-
-  // Apply Conditioning 3% multiplier
-  if (hasConditioning) {
-    bonusArmor = bonusArmor * 1.03
-    bonusMr = bonusMr * 1.03
   }
 
   // --- APPLY ITEM PASSIVES (Parsed from DDragon descriptions) ---
@@ -306,7 +219,7 @@ export const calculateStats = (slot: DraftSlot) => {
   let bonusApFromHp = 0
   let bonusAdFromHp = 0
 
-  for (const item of slot.items) {
+  for (const item of slot.items || []) {
     if (!item) continue
     const name = item.name.toLowerCase()
     const desc = item.description.toLowerCase()
@@ -321,12 +234,12 @@ export const calculateStats = (slot: DraftSlot) => {
     // 2. Seraph's Embrace / Archangel's Staff: AP from bonus mana
     if (usesMana && (name.includes("seraph's embrace") || name.includes("archangel's staff"))) {
       const match = desc.match(/(\d+)%\s*(?:of\s*)?bonus\s*mana/i)
-      const pct = match ? parseInt(match[1] || '0') : (name.includes("seraph") ? 2 : 1)
+      const pct = match ? parseInt(match[1] || '0') : name.includes('seraph') ? 2 : 1
       bonusApFromMana += bonusMp * (pct / 100)
     }
 
     // 3. Muramana / Manamune: AD from max mana
-    if (usesMana && (name.includes("muramana") || name.includes("manamune"))) {
+    if (usesMana && (name.includes('muramana') || name.includes('manamune'))) {
       const match = desc.match(/(\d+(?:\.\d+)?)%\s*(?:of\s*)?(?:max\s*|total\s*)?mana/i)
       const pct = match ? parseFloat(match[1] || '2.5') : 2.5
       const maxMana = baseMp + bonusMp
@@ -341,20 +254,20 @@ export const calculateStats = (slot: DraftSlot) => {
     }
 
     // 5. Riftmaker: AP from bonus health
-    if (name.includes("riftmaker")) {
+    if (name.includes('riftmaker')) {
       const match = desc.match(/(\d+)%\s*(?:of\s*)?bonus\s*health/i)
       const pct = match ? parseInt(match[1] || '2') : 2
       bonusApFromHp += bonusHp * (pct / 100)
     }
 
     // 6. Titanic Hydra: AD from max health
-    if (name.includes("titanic hydra")) {
+    if (name.includes('titanic hydra')) {
       const maxHp = baseHp + bonusHp
       bonusAdFromHp += maxHp * 0.015
     }
 
     // 7. Dawncore: AP from Base Mana Regen (10 AP per 100% Base Mana Regen)
-    if (name.includes("dawncore")) {
+    if (name.includes('dawncore')) {
       let totalManaRegenPct = 0
       for (const it of slot.items) {
         if (!it) continue
@@ -367,14 +280,11 @@ export const calculateStats = (slot: DraftSlot) => {
 
     // 8. Jak'Sho, The Protean: +30% bonus Armor & MR
     if (name.includes("jak'sho")) {
-      bonusArmor = bonusArmor * 1.30
-      bonusMr = bonusMr * 1.30
+      bonusArmor = bonusArmor * 1.3
+      bonusMr = bonusMr * 1.3
     }
 
-    // 9. Blackfire Torch: +4% AP per enemy champion affected
-    if (name.includes("blackfire torch")) {
-      apMultiplier += 0.04
-    }
+    // Blackfire Torch AP bonus is applied dynamically in combat (CalculatorView) per target affected
   }
 
   bonusAp += bonusApFromMana + bonusApFromHp
@@ -382,19 +292,23 @@ export const calculateStats = (slot: DraftSlot) => {
 
   // Calculate HP/MP Regen
   const baseHpRegen = calculateStatForLevel(stats.hpregen, stats.hpregenperlevel, lvl)
-  const baseMpRegen = usesMana ? calculateStatForLevel(stats.mpregen, stats.mpregenperlevel, lvl) : 0
+  const baseMpRegen = usesMana
+    ? calculateStatForLevel(stats.mpregen, stats.mpregenperlevel, lvl)
+    : 0
   let bonusHpRegenPct = 0
   let bonusMpRegenPct = 0
 
-  for (const item of slot.items) {
+  for (const item of slot.items || []) {
     if (!item) continue
     const parsed = parseStatsFromDescription(item.description)
     bonusHpRegenPct += parsed.hpRegenPercent
     if (usesMana) bonusMpRegenPct += parsed.manaRegenPercent
   }
 
-  const totalHpRegen = Math.round((baseHpRegen * (1 + bonusHpRegenPct / 100)) * 10) / 10
-  const totalMpRegen = usesMana ? Math.round((baseMpRegen * (1 + bonusMpRegenPct / 100)) * 10) / 10 : 0
+  const totalHpRegen = Math.round(baseHpRegen * (1 + bonusHpRegenPct / 100) * 10) / 10
+  const totalMpRegen = usesMana
+    ? Math.round(baseMpRegen * (1 + bonusMpRegenPct / 100) * 10) / 10
+    : 0
 
   // Calculate Totals
   let totalHp = Math.round(baseHp + bonusHp)
@@ -406,7 +320,7 @@ export const calculateStats = (slot: DraftSlot) => {
   const totalAp = Math.round((0 + bonusAp) * apMultiplier)
   const totalAs = calculateAttackSpeedForLevel(
     stats.attackspeed,
-    stats.attackspeedratio,
+    stats.attackspeedratio ?? stats.attackspeed,
     stats.attackspeedperlevel,
     lvl,
     bonusAsPercent,
@@ -450,11 +364,10 @@ export const calculateStats = (slot: DraftSlot) => {
     magicPenFlat: { base: 0, bonus: bonusMagicPenFlat, total: totalMagicPenFlat },
     magicPenPercent: { base: 0, bonus: bonusMagicPenPercent, total: totalMagicPenPercent },
     abilityHaste: { base: 0, bonus: bonusHaste, total: totalHaste, cdrPercent },
-    basicAbilityHaste,
+    hpRegen: { base: baseHpRegen, bonusPercent: bonusHpRegenPct, total: totalHpRegen },
+    mpRegen: { base: baseMpRegen, bonusPercent: bonusMpRegenPct, total: totalMpRegen },
     lifeSteal: { base: 0, bonus: bonusLifeSteal, total: totalLifeSteal },
     omnivamp: { base: 0, bonus: bonusOmnivamp, total: totalOmnivamp },
     tenacity: { base: 0, bonus: bonusTenacity, total: totalTenacity },
-    hpRegen: { base: baseHpRegen, bonus: Math.round((totalHpRegen - baseHpRegen) * 10) / 10, total: totalHpRegen },
-    mpRegen: { base: baseMpRegen, bonus: Math.round((totalMpRegen - baseMpRegen) * 10) / 10, total: totalMpRegen },
   }
 }
