@@ -16,8 +16,10 @@ export interface ChampionStats {
   movespeed: number
   armor: number
   armorperlevel: number
-  magicResist: number
-  magicResistPerLevel: number
+  spellblock?: number
+  spellblockperlevel?: number
+  magicResist?: number
+  magicResistPerLevel?: number
   attackrange: number
   hpregen: number
   hpregenperlevel: number
@@ -29,35 +31,42 @@ export interface ChampionStats {
   attackdamageperlevel: number
   attackspeedperlevel: number
   attackspeed: number
-  attackspeedratio: number
+  attackspeedratio?: number
 }
 
 export interface ChampionSpells {
   id: string
   name: string
   description: string
-  tooltip: string
-  cooldown: number[]
-  cooldownBurn: string
-  cost: number[]
-  costBurn: string
-  image: ChampionImage
+  tooltip?: string
+  icon?: string
+  cooldown?: number[]
+  cooldownBurn?: string
+  cost?: number[]
+  costBurn?: string
+  image?: ChampionImage
+  maxrank?: number
+  effect?: (number[] | null)[]
+  vars?: Record<string, unknown>[]
 }
 
 export interface ChampionPassive {
   name: string
   description: string
-  image: ChampionImage
+  icon?: string
+  image?: ChampionImage
 }
 
 export interface Champion {
   id: string
   key: string
   name: string
-  image: ChampionImage
+  title?: string
+  icon?: string
+  image?: ChampionImage
   stats: ChampionStats
   spells: ChampionSpells[]
   passive: ChampionPassive
-  tags: string[]
-  partype: string
+  tags?: string[]
+  partype?: string
 }

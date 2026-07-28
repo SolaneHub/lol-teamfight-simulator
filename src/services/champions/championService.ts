@@ -1,395 +1,374 @@
-import type { Champion, ChampionImage, ChampionStats } from '@/types'
-import championData from '../../../public/ddragon/16.14.1/data/en_US/championFull.json'
-import championHudMap from '../../../public/data/championHudMap.json'
+import type { Champion, ChampionImage, ChampionPassive, ChampionSpells } from '../../types'
 
-export const championSplashPositions: Record<string, string> = {
-  Aatrox: 'object-[50%_15%]',
-  Ahri: 'object-[50%_20%]',
-  Akali: 'object-[50%_10%]',
-  Akshan: 'object-[50%_15%]',
-  Alistar: 'object-[50%_15%]',
-  Amumu: 'object-[50%_20%]',
-  Anivia: 'object-[50%_20%]',
-  Annie: 'object-[55%_25%]',
-  Aphelios: 'object-[50%_15%]',
-  Ashe: 'object-[50%_20%]',
-  AurelionSol: 'object-[50%_25%]',
-  Aurora: 'object-[50%_15%]',
-  Azir: 'object-[50%_15%]',
-  Bard: 'object-[50%_20%]',
-  Belveth: 'object-[50%_15%]',
-  Blitzcrank: 'object-[50%_15%]',
-  Brand: 'object-[50%_15%]',
-  Braum: 'object-[50%_10%]',
-  Briar: 'object-[50%_15%]',
-  Caitlyn: 'object-[50%_20%]',
-  Camille: 'object-[50%_15%]',
-  Cassiopeia: 'object-[50%_15%]',
-  ChoGath: 'object-[50%_20%]',
-  Corki: 'object-[50%_20%]',
-  Darius: 'object-[50%_10%]',
-  Diana: 'object-[50%_15%]',
-  DrMundo: 'object-[50%_10%]',
-  Draven: 'object-[55%_12%]',
-  Ekko: 'object-[50%_15%]',
-  Elise: 'object-[50%_20%]',
-  Evelynn: 'object-[55%_20%]',
-  Ezreal: 'object-[50%_15%]',
-  Fiddlesticks: 'object-[50%_10%]',
-  Fiora: 'object-[50%_15%]',
-  Fizz: 'object-[50%_20%]',
-  Galio: 'object-[50%_10%]',
-  Gangplank: 'object-[50%_15%]',
-  Garen: 'object-[50%_12%]',
-  Gnar: 'object-[50%_20%]',
-  Gragas: 'object-[50%_15%]',
-  Graves: 'object-[50%_15%]',
-  Gwen: 'object-[50%_15%]',
-  Hecarim: 'object-[50%_20%]',
-  Heimerdinger: 'object-[50%_20%]',
-  Hwei: 'object-[50%_15%]',
-  Illaoi: 'object-[50%_15%]',
-  Irelia: 'object-[50%_15%]',
-  Ivern: 'object-[50%_20%]',
-  Janna: 'object-[50%_15%]',
-  JarvanIV: 'object-[50%_15%]',
-  Jax: 'object-[50%_20%]',
-  Jayce: 'object-[50%_15%]',
-  Jhin: 'object-[50%_10%]',
-  Jinx: 'object-[50%_15%]',
-  Kaisa: 'object-[50%_15%]',
-  Kalista: 'object-[50%_15%]',
-  Karma: 'object-[50%_15%]',
-  Karthus: 'object-[50%_15%]',
-  Kassadin: 'object-[50%_15%]',
-  Katarina: 'object-[50%_15%]',
-  Kayle: 'object-[50%_15%]',
-  Kayn: 'object-[50%_15%]',
-  Kennen: 'object-[50%_20%]',
-  KhaZix: 'object-[50%_15%]',
-  Kindred: 'object-[50%_20%]',
-  KindredLine: 'object-[50%_20%]',
-  Kled: 'object-[50%_20%]',
-  KogMaw: 'object-[50%_25%]',
-  Leblanc: 'object-[50%_15%]',
-  LeeSin: 'object-[50%_15%]',
-  Leona: 'object-[50%_15%]',
-  Lillia: 'object-[55%_18%]',
-  Lissandra: 'object-[50%_15%]',
-  Lucian: 'object-[50%_15%]',
-  Lulu: 'object-[50%_20%]',
-  Lux: 'object-[50%_15%]',
-  Malphite: 'object-[50%_20%]',
-  Malzahar: 'object-[50%_15%]',
-  Maokai: 'object-[50%_20%]',
-  MasterYi: 'object-[50%_15%]',
-  Milio: 'object-[50%_15%]',
-  MissFortune: 'object-[50%_15%]',
-  Mordekaiser: 'object-[50%_15%]',
-  Morgana: 'object-[50%_15%]',
-  Naafiri: 'object-[50%_15%]',
-  Nami: 'object-[50%_15%]',
-  Nasus: 'object-[50%_15%]',
-  Nautilus: 'object-[50%_15%]',
-  Neeko: 'object-[50%_15%]',
-  Nidalee: 'object-[50%_15%]',
-  Nilah: 'object-[50%_15%]',
-  Nocturne: 'object-[50%_15%]',
-  Nunu: 'object-[50%_20%]',
-  Olaf: 'object-[50%_15%]',
-  Orianna: 'object-[55%_15%]',
-  Ornn: 'object-[50%_15%]',
-  Pantheon: 'object-[50%_15%]',
-  Poppy: 'object-[50%_15%]',
-  Pyke: 'object-[50%_15%]',
-  Qiyana: 'object-[50%_15%]',
-  Quinn: 'object-[50%_15%]',
-  Rakan: 'object-[50%_15%]',
-  Rammus: 'object-[50%_20%]',
-  RekSai: 'object-[50%_20%]',
-  Rell: 'object-[50%_15%]',
-  Renata: 'object-[50%_15%]',
-  Renekton: 'object-[50%_15%]',
-  Rengar: 'object-[50%_15%]',
-  Riven: 'object-[55%_15%]',
-  Rumble: 'object-[50%_20%]',
-  Ryze: 'object-[50%_15%]',
-  Samira: 'object-[50%_15%]',
-  Sejuani: 'object-[50%_15%]',
-  Senna: 'object-[50%_15%]',
-  Seraphine: 'object-[50%_15%]',
-  Sett: 'object-[50%_10%]',
-  Shaco: 'object-[50%_15%]',
-  Shen: 'object-[50%_15%]',
-  Shyvana: 'object-[50%_15%]',
-  Singed: 'object-[55%_15%]',
-  Sion: 'object-[50%_15%]',
-  Sivir: 'object-[50%_15%]',
-  Skarner: 'object-[50%_15%]',
-  Smolder: 'object-[50%_15%]',
-  Sona: 'object-[50%_15%]',
-  Soraka: 'object-[50%_15%]',
-  Swain: 'object-[50%_12%]',
-  Sylas: 'object-[50%_12%]',
-  Syndra: 'object-[50%_15%]',
-  TahmKench: 'object-[50%_20%]',
-  Taliyah: 'object-[50%_15%]',
-  Talon: 'object-[55%_12%]',
-  Taric: 'object-[50%_15%]',
-  Teemo: 'object-[50%_20%]',
-  Thresh: 'object-[50%_15%]',
-  Tristana: 'object-[50%_20%]',
-  Trundle: 'object-[55%_15%]',
-  Tryndamere: 'object-[55%_12%]',
-  TwistedFate: 'object-[50%_15%]',
-  Twitch: 'object-[50%_20%]',
-  Udyr: 'object-[50%_15%]',
-  Urgot: 'object-[50%_15%]',
-  Varus: 'object-[55%_15%]',
-  Vayne: 'object-[50%_15%]',
-  Veigar: 'object-[50%_20%]',
-  Velkoz: 'object-[50%_20%]',
-  Vex: 'object-[50%_15%]',
-  Vi: 'object-[50%_12%]',
-  Viego: 'object-[50%_12%]',
-  Viktor: 'object-[50%_15%]',
-  Vladimir: 'object-[55%_15%]',
-  Volibear: 'object-[50%_15%]',
-  Warwick: 'object-[50%_15%]',
-  Xayah: 'object-[50%_15%]',
-  Xerath: 'object-[55%_15%]',
-  XinZhao: 'object-[50%_15%]',
-  Yasuo: 'object-[50%_12%]',
-  Yone: 'object-[50%_12%]',
-  Yorick: 'object-[50%_15%]',
-  Yuumi: 'object-[50%_20%]',
-  Zac: 'object-[50%_20%]',
-  Zed: 'object-[50%_12%]',
-  Zeri: 'object-[50%_15%]',
-  Ziggs: 'object-[50%_20%]',
-  Zilean: 'object-[50%_20%]',
-  Zoe: 'object-[50%_15%]',
-  Zyra: 'object-[50%_15%]',
+const BASE_URL = `${import.meta.env?.BASE_URL || '/'}ddragon/16.14.1/data/en_US`
+const CHAMP_FULL_URL = `${BASE_URL}/championFull.json`
+
+const CHAMP_IMG_URL = 'https://ddragon.leagueoflegends.com/cdn/16.14.1/img/champion'
+const PASSIVE_IMG_URL = 'https://ddragon.leagueoflegends.com/cdn/16.14.1/img/passive'
+const SPELL_IMG_URL = 'https://ddragon.leagueoflegends.com/cdn/16.14.1/img/spell'
+
+export function formatTooltipTags(text: string): string {
+  if (!text) return ''
+  return (
+    text
+      // Replace legacy Riot <font color="..."> tags for keywords like Curse (#9b0f5f) to match keywordMajor styling
+      .replace(
+        /<font color=['"]#9b0f5f['"]>(.*?)<\/font>/gi,
+        '<span class="text-indigo-300 font-semibold underline decoration-indigo-500">$1</span>',
+      )
+      .replace(
+        /<font color=['"]#([\da-f]{3,6})['"]>(.*?)<\/font>/gi,
+        '<span style="color: #$1">$2</span>',
+      )
+      .replace(/<magicDamage>/gi, '<span class="text-cyan-400 font-semibold">')
+      .replace(/<\/magicDamage>/gi, '</span>')
+      .replace(/<physicalDamage>/gi, '<span class="text-orange-400 font-semibold">')
+      .replace(/<\/physicalDamage>/gi, '</span>')
+      .replace(/<trueDamage>/gi, '<span class="text-white font-bold">')
+      .replace(/<\/trueDamage>/gi, '</span>')
+      .replace(
+        /<shield>/gi,
+        '<span class="text-slate-100 font-semibold bg-slate-800/60 px-1 rounded border border-slate-700">',
+      )
+      .replace(/<\/shield>/gi, '</span>')
+      .replace(/<(healing|lifeSteal|omnivamp)>/gi, '<span class="text-emerald-400 font-semibold">')
+      .replace(/<\/(healing|lifeSteal|omnivamp)>/gi, '</span>')
+      .replace(/<(speed|attackSpeed)>/gi, '<span class="text-teal-300 font-semibold">')
+      .replace(/<\/(speed|attackSpeed)>/gi, '</span>')
+      .replace(/<(status|slow)>/gi, '<span class="text-purple-400 font-semibold">')
+      .replace(/<\/(status|slow)>/gi, '</span>')
+      .replace(
+        /<(recast|active|spellActive|spellPassive|spellName|passive|toggle|tap|hold|release|charge|evolve)>/gi,
+        '<span class="text-amber-400 font-bold">',
+      )
+      .replace(
+        /<\/(recast|active|spellActive|spellPassive|spellName|passive|toggle|tap|hold|release|charge|evolve)>/gi,
+        '</span>',
+      )
+      .replace(/<scaleAD>/gi, '<span class="text-orange-400 font-semibold">')
+      .replace(/<\/scaleAD>/gi, '</span>')
+      .replace(/<scaleAP>/gi, '<span class="text-cyan-400 font-semibold">')
+      .replace(/<\/scaleAP>/gi, '</span>')
+      .replace(
+        /<(scaleHealth|scaleArmor|scaleMR|scaleMana)>/gi,
+        '<span class="text-emerald-400 font-semibold">',
+      )
+      .replace(/<\/(scaleHealth|scaleArmor|scaleMR|scaleMana)>/gi, '</span>')
+      .replace(
+        /<(keyword|keywordMajor|keywordName|keywordStealth)>/gi,
+        '<span class="text-indigo-300 font-semibold underline decoration-indigo-500">',
+      )
+      .replace(/<\/(keyword|keywordMajor|keywordName|keywordStealth)>/gi, '</span>')
+      .replace(/<(attention|danger)>/gi, '<span class="text-rose-400 font-bold uppercase">')
+      .replace(/<\/(attention|danger)>/gi, '</span>')
+      .replace(/<armorPen>/gi, '<span class="text-red-400 font-semibold">')
+      .replace(/<\/armorPen>/gi, '</span>')
+      .replace(/<OnHit>/gi, '<span class="text-yellow-300 font-semibold">')
+      .replace(/<\/OnHit>/gi, '</span>')
+      .replace(/<br\s*\/?>/gi, '<br />')
+  )
 }
 
-export const getChampionSplashUrl = (champId: string): string => {
-  if (!champId) return ''
-  const folder = champId.toLowerCase()
-  const fileName = folder === 'xinzhao' ? 'xinzhaorework' : folder
-  return `${import.meta.env.BASE_URL}out/champions/${folder}/assets/${fileName}_splash_centered_0.jpg`
-}
-
-export const getChampionIconUrl = (champ: any): string => {
-  if (!champ) return ''
-  const folder = (champ.id || '').toLowerCase()
-  return `${import.meta.env.BASE_URL}out/champions/${folder}/assets/icon.png`
-}
-
-export const getChampionPassiveUrl = (champId: string): string => {
-  if (!champId) return ''
-  const folder = champId.toLowerCase()
-  const hud = (championHudMap as Record<string, any>)[folder]
-  if (hud?.passive) {
-    return `${import.meta.env.BASE_URL}out/champions/${folder}/assets/hud/${hud.passive}`
-  }
-  return `${import.meta.env.BASE_URL}out/champions/${folder}/assets/hud/${folder}_passive.png`
-}
-
-export const getChampionSpellUrl = (champId: string, spellIndex: number): string => {
-  if (!champId) return ''
-  const folder = champId.toLowerCase()
-  const hud = (championHudMap as Record<string, any>)[folder]
-  if (hud?.spells?.[spellIndex]) {
-    return `${import.meta.env.BASE_URL}out/champions/${folder}/assets/hud/${hud.spells[spellIndex]}`
-  }
-  const letters = ['q', 'w', 'e', 'r']
-  return `${import.meta.env.BASE_URL}out/champions/${folder}/assets/hud/${folder}_${letters[spellIndex]}.png`
-}
-
-export const getChampionPosition = (champId: string): string => {
-  return championSplashPositions[champId] || 'object-center'
-}
-
-export const getChampionDefaultAdaptiveType = (champId: string, tags: string[]): 'AD' | 'AP' => {
+export const getChampionDefaultAdaptiveType = (
+  champId: string,
+  tags: string[] = [],
+): 'AP' | 'AD' => {
   const apChamps = ['Mage', 'Support']
-  if (tags.some(t => apChamps.includes(t))) return 'AP'
+  if (tags && Array.isArray(tags) && tags.some((t) => apChamps.includes(t))) return 'AP'
   return 'AD'
 }
 
-export const mapChampionImage = (img: any): ChampionImage => ({
-  full: img?.full || '',
-  sprite: img?.sprite || '',
-  group: img?.group || '',
-  x: img?.x || 0,
-  y: img?.y || 0,
-  w: img?.w || 0,
-  h: img?.h || 0,
-})
+export const getChampionSplashUrl = (champId: string, skinNum: number = 0): string => {
+  if (!champId) return ''
+  return `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${champId}_${skinNum}.jpg`
+}
 
-export const mapChampionStats = (stats: any): ChampionStats => ({
-  hp: stats?.hp || 0,
-  hpperlevel: stats?.hpperlevel || 0,
-  mp: stats?.mp || 0,
-  mpperlevel: stats?.mpperlevel || 0,
-  movespeed: stats?.movespeed || 0,
-  armor: stats?.armor || 0,
-  armorperlevel: stats?.armorperlevel || 0,
-  magicResist: stats?.spellblock || 0,
-  magicResistPerLevel: stats?.spellblockperlevel || 0,
-  attackrange: stats?.attackrange || 0,
-  hpregen: stats?.hpregen || 0,
-  hpregenperlevel: stats?.hpregenperlevel || 0,
-  mpregen: stats?.mpregen || 0,
-  mpregenperlevel: stats?.mpregenperlevel || 0,
-  crit: stats?.crit || 0,
-  critperlevel: stats?.critperlevel || 0,
-  attackdamage: stats?.attackdamage || 0,
-  attackdamageperlevel: stats?.attackdamageperlevel || 0,
-  attackspeedperlevel: stats?.attackspeedperlevel || 0,
-  attackspeed: stats?.attackspeed || 0,
-  attackspeedratio: stats?.attackspeedratio || stats?.attackspeed || 0,
-})
+export const getChampionIconUrl = (
+  champ?: string | Champion | { id?: string; key?: string } | null,
+): string => {
+  if (!champ) return ''
+  const champId = typeof champ === 'string' ? champ : champ.id || champ.key || ''
+  if (!champId) return ''
+  return `${CHAMP_IMG_URL}/${champId}.png`
+}
 
-export const mapChampion = (raw: any): Champion => ({
-  id: raw?.id || '',
-  key: raw?.key || '',
-  name: raw?.name || '',
-  image: mapChampionImage(raw?.image),
-  stats: mapChampionStats(raw?.stats),
-  spells: (raw?.spells || []).map((spell: any) => ({
-    id: spell?.id || '',
-    name: spell?.name || '',
-    description: spell?.description || '',
-    tooltip: spell?.tooltip || '',
-    cooldown: spell?.cooldown || [],
-    cooldownBurn: spell?.cooldownBurn || '',
-    cost: spell?.cost || [],
-    costBurn: spell?.costBurn || '',
-    image: mapChampionImage(spell?.image),
-  })),
-  passive: {
-    name: raw?.passive?.name || '',
-    description: raw?.passive?.description || '',
-    image: mapChampionImage(raw?.passive?.image),
-  },
-  tags: raw?.tags || [],
-  partype: raw?.partype || 'Mana',
-})
+export const getChampionPassiveUrl = (champ?: Champion | string | null): string => {
+  if (!champ) return ''
+  if (typeof champ !== 'string' && champ.passive?.icon) {
+    return champ.passive.icon
+  }
+  return ''
+}
 
-export const formatTooltipTags = (text: string): string => {
-  if (!text) return ''
-  return text
-    .replace(/%i:[a-zA-Z0-9_-]+%/gi, '')
-    // Riot LoL UIKit tags
-    .replace(/<lol-uikit-tooltipped-keyword[^>]*>/gi, '<span class="text-cyan-300 font-semibold underline decoration-cyan-500/40">')
-    .replace(/<\/lol-uikit-tooltipped-keyword>/gi, '</span>')
-    .replace(/<font color=['"]?([^'"]+)['"]?>/gi, '<span style="color: $1" class="font-semibold">')
-    .replace(/<\/font>/gi, '</span>')
-    .replace(/<scaleLevel>/gi, '<span class="text-amber-400 font-semibold">')
-    .replace(/<\/scaleLevel>/gi, '</span>')
-    .replace(/<gold>/gi, '<span class="text-amber-300 font-semibold">')
-    .replace(/<\/gold>/gi, '</span>')
-    .replace(/<rules>/gi, '<span class="block mt-2 text-slate-400 text-xs italic font-mono border-t border-slate-800/80 pt-1.5">')
-    .replace(/<\/rules>/gi, '</span>')
-    .replace(/<i>/gi, '<span class="text-amber-300/80 italic">')
-    .replace(/<\/i>/gi, '</span>')
-    .replace(/<\/?(pathBonus|pathResolve|pathSorcery|pathPrecision|pathDomination|pathInspiration)>/gi, '')
-    // Damage & Stat tags
-    .replace(/<magicDamage>/gi, '<span class="text-cyan-400 font-semibold">')
-    .replace(/<\/magicDamage>/gi, '</span>')
-    .replace(/<physicalDamage>/gi, '<span class="text-orange-400 font-semibold">')
-    .replace(/<\/physicalDamage>/gi, '</span>')
-    .replace(/<trueDamage>/gi, '<span class="text-white font-bold underline decoration-amber-300">')
-    .replace(/<\/trueDamage>/gi, '</span>')
-    .replace(/<shield>/gi, '<span class="text-slate-100 font-semibold bg-slate-800/60 px-1 rounded border border-slate-700">')
-    .replace(/<\/shield>/gi, '</span>')
-    .replace(/<(healing|lifeSteal|omnivamp)>/gi, '<span class="text-emerald-400 font-semibold">')
-    .replace(/<\/(healing|lifeSteal|omnivamp)>/gi, '</span>')
-    .replace(/<(speed|attackSpeed)>/gi, '<span class="text-teal-300 font-semibold">')
-    .replace(/<\/(speed|attackSpeed)>/gi, '</span>')
-    .replace(/<(status|slow)>/gi, '<span class="text-purple-400 font-semibold">')
-    .replace(/<\/(status|slow)>/gi, '</span>')
-    .replace(/<(recast|active|spellActive|spellPassive|spellName|passive|toggle|tap|hold|release|charge|evolve)>/gi, '<span class="text-amber-400 font-bold">')
-    .replace(/<\/(recast|active|spellActive|spellPassive|spellName|passive|toggle|tap|hold|release|charge|evolve)>/gi, '</span>')
-    .replace(/<scaleAD>/gi, '<span class="text-orange-400 font-semibold">')
-    .replace(/<\/scaleAD>/gi, '</span>')
-    .replace(/<scaleAP>/gi, '<span class="text-cyan-400 font-semibold">')
-    .replace(/<\/scaleAP>/gi, '</span>')
-    .replace(/<(scaleHealth|scaleArmor|scaleMR|scaleMana)>/gi, '<span class="text-emerald-400 font-semibold">')
-    .replace(/<\/(scaleHealth|scaleArmor|scaleMR|scaleMana)>/gi, '</span>')
-    .replace(/<(keyword|keywordMajor|keywordName|keywordStealth)>/gi, '<span class="text-indigo-300 font-semibold underline decoration-indigo-500">')
-    .replace(/<\/(keyword|keywordMajor|keywordName|keywordStealth)>/gi, '</span>')
-    .replace(/<(attention|danger)>/gi, '<span class="text-rose-400 font-bold uppercase">')
-    .replace(/<\/(attention|danger)>/gi, '</span>')
-    .replace(/<armorPen>/gi, '<span class="text-red-400 font-semibold">')
-    .replace(/<\/armorPen>/gi, '</span>')
-    .replace(/<OnHit>/gi, '<span class="text-yellow-300 font-semibold">')
-    .replace(/<\/OnHit>/gi, '</span>')
-    .replace(/<br\s*\/?>/gi, '<br />')
+export const getChampionSpellUrl = (
+  champ?: Champion | string | null,
+  spellIndex?: number,
+): string => {
+  if (!champ || spellIndex === undefined) return ''
+  if (typeof champ !== 'string' && champ.spells?.[spellIndex]?.icon) {
+    return champ.spells[spellIndex].icon
+  }
+  return ''
+}
+
+export const getChampionPosition = (champId: string): string => {
+  if (!champId) return 'center top'
+  const positions: Record<string, string> = {
+    Aatrox: 'center 15%',
+    Ahri: 'center 20%',
+    Akali: 'center 20%',
+    Alistar: 'center 25%',
+    Amumu: 'center 20%',
+    Anivia: 'center 15%',
+    Annie: 'center 20%',
+    Aphelios: 'center 20%',
+    Ashe: 'center 20%',
+    AurelionSol: 'center 20%',
+    Azir: 'center 20%',
+    Bard: 'center 20%',
+    Belveth: 'center 20%',
+    Blitzcrank: 'center 20%',
+    Brand: 'center 20%',
+    Braum: 'center 20%',
+    Briar: 'center 20%',
+    Caitlyn: 'center 20%',
+    Camille: 'center 20%',
+    Cassiopeia: 'center 20%',
+    Chogath: 'center 20%',
+    Corki: 'center 20%',
+    Darius: 'center 20%',
+    Diana: 'center 20%',
+    Draven: 'center 20%',
+    DrMundo: 'center 20%',
+    Ekko: 'center 20%',
+    Elise: 'center 20%',
+    Evelynn: 'center 20%',
+    Ezreal: 'center 20%',
+    Fiddlesticks: 'center 20%',
+    Fiora: 'center 20%',
+    Fizz: 'center 20%',
+    Galio: 'center 20%',
+    Gangplank: 'center 20%',
+    Garen: 'center 20%',
+    Gnar: 'center 20%',
+    Gragas: 'center 20%',
+    Graves: 'center 20%',
+    Gwen: 'center 20%',
+    Hecarim: 'center 20%',
+    Heimerdinger: 'center 20%',
+    Hwei: 'center 20%',
+    Illaoi: 'center 20%',
+    Irelia: 'center 20%',
+    Ivern: 'center 20%',
+    Janna: 'center 20%',
+    JarvanIV: 'center 20%',
+    Jax: 'center 20%',
+    Jayce: 'center 20%',
+    Jhin: 'center 20%',
+    Jinx: 'center 20%',
+    Ksante: 'center 20%',
+    Kaisa: 'center 20%',
+    Kalista: 'center 20%',
+    Karma: 'center 20%',
+    Karthus: 'center 20%',
+    Kassadin: 'center 20%',
+    Katarina: 'center 20%',
+    Kayle: 'center 20%',
+    Kayn: 'center 20%',
+    Kennen: 'center 20%',
+    Khazix: 'center 20%',
+    Kindred: 'center 20%',
+    Kled: 'center 20%',
+    KogMaw: 'center 20%',
+    Leblanc: 'center 20%',
+    LeeSin: 'center 20%',
+    Leona: 'center 20%',
+    Lillia: 'center 20%',
+    Lissandra: 'center 20%',
+    Lucian: 'center 20%',
+    Lulu: 'center 20%',
+    Lux: 'center 20%',
+    Malphite: 'center 20%',
+    Malzahar: 'center 20%',
+    Maokai: 'center 20%',
+    MasterYi: 'center 20%',
+    Milio: 'center 20%',
+    MissFortune: 'center 20%',
+    Mordekaiser: 'center 20%',
+    Morgana: 'center 20%',
+    Naafiri: 'center 20%',
+    Nami: 'center 20%',
+    Nasus: 'center 20%',
+    Nautilus: 'center 20%',
+    Neeko: 'center 20%',
+    Nidalee: 'center 20%',
+    Nilah: 'center 20%',
+    Nocturne: 'center 20%',
+    Nunu: 'center 20%',
+    Olaf: 'center 20%',
+    Orianna: 'center 20%',
+    Ornn: 'center 20%',
+    Pantheon: 'center 20%',
+    Poppy: 'center 20%',
+    Pyke: 'center 20%',
+    Qiyana: 'center 20%',
+    Quinn: 'center 20%',
+    Rakan: 'center 20%',
+    Rammus: 'center 20%',
+    RekSai: 'center 20%',
+    Rell: 'center 20%',
+    Renata: 'center 20%',
+    Renekton: 'center 20%',
+    Rengar: 'center 20%',
+    Riven: 'center 20%',
+    Rumble: 'center 20%',
+    Ryze: 'center 20%',
+    Samira: 'center 20%',
+    Sejuani: 'center 20%',
+    Senna: 'center 20%',
+    Seraphine: 'center 20%',
+    Sett: 'center 20%',
+    Shaco: 'center 20%',
+    Shen: 'center 20%',
+    Shyvana: 'center 20%',
+    Singed: 'center 20%',
+    Sion: 'center 20%',
+    Sivir: 'center 20%',
+    Skarner: 'center 20%',
+    Smolder: 'center 20%',
+    Sona: 'center 20%',
+    Soraka: 'center 20%',
+    Swain: 'center 20%',
+    Sylas: 'center 20%',
+    Syndra: 'center 20%',
+    TahmKench: 'center 20%',
+    Taliyah: 'center 20%',
+    Talon: 'center 20%',
+    Taric: 'center 20%',
+    Teemo: 'center 20%',
+    Thresh: 'center 20%',
+    Tristana: 'center 20%',
+    Trundle: 'center 20%',
+    Tryndamere: 'center 20%',
+    TwistedFate: 'center 20%',
+    Twitch: 'center 20%',
+    Udyr: 'center 20%',
+    Urgot: 'center 20%',
+    Varus: 'center 20%',
+    Vayne: 'center 20%',
+    Veigar: 'center 20%',
+    Velkoz: 'center 20%',
+    Vex: 'center 20%',
+    Vi: 'center 20%',
+    Viego: 'center 20%',
+    Viktor: 'center 20%',
+    Vladimir: 'center 20%',
+    Volibear: 'center 20%',
+    Warwick: 'center 20%',
+    Wukong: 'center 20%',
+    Xayah: 'center 20%',
+    Xerath: 'center 20%',
+    XinZhao: 'center 20%',
+    Yasuo: 'center 20%',
+    Yone: 'center 20%',
+    Yorick: 'center 20%',
+    Yuumi: 'center 20%',
+    Zac: 'center 20%',
+    Zed: 'center 20%',
+    Zeri: 'center 20%',
+    Ziggs: 'center 20%',
+    Zilean: 'center 20%',
+    Zoe: 'center 20%',
+    Zyra: 'center 20%',
+  }
+  return positions[champId] || 'center 20%'
 }
 
 export const championService = {
   async getChampions(): Promise<Champion[]> {
     try {
-      return Object.values(championData.data)
-        .map(mapChampion)
-        .sort((a, b) => a.name.localeCompare(b.name))
+      const response = await fetch(CHAMP_FULL_URL)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch champions: ${response.statusText}`)
+      }
+      const data = await response.json()
+      const rawData: Record<string, unknown> = data.data || {}
+
+      return Object.values(rawData || {}).map((champObj: unknown) => {
+        const champ = champObj as Record<string, unknown>
+        const stats = (champ.stats as Record<string, number>) || {}
+        const passive = (champ.passive as Record<string, unknown>) || {}
+        const passiveImg = (passive.image as Record<string, string>) || {}
+        const spells = (champ.spells as Record<string, unknown>[]) || []
+        const champImg = (champ.image as Record<string, string>) || {}
+
+        return {
+          id: champ.id as string,
+          key: champ.key as string,
+          name: champ.name as string,
+          title: champ.title as string,
+          icon: `${CHAMP_IMG_URL}/${champImg.full || (champ.id as string) + '.png'}`,
+          image: champ.image as ChampionImage,
+          tags: (champ.tags as string[]) || [],
+          partype: (champ.partype as string) || 'Mana',
+          stats: {
+            hp: stats.hp ?? 500,
+            hpperlevel: stats.hpperlevel ?? 0,
+            mp: stats.mp ?? 300,
+            mpperlevel: stats.mpperlevel ?? 0,
+            movespeed: stats.movespeed ?? 330,
+            armor: stats.armor ?? 30,
+            armorperlevel: stats.armorperlevel ?? 0,
+            spellblock: stats.spellblock ?? 30,
+            spellblockperlevel: stats.spellblockperlevel ?? 0,
+            magicResist: stats.spellblock ?? stats.magicResist ?? 30,
+            magicResistPerLevel: stats.spellblockperlevel ?? stats.magicResistPerLevel ?? 0,
+            attackrange: stats.attackrange ?? 125,
+            hpregen: stats.hpregen ?? 6,
+            hpregenperlevel: stats.hpregenperlevel ?? 0,
+            mpregen: stats.mpregen ?? 6,
+            mpregenperlevel: stats.mpregenperlevel ?? 0,
+            crit: stats.crit ?? 0,
+            critperlevel: stats.critperlevel ?? 0,
+            attackdamage: stats.attackdamage ?? 60,
+            attackdamageperlevel: stats.attackdamageperlevel ?? 0,
+            attackspeedperlevel: stats.attackspeedperlevel ?? 0,
+            attackspeed: stats.attackspeed ?? 0.625,
+            attackspeedratio: stats.attackspeedratio || stats.attackspeed || 0.625,
+          },
+          passive: {
+            name: (passive.name as string) || '',
+            description: (passive.description as string) || '',
+            icon: `${PASSIVE_IMG_URL}/${passiveImg.full}`,
+            image: champ.passive as ChampionPassive['image'],
+          },
+          spells: spells.map((spell) => {
+            const spellImg = (spell.image as Record<string, string>) || {}
+            return {
+              id: spell.id as string,
+              name: spell.name as string,
+              description: spell.description as string,
+              tooltip: spell.tooltip as string,
+              icon: `${SPELL_IMG_URL}/${spellImg.full}`,
+              image: spell.image as ChampionSpells['image'],
+              cooldown: spell.cooldown as number[],
+              cost: spell.cost as number[],
+              costType: spell.costType as string,
+              maxrank: spell.maxrank as number,
+              effect: spell.effect as (number[] | null)[],
+              vars: spell.vars as Record<string, unknown>[],
+            }
+          }),
+        }
+      })
     } catch (error) {
-      console.error('Errore nel championService (getChampions):', error)
+      console.error('Error fetching champion data:', error)
       throw error
     }
   },
 
-  async getChampionDetails(championId: string): Promise<Champion> {
-    try {
-      const module = await import(
-        `../../../public/ddragon/16.14.1/data/en_US/champion/${championId}.json`
-      )
-      const champion = mapChampion(module.default.data[championId])
-
-      try {
-        const folder = championId.toLowerCase()
-        const res = await fetch(`${import.meta.env.BASE_URL}out/champions/${folder}/data/${folder}.bin.json`)
-        if (res.ok) {
-          const binData = await res.json()
-          const rootKey = Object.keys(binData).find(k => k.endsWith('/CharacterRecords/Root'))
-          if (rootKey) {
-            const root = binData[rootKey]
-            champion.stats = {
-              hp: root.baseHPModifiable?.baseValue ?? champion.stats.hp,
-              hpperlevel: root.hpPerLevelModifiable?.baseValue ?? champion.stats.hpperlevel,
-              mp: root.primaryAbilityResource?.['{726ee5cd}']?.baseValue ?? champion.stats.mp,
-              mpperlevel: root.primaryAbilityResource?.['{c4ab3550}']?.baseValue ?? champion.stats.mpperlevel,
-              movespeed: root.baseMoveSpeedModifiable?.baseValue ?? champion.stats.movespeed,
-              armor: root.baseArmorModifiable?.baseValue ?? champion.stats.armor,
-              armorperlevel: root.armorPerLevelModifiable?.baseValue ?? champion.stats.armorperlevel,
-              magicResist: root.baseMR?.baseValue ?? champion.stats.magicResist,
-              magicResistPerLevel: root['{01262a25}']?.baseValue ?? champion.stats.magicResistPerLevel,
-              attackrange: root.attackRangeModifiable?.baseValue ?? champion.stats.attackrange,
-              hpregen: root.baseStaticHPRegenModifiable?.baseValue != null
-                ? root.baseStaticHPRegenModifiable.baseValue * 5
-                : champion.stats.hpregen,
-              hpregenperlevel: root.hpRegenPerLevelModifiable?.baseValue ?? champion.stats.hpregenperlevel,
-              mpregen: champion.stats.mpregen,
-              mpregenperlevel: champion.stats.mpregenperlevel,
-              crit: champion.stats.crit,
-              critperlevel: champion.stats.critperlevel,
-              attackdamage: root.baseDamageModifiable?.baseValue ?? champion.stats.attackdamage,
-              attackdamageperlevel: root.damagePerLevelModifiable?.baseValue ?? champion.stats.attackdamageperlevel,
-              attackspeed: root.attackSpeedModifiable?.baseValue ?? champion.stats.attackspeed,
-              attackspeedperlevel: root.attackSpeedPerLevelModifiable?.baseValue ?? champion.stats.attackspeedperlevel,
-              attackspeedratio: root.attackSpeedRatioModifiable?.baseValue ?? champion.stats.attackspeedratio,
-            }
-          }
-        }
-      } catch (binErr) {
-        console.warn(`bin.json stats overlay failed for ${championId}, using DDragon fallback`)
-      }
-
-      return champion
-    } catch (error) {
-      console.error('Errore nel championService (getChampionDetails):', error)
-      throw error
-    }
-  }
+  async getChampionById(id: string): Promise<Champion | null> {
+    const champions = await this.getChampions()
+    return champions.find((c) => c.id.toLowerCase() === id.toLowerCase()) || null
+  },
 }

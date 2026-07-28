@@ -24,8 +24,8 @@ export const useDDragonStore = defineStore('ddragon', () => {
       allChampions.value = champs
       allItems.value = items
       allRunes.value = runes
-    } catch (err: any) {
-      error.value = err.message || 'Failed to load DDragon assets'
+    } catch (err: unknown) {
+      error.value = (err as Error).message || 'Failed to load DDragon assets'
       console.error('DDragon loader error:', err)
     } finally {
       isLoading.value = false
@@ -38,6 +38,6 @@ export const useDDragonStore = defineStore('ddragon', () => {
     allRunes,
     isLoading,
     error,
-    loadData
+    loadData,
   }
 })

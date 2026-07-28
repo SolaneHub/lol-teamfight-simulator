@@ -5,7 +5,7 @@ export const parseItemStatsFromDescription = (description: string): ItemStats =>
   if (!description) return stats
 
   const statsMatch = description.match(/<stats>([\s\S]*?)<\/stats>/i)
-  const textToParse = (statsMatch && statsMatch[1]) ? statsMatch[1] : description
+  const textToParse = statsMatch && statsMatch[1] ? statsMatch[1] : description
 
   const regex = /<attention>\s*([+-\d%.]+)\s*%?<\/attention>\s*([^<]+)/gi
   let match
@@ -25,7 +25,11 @@ export const parseItemStatsFromDescription = (description: string): ItemStats =>
       stats.FlatArmorMod = val
     } else if (nameStr.includes('magic resist')) {
       stats.FlatSpellBlockMod = val
-    } else if (nameStr.includes('health') && !nameStr.includes('regen') && !nameStr.includes('shield')) {
+    } else if (
+      nameStr.includes('health') &&
+      !nameStr.includes('regen') &&
+      !nameStr.includes('shield')
+    ) {
       stats.FlatHPPoolMod = val
     } else if (nameStr.includes('mana') && !nameStr.includes('regen')) {
       stats.FlatMPPoolMod = val
@@ -101,14 +105,14 @@ export const parseStatsFromDescription = (description: string) => {
   return result
 }
 
-export const mapItem = (id: string, raw: any): Item => {
-  const iconPath = raw?.iconPath || ''
+export const mapItem = (id: string, raw: Record<string, unknown> | null | undefined): Item => {
+  const iconPath = (raw?.iconPath as string) || ''
   const filename = iconPath.split('/').pop()?.toLowerCase() || ''
 
   return {
     id,
-    name: raw?.name || '',
-    description: raw?.description || '',
+    name: (raw?.name as string) || '',
+    description: (raw?.description as string) || '',
     colloq: '',
     image: {
       full: filename,
@@ -120,19 +124,19 @@ export const mapItem = (id: string, raw: any): Item => {
       h: 48,
     },
     gold: {
-      base: raw?.price || 0,
-      total: raw?.priceTotal || 0,
-      sell: raw?.price || 0,
-      purchasable: raw?.inStore ?? false,
+      base: (raw?.price as number) || 0,
+      total: (raw?.priceTotal as number) || 0,
+      sell: (raw?.price as number) || 0,
+      purchasable: (raw?.inStore as boolean) ?? false,
     },
-    tags: raw?.categories || [],
-    stats: parseItemStatsFromDescription(raw?.description),
+    tags: (raw?.categories as string[]) || [],
+    stats: parseItemStatsFromDescription((raw?.description as string) || ''),
     maps: {},
-    inStore: raw?.inStore,
-    requiredChampion: raw?.requiredChampion,
-    requiredAlly: raw?.requiredAlly,
-    from: (raw?.from || []).map((x: any) => x.toString()),
-    into: (raw?.to || []).map((x: any) => x.toString()),
+    inStore: raw?.inStore as boolean,
+    requiredChampion: raw?.requiredChampion as string,
+    requiredAlly: raw?.requiredAlly as string,
+    from: ((raw?.from as (string | number)[]) || []).map((x) => x.toString()),
+    into: ((raw?.to as (string | number)[]) || []).map((x) => x.toString()),
     iconPath,
   }
 }
@@ -151,101 +155,186 @@ export const getItemIconUrl = (item: Item): string => {
 
 export const itemClassMap: Record<string, string[]> = {
   // Starter items
-  "Doran's Blade": ["Fighter", "Marksman"],
-  "Doran's Ring": ["Mage"],
-  "Doran's Shield": ["Tank"],
-  "Tear of the Goddess": ["Mage", "Marksman"],
+  "Doran's Blade": ['Fighter', 'Marksman'],
+  "Doran's Ring": ['Mage'],
+  "Doran's Shield": ['Tank'],
+  'Tear of the Goddess': ['Mage', 'Marksman'],
 
   // Fighter
-  "Black Cleaver": ["Fighter"],
-  "Trinity Force": ["Fighter"],
-  "Sterak's Gage": ["Fighter"],
-  "Ravenous Hydra": ["Fighter"],
-  "Titanic Hydra": ["Fighter"],
-  "Stridebreaker": ["Fighter"],
-  "Death's Dance": ["Fighter"],
+  'Black Cleaver': ['Fighter'],
+  'Trinity Force': ['Fighter'],
+  "Sterak's Gage": ['Fighter'],
+  'Ravenous Hydra': ['Fighter'],
+  'Titanic Hydra': ['Fighter'],
+  Stridebreaker: ['Fighter'],
+  "Death's Dance": ['Fighter'],
 
   // Marksman
-  "Infinity Edge": ["Marksman"],
-  "Kraken Slayer": ["Marksman"],
-  "Lord Dominik's Regards": ["Marksman"],
-  "Bloodthirster": ["Marksman"],
-  "Rapid Firecannon": ["Marksman"],
-  "Runaan's Hurricane": ["Marksman"],
-  "Statikk Shiv": ["Marksman"],
+  'Infinity Edge': ['Marksman'],
+  'Kraken Slayer': ['Marksman'],
+  "Lord Dominik's Regards": ['Marksman'],
+  Bloodthirster: ['Marksman'],
+  'Rapid Firecannon': ['Marksman'],
+  "Runaan's Hurricane": ['Marksman'],
+  'Statikk Shiv': ['Marksman'],
 
   // Assassin
-  "Youmuu's Ghostblade": ["Assassin"],
-  "Hubris": ["Assassin"],
-  "Serylda's Grudge": ["Assassin"],
-  "Opportunity": ["Assassin"],
-  "Edge of Night": ["Assassin"],
-  "Profane Hydra": ["Assassin"],
+  "Youmuu's Ghostblade": ['Assassin'],
+  Hubris: ['Assassin'],
+  "Serylda's Grudge": ['Assassin'],
+  Opportunity: ['Assassin'],
+  'Edge of Night': ['Assassin'],
+  'Profane Hydra': ['Assassin'],
 
   // Mage
-  "Rabadon's Deathcap": ["Mage"],
-  "Luden's Companion": ["Mage"],
-  "Zhonya's Hourglass": ["Mage"],
-  "Banshee's Veil": ["Mage"],
-  "Shadowflame": ["Mage"],
-  "Stormsurge": ["Mage"],
-  "Liandry's Torment": ["Mage", "Fighter"],
-  "Riftmaker": ["Mage", "Fighter"],
-  "Seraph's Embrace": ["Mage"],
+  "Rabadon's Deathcap": ['Mage'],
+  "Luden's Companion": ['Mage'],
+  "Zhonya's Hourglass": ['Mage'],
+  "Banshee's Veil": ['Mage'],
+  Shadowflame: ['Mage'],
+  Stormsurge: ['Mage'],
+  "Liandry's Torment": ['Mage', 'Fighter'],
+  Riftmaker: ['Mage', 'Fighter'],
+  "Seraph's Embrace": ['Mage'],
 
   // Tank
-  "Thornmail": ["Tank"],
-  "Warmog's Armor": ["Tank"],
-  "Sunfire Aegis": ["Tank"],
-  "Jak'Sho, The Protean": ["Tank"],
-  "Kaenic Rookern": ["Tank"],
-  "Heartsteel": ["Tank"],
-  "Randuin's Omen": ["Tank"],
+  Thornmail: ['Tank'],
+  "Warmog's Armor": ['Tank'],
+  'Sunfire Aegis': ['Tank'],
+  "Jak'Sho, The Protean": ['Tank'],
+  'Kaenic Rookern': ['Tank'],
+  Heartsteel: ['Tank'],
+  "Randuin's Omen": ['Tank'],
 
   // Support
-  "Redemption": ["Support"],
-  "Locket of the Iron Solari": ["Support"],
-  "Ardent Censer": ["Support"],
-  "Staff of Flowing Water": ["Support"],
-  "Imperial Mandate": ["Support"],
-  "Moonstone Renewer": ["Support"],
-  "Shurelya's Battlesong": ["Support"],
+  'World Atlas': ['Support'],
+  'Celestial Opposition': ['Support'],
+  'Dream Maker': ['Support'],
+  "Zaz'Zak's Realmspike": ['Support'],
+  'Solstice Sleigh': ['Support'],
+  Bloodsong: ['Support'],
+  'Runic Compass': ['Support'],
+  'Bounty of Worlds': ['Support'],
+  Redemption: ['Support'],
+  'Locket of the Iron Solari': ['Support'],
+  'Ardent Censer': ['Support'],
+  'Staff of Flowing Water': ['Support'],
+  'Imperial Mandate': ['Support'],
+  'Moonstone Renewer': ['Support'],
+  "Shurelya's Battlesong": ['Support'],
 }
 
 export const getItemClass = (item: Item): string[] => {
   return itemClassMap[item.name] || []
 }
 
-export const itemTierMap: Record<string, 'starter' | 'basic' | 'epic' | 'legendary'> = {
-  "Doran's Blade": "starter",
-  "Doran's Ring": "starter",
-  "Doran's Shield": "starter",
-  "Cull": "starter",
-  "Dark Seal": "starter",
-  "Tear of the Goddess": "starter",
-  "Boots of Speed": "basic",
-  "Seraph's Embrace": "legendary",
-  "Muramana": "legendary",
-  "Fimbulwinter": "legendary",
+export const itemTierMap: Record<
+  string,
+  'starter' | 'boots' | 'basic' | 'epic' | 'legendary' | 'unique'
+> = {
+  "Doran's Blade": 'starter',
+  "Doran's Ring": 'starter',
+  "Doran's Shield": 'starter',
+  Cull: 'starter',
+  'Dark Seal': 'starter',
+  'Tear of the Goddess': 'starter',
+  'World Atlas': 'starter',
+  'Runic Compass': 'legendary',
+  'Bounty of Worlds': 'legendary',
+  'Celestial Opposition': 'legendary',
+  'Dream Maker': 'legendary',
+  "Zaz'Zak's Realmspike": 'legendary',
+  'Solstice Sleigh': 'legendary',
+  Bloodsong: 'legendary',
+  'Boots of Speed': 'boots',
+  Boots: 'boots',
+  "Seraph's Embrace": 'legendary',
+  Muramana: 'legendary',
+  Fimbulwinter: 'legendary',
 }
 
-export const getItemTier = (item: Item): 'starter' | 'basic' | 'epic' | 'legendary' => {
+export const isTier3Item = (item: Item): boolean => {
+  const idNum = parseInt(item.id, 10)
+  const tier3BootIds = [3168, 3170, 3171, 3172, 3173, 3174, 3175, 3013, 3176]
+  const tier2BootIds = [3005, 3006, 3008, 3009, 3010, 3020, 3047, 3111, 3158]
+
+  if (tier3BootIds.includes(idNum)) return true
+  if (idNum >= 7000 && idNum <= 7050) return true
+  if (item.from && item.from.some((fromId) => tier2BootIds.includes(parseInt(fromId, 10))))
+    return true
+
+  const name = item.name.toLowerCase()
+  if (
+    name === 'immortal path' ||
+    name === 'swiftmarch' ||
+    name === 'crimson lucidity' ||
+    name === 'gunmetal greaves' ||
+    name === 'chainlaced crushers' ||
+    name === 'armored advance' ||
+    name === "spellslinger's shoes" ||
+    name === 'synchronized souls' ||
+    name === 'forever forward'
+  ) {
+    return true
+  }
+
+  return false
+}
+
+export const isBootsItem = (item: Item): boolean => {
+  const name = item.name.toLowerCase()
+  const tags = item.tags || []
+  if (tags.includes('Boots')) return true
+  if (
+    name.includes('boots') ||
+    name.includes('greaves') ||
+    name.includes('shoes') ||
+    name.includes('treads') ||
+    name.includes('steelcaps') ||
+    name.includes('soles') ||
+    name.includes('swiftmarch')
+  ) {
+    return true
+  }
+  return false
+}
+
+export const getItemTier = (
+  item: Item,
+): 'starter' | 'boots' | 'basic' | 'epic' | 'legendary' | 'unique' => {
   const manualTier = itemTierMap[item.name]
   if (manualTier) return manualTier
 
+  if (isTier3Item(item)) {
+    return 'unique'
+  }
+
+  if (isBootsItem(item)) {
+    return 'boots'
+  }
+
   const name = item.name.toLowerCase()
-  
+
   if (
     name.includes("doran's") ||
     name === 'cull' ||
     name === 'dark seal' ||
     name === 'tear of the goddess' ||
-    name.includes('scorchclaw') ||
-    name.includes('gustwalker') ||
-    name.includes('mosstomper') ||
-    item.tags.includes('GoldInflow')
+    name === 'world atlas'
   ) {
     return 'starter'
+  }
+
+  if (
+    name.includes('celestial opposition') ||
+    name.includes('dream maker') ||
+    name.includes('realmspike') ||
+    name.includes('solstice sleigh') ||
+    name.includes('bloodsong') ||
+    name.includes('runic compass') ||
+    name.includes('bounty of worlds')
+  ) {
+    return 'legendary'
   }
 
   if (!item.from || item.from.length === 0) {
@@ -259,37 +348,94 @@ export const getItemTier = (item: Item): 'starter' | 'basic' | 'epic' | 'legenda
   return 'legendary'
 }
 
+export const isJungleItem = (item: Item | Record<string, unknown>): boolean => {
+  const itemObj = item as { name?: string; tags?: string[]; categories?: string[] }
+  const name = (itemObj.name || '').toLowerCase()
+  if (
+    name.includes('scorchclaw') ||
+    name.includes('gustwalker') ||
+    name.includes('mosstomper') ||
+    name.includes('emberknife') ||
+    name.includes('hailblade') ||
+    name.includes('obsidian edge') ||
+    name.includes('jungle')
+  ) {
+    return true
+  }
+  const cats = itemObj.tags || itemObj.categories || []
+  if (
+    cats.includes('Jungle') &&
+    !cats.includes('Consumable') &&
+    !cats.includes('Lane') &&
+    !cats.includes('Vision')
+  ) {
+    return true
+  }
+  return false
+}
+
 export const itemService = {
   async getItems(): Promise<Item[]> {
     try {
       const res = await fetch(`${import.meta.env.BASE_URL}out/items/items.json`)
       const itemData = await res.json()
 
-      const upgradedItemIds = [3040, 3042, 3121, 3002, 6701, 3010, 3013, 3866, 3867, 3168, 3170, 3171, 3172, 3173, 3174, 3175]
+      const upgradedItemIds = [
+        3040, 3042, 3121, 3002, 6701, 3010, 3013, 3866, 3867, 3168, 3170, 3171, 3172, 3173, 3174,
+        3175,
+      ]
 
-      const filteredItems = (itemData as any[]).filter((item) => {
-        const isUpgraded = upgradedItemIds.includes(item.id) || (item.id >= 7000 && item.id <= 7050)
-        
+      const filteredItems = (itemData as Record<string, unknown>[]).filter((item) => {
+        const itemId = Number(item.id) || 0
+        const isUpgraded = upgradedItemIds.includes(itemId) || (itemId >= 7000 && itemId <= 7050)
+
         if (!isUpgraded) {
-          if (!item.inStore || item.priceTotal <= 0 || item.displayInItemSets === false) return false
-          if (item.id >= 10000) return false
+          if (!item.inStore || (item.priceTotal as number) <= 0 || item.displayInItemSets === false)
+            return false
+          if (itemId >= 10000) return false
         }
 
-        const name = (item.name || '').toLowerCase()
-        if (name.includes('guardian\'s') || name.includes('poro') || name.includes('snowball')) return false
-        if (name.includes('juice') || name.includes('anvil') || name.includes('flesheater') || name.includes('prismatic')) return false
+        const name = ((item.name as string) || '').toLowerCase()
+        if (name.includes("guardian's") || name.includes('poro') || name.includes('snowball'))
+          return false
+        if (
+          name.includes('juice') ||
+          name.includes('anvil') ||
+          name.includes('flesheater') ||
+          name.includes('prismatic')
+        )
+          return false
         if (name.includes('swarm') || name.includes('golden spatula')) return false
-        if (name.includes('gangplank') || name.includes('silver serpents') || name.includes('deprecated item')) return false
+        if (
+          name.includes('gangplank') ||
+          name.includes('silver serpents') ||
+          name.includes('deprecated item')
+        )
+          return false
+        if (
+          name.includes('potion') ||
+          name.includes('control ward') ||
+          name.includes('elixir') ||
+          name.includes('augment level')
+        )
+          return false
+
+        if (isJungleItem(item)) return false
 
         return true
       })
 
-      return filteredItems.map((item) =>
-        mapItem(item.id.toString(), item),
-      )
+      const items = filteredItems.map((item) => mapItem(String(item.id), item))
+
+      return items.sort((a, b) => {
+        if (a.gold.total !== b.gold.total) {
+          return a.gold.total - b.gold.total
+        }
+        return a.name.localeCompare(b.name)
+      })
     } catch (error) {
       console.error('Errore nel itemService (getItems):', error)
       throw error
     }
-  }
+  },
 }

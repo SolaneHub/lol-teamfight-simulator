@@ -24,9 +24,11 @@ export interface DraftSlot {
   secondaryRune2: Rune | null
 
   // Stat Shards
-  shardOffensive: 'adaptive' | 'as' | 'haste' | null
-  shardFlex: 'adaptive' | 'ms' | 'scaling_hp' | null
-  shardDefensive: 'scaling_hp' | 'tenacity' | 'flat_hp' | null
+  shardOffensive?: 'adaptive' | 'as' | 'haste' | string | null
+  shardFlex?: 'adaptive' | 'ms' | 'scaling_hp' | string | null
+  shardDefensive?: 'scaling_hp' | 'tenacity' | 'flat_hp' | string | null
+  statShards?: (string | null)[]
+  runes?: (Rune | null)[]
 }
 
 export interface SummonerSlot {
@@ -38,5 +40,5 @@ export interface SummonerSlot {
   primaryRunes: (Rune | null)[]
   secondaryPath: RuneKeystone | null
   secondaryRunes: (Rune | null)[]
-  shards: (any | null)[]
+  shards: (string | null)[]
 }

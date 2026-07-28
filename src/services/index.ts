@@ -1,5 +1,4 @@
 export * from './champions/championService'
-export * from './champions/spellFormulas'
 export * from './items/itemService'
 export * from './runes/runeService'
 export * from './draft/draftService'

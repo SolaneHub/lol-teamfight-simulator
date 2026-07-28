@@ -1,6 +1,6 @@
 /**
  * Monster & Objective Buff Service
- * 
+ *
  * Provides official League of Legends formulas and stat modifiers for:
  * - 6 Elemental Dragons (Infernal, Mountain, Ocean, Cloud, Hextech, Chemtech)
  * - 6 Dragon Souls
@@ -8,7 +8,7 @@
  * - Baron Nashor (Hand of Baron +40 AD / +80 AP)
  * - Red Buff (Crest of Cinders burn & slow)
  * - Blue Buff (Crest of Insight +10 AH & Mana Regen)
- * 
+ *
  * Sources: Authentic Riot Game Data in `out/monsters/`
  */
 
@@ -17,13 +17,13 @@ export interface SideBuffs {
   blue: boolean
   baron: boolean
   elder: boolean
-  infernal: number  // 0 to 4
-  mountain: number  // 0 to 4
-  ocean: number     // 0 to 4
-  cloud: number     // 0 to 4
-  hextech: number   // 0 to 4
-  chemtech: number  // 0 to 4
-  soul: string      // 'none' | 'infernal' | 'mountain' | 'ocean' | 'cloud' | 'hextech' | 'chemtech'
+  infernal: number // 0 to 4
+  mountain: number // 0 to 4
+  ocean: number // 0 to 4
+  cloud: number // 0 to 4
+  hextech: number // 0 to 4
+  chemtech: number // 0 to 4
+  soul: string // 'none' | 'infernal' | 'mountain' | 'ocean' | 'cloud' | 'hextech' | 'chemtech'
 }
 
 export interface CalculatedMonsterBuffStats {
@@ -116,7 +116,10 @@ export function calculateRedBuffBurn(level: number): number {
 /**
  * Calculates Dragon Soul damage or shield effect
  */
-export function calculateDragonSoulEffect(soulType: string, attackerStats: { ad: number; ap: number; bonusHp?: number }): {
+export function calculateDragonSoulEffect(
+  soulType: string,
+  attackerStats: { ad: number; ap: number; bonusHp?: number },
+): {
   name: string
   amount: number
   type: 'physical' | 'magic' | 'true' | 'shield' | 'adaptive'
@@ -129,8 +132,8 @@ export function calculateDragonSoulEffect(soulType: string, attackerStats: { ad:
     case 'infernal':
       // 80 (+22.5% bonus AD) (+13.5% AP) (+2.75% bonus HP) Adaptive Damage
       const infDmg = Math.round(80 + ad * 0.225 + ap * 0.135 + bonusHp * 0.0275)
-      return { name: '🔥 Infernal Soul Explosion', amount: infDmg, type: 'adaptive' as any }
-    
+      return { name: '🔥 Infernal Soul Explosion', amount: infDmg, type: 'adaptive' as const }
+
     case 'mountain':
       // 200 (+18% bonus AD) (+13.5% AP) (+13.5% bonus HP) Shield
       const mntShield = Math.round(200 + ad * 0.18 + ap * 0.135 + bonusHp * 0.135)
@@ -143,7 +146,7 @@ export function calculateDragonSoulEffect(soulType: string, attackerStats: { ad:
 
     case 'hextech':
       // 50 (+15% bonus AD) (+10% AP) True Damage chain lightning
-      const hexDmg = Math.round(50 + ad * 0.15 + ap * 0.10)
+      const hexDmg = Math.round(50 + ad * 0.15 + ap * 0.1)
       return { name: '⚡ Hextech Soul Lightning', amount: hexDmg, type: 'true' }
 
     case 'chemtech':
