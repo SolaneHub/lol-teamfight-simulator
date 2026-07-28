@@ -5,21 +5,28 @@
       ref="tooltipRef"
       :style="{
         top: `${computedPos.y}px`,
-        left: `${computedPos.x}px`
+        left: `${computedPos.x}px`,
       }"
       class="fixed z-100 w-80 bg-[#131926] border border-slate-800 rounded-xl overflow-hidden shadow-xl pointer-events-none transition-opacity duration-150"
     >
       <!-- Header -->
       <div class="flex items-center gap-3 p-4 border-b border-slate-800 bg-slate-950/50">
         <!-- Rune Icon -->
-        <div class="h-11 w-11 rounded-full bg-slate-950 border border-slate-800 p-0.5 shrink-0 flex items-center justify-center">
-          <img :src="getRuneIconUrl(rune.icon)" class="h-full w-full object-contain select-none pointer-events-none" />
+        <div
+          class="h-11 w-11 rounded-full bg-slate-950 border border-slate-800 p-0.5 shrink-0 flex items-center justify-center"
+        >
+          <img
+            :src="getRuneIconUrl(rune.icon || '')"
+            class="h-full w-full object-contain select-none pointer-events-none"
+          />
         </div>
         <div class="flex flex-col min-w-0">
           <h4 class="text-base font-bold text-white tracking-wide truncate leading-tight">
             {{ rune.name }}
           </h4>
-          <span class="text-base px-2 py-0.5 rounded font-mono border uppercase tracking-wider font-semibold mt-1 inline-block w-fit bg-cyan-950/40 text-cyan-400 border-cyan-900/30">
+          <span
+            class="text-base px-2 py-0.5 rounded font-mono border uppercase tracking-wider font-semibold mt-1 inline-block w-fit bg-cyan-950/40 text-cyan-400 border-cyan-900/30"
+          >
             {{ rune.category || 'Rune' }}
           </span>
         </div>
@@ -38,8 +45,19 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { getRuneIconUrl, formatTooltipTags } from '@/services'
 
+export interface RuneTooltipData {
+  id?: number | string
+  key?: string
+  name?: string
+  icon?: string
+  category?: string
+  shortDesc?: string
+  longDesc?: string
+  desc?: string
+}
+
 const props = defineProps<{
-  rune: any
+  rune: RuneTooltipData | null | undefined
   mousePos: { x: number; y: number }
 }>()
 
@@ -74,7 +92,7 @@ const computedPos = computed(() => {
 
   return {
     x: Math.max(padding, x),
-    y: Math.max(padding, y)
+    y: Math.max(padding, y),
   }
 })
 </script>

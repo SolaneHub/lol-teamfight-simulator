@@ -6,14 +6,18 @@ import tailwindcss from '@tailwindcss/vite'
 import fs from 'node:fs'
 import path from 'node:path'
 
+import type { ViteDevServer, Connect } from 'vite'
+
+import type { ServerResponse } from 'node:http'
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // Custom plugin to serve the local 'out/' directory at dev time and copy it at build time
 const serveAndCopyOutPlugin = () => {
   return {
     name: 'serve-and-copy-out',
-    configureServer(server: any) {
-      server.middlewares.use((req: any, res: any, next: any) => {
+    configureServer(server: ViteDevServer) {
+      server.middlewares.use((req: Connect.IncomingMessage, res: ServerResponse, next: Connect.NextFunction) => {
         const url = req.url || ''
         if (url.startsWith('/out/')) {
           const safeUrl = url.replace('/out/', '').split('?')[0]
