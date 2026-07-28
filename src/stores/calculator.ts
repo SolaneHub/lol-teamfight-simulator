@@ -65,15 +65,21 @@ export const useCalculatorStore = defineStore('calculator', () => {
   })
 
   // LocalStorage Persistence
-  const savedCalc = typeof localStorage !== 'undefined' ? localStorage.getItem('lol_sim_calculator') : null
+  const savedCalc =
+    typeof localStorage !== 'undefined' ? localStorage.getItem('lol_sim_calculator') : null
   if (savedCalc) {
     try {
       const parsed = JSON.parse(savedCalc)
-      if (parsed.selectedAttackerSlotId) selectedAttackerSlotId.value = parsed.selectedAttackerSlotId
-      if (parsed.selectedDefenderSlotId) selectedDefenderSlotId.value = parsed.selectedDefenderSlotId
-      if (parsed.selectedAttackerSlotIds && Array.isArray(parsed.selectedAttackerSlotIds)) selectedAttackerSlotIds.value = parsed.selectedAttackerSlotIds
-      if (parsed.selectedDefenderSlotIds && Array.isArray(parsed.selectedDefenderSlotIds)) selectedDefenderSlotIds.value = parsed.selectedDefenderSlotIds
-      if (parsed.teamfightActions && Array.isArray(parsed.teamfightActions)) teamfightActions.value = parsed.teamfightActions
+      if (parsed.selectedAttackerSlotId)
+        selectedAttackerSlotId.value = parsed.selectedAttackerSlotId
+      if (parsed.selectedDefenderSlotId)
+        selectedDefenderSlotId.value = parsed.selectedDefenderSlotId
+      if (parsed.selectedAttackerSlotIds && Array.isArray(parsed.selectedAttackerSlotIds))
+        selectedAttackerSlotIds.value = parsed.selectedAttackerSlotIds
+      if (parsed.selectedDefenderSlotIds && Array.isArray(parsed.selectedDefenderSlotIds))
+        selectedDefenderSlotIds.value = parsed.selectedDefenderSlotIds
+      if (parsed.teamfightActions && Array.isArray(parsed.teamfightActions))
+        teamfightActions.value = parsed.teamfightActions
       if (parsed.attackerBuffs) attackerBuffs.value = parsed.attackerBuffs
       if (parsed.defenderBuffs) defenderBuffs.value = parsed.defenderBuffs
     } catch (e) {
@@ -82,21 +88,32 @@ export const useCalculatorStore = defineStore('calculator', () => {
   }
 
   watch(
-    [selectedAttackerSlotId, selectedDefenderSlotId, selectedAttackerSlotIds, selectedDefenderSlotIds, teamfightActions, attackerBuffs, defenderBuffs],
+    [
+      selectedAttackerSlotId,
+      selectedDefenderSlotId,
+      selectedAttackerSlotIds,
+      selectedDefenderSlotIds,
+      teamfightActions,
+      attackerBuffs,
+      defenderBuffs,
+    ],
     () => {
       if (typeof localStorage !== 'undefined') {
-        localStorage.setItem('lol_sim_calculator', JSON.stringify({
-          selectedAttackerSlotId: selectedAttackerSlotId.value,
-          selectedDefenderSlotId: selectedDefenderSlotId.value,
-          selectedAttackerSlotIds: selectedAttackerSlotIds.value,
-          selectedDefenderSlotIds: selectedDefenderSlotIds.value,
-          teamfightActions: teamfightActions.value,
-          attackerBuffs: attackerBuffs.value,
-          defenderBuffs: defenderBuffs.value,
-        }))
+        localStorage.setItem(
+          'lol_sim_calculator',
+          JSON.stringify({
+            selectedAttackerSlotId: selectedAttackerSlotId.value,
+            selectedDefenderSlotId: selectedDefenderSlotId.value,
+            selectedAttackerSlotIds: selectedAttackerSlotIds.value,
+            selectedDefenderSlotIds: selectedDefenderSlotIds.value,
+            teamfightActions: teamfightActions.value,
+            attackerBuffs: attackerBuffs.value,
+            defenderBuffs: defenderBuffs.value,
+          }),
+        )
       }
     },
-    { deep: true, immediate: true }
+    { deep: true, immediate: true },
   )
 
   const addActionToCombo = (action: string) => {
@@ -105,12 +122,16 @@ export const useCalculatorStore = defineStore('calculator', () => {
     teamfightActions.value.push({
       id: Math.random().toString(36).substring(2, 9),
       actorSlotId: selectedAttackerSlotId.value,
-      action: action as any,
+      action: action as 'Q' | 'W' | 'E' | 'R' | 'P' | 'AA',
       targetSlotIds: [...selectedDefenderSlotIds.value],
     })
   }
 
-  const addTeamfightAction = (actorSlotId: number, action: 'Q' | 'W' | 'E' | 'R' | 'P' | 'AA', targetSlotIds: number[]) => {
+  const addTeamfightAction = (
+    actorSlotId: number,
+    action: 'Q' | 'W' | 'E' | 'R' | 'P' | 'AA',
+    targetSlotIds: number[],
+  ) => {
     teamfightActions.value.push({
       id: Math.random().toString(36).substring(2, 9),
       actorSlotId,

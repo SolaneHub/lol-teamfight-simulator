@@ -26,7 +26,7 @@ const STAT_MAP = {
   6: 'magicResist',
   7: 'attackSpeed',
   11: 'abilityHaste',
-  12: 'critChance',
+  12: 'charLevel',  // level scaling
   15: 'totalAp',
   18: 'lifesteal',
   20: 'totalAd',
@@ -37,7 +37,187 @@ function getStatName(mStat) {
   return STAT_MAP[mStat] || `stat_${mStat}`;
 }
 
-function parseCalculation(calcName, calcDef, dataValuesMap, allCalcs) {
+function roundVal(v) {
+  return Math.round(v * 10000) / 10000;
+}
+
+function parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSpell) {
+  if (!part || !part.__type) return;
+
+  switch (part.__type) {
+    case 'ByCharLevelInterpolationCalculationPart':
+    case 'ByCharLevelFormulaCalculationPart': {
+      if (Array.isArray(part.values) && part.values.length > 0) {
+        const mult = isPercent ? (part.values[0] > 1 ? 1 : 100) : 1;
+        result.base = part.values.slice(0, 18).map(v => roundVal(v * mult));
+      } else {
+        const startVal = part.mStartValue !== undefined ? part.mStartValue : (part.mLevel1Value || 0);
+        const endVal = part.mEndValue !== undefined ? part.mEndValue : startVal;
+        const arr = [];
+        const mult = isPercent ? 100 : 1;
+        for (let l = 1; l <= 18; l++) {
+          const val = startVal + (endVal - startVal) * ((l - 1) / 17);
+          arr.push(roundVal(val * mult));
+        }
+        result.base = arr;
+      }
+      break;
+    }
+
+    case 'ByCharLevelBreakpointsCalculationPart': {
+      let val = part.mLevel1Value || 0;
+      const breakpoints = part.mBreakpoints || [];
+      const arr = [];
+      const mult = isPercent ? 100 : 1;
+      for (let l = 1; l <= 18; l++) {
+        const bp = breakpoints.find(b => b.mLevel === l);
+        if (bp) val += (bp.mAdditionalBonusAtThisLevel || 0);
+        arr.push(roundVal(val * mult));
+      }
+      result.base = arr;
+      break;
+    }
+
+    case 'NamedDataValueCalculationPart':
+    case 'BuffCounterByNamedDataValueCalculationPart': {
+      const dvName = part.mDataValue;
+      if (dvName) {
+        const vals = dataValuesMap[dvName.toLowerCase()];
+        if (vals && vals.length > 0) {
+          const rankVals = vals.slice(1, 6);
+          const mult = isPercent ? (vals[0] > 1 ? 1 : 100) : 1;
+          if (rankVals.length > 0) {
+            result.base = rankVals.map(v => roundVal(v * mult));
+          } else {
+            result.base = [roundVal(vals[0] * mult)];
+          }
+        }
+      }
+      break;
+    }
+
+    case 'BuffCounterByCoefficientCalculationPart': {
+      if (part.mCoefficient !== undefined) {
+        result.base = [roundVal(part.mCoefficient * (isPercent ? 100 : 1))];
+      }
+      break;
+    }
+
+    case 'NumberCalculationPart': {
+      if (part.mNumber !== undefined) {
+        const mult = isPercent ? (part.mNumber > 1 ? 1 : 100) : 1;
+        result.base = [roundVal(part.mNumber * mult)];
+      }
+      break;
+    }
+
+    case 'StatByCoefficientCalculationPart': {
+      const ratio = part.mCoefficient || 0;
+      const stat = getStatName(part.mStat);
+      if (ratio !== 0) {
+        if (stat === 'charLevel') {
+          const arr = [];
+          for (let l = 1; l <= 18; l++) arr.push(roundVal(l * ratio));
+          result.base = arr;
+        } else {
+          result.scalings.push({ ratio: roundVal(ratio), stat });
+        }
+      }
+      break;
+    }
+    
+    case 'StatByNamedDataValueCalculationPart': {
+      const dvName = part.mDataValue;
+      const stat = getStatName(part.mStat);
+      if (dvName) {
+        const vals = dataValuesMap[dvName.toLowerCase()];
+        if (vals && vals.length > 0) {
+          const mult = vals[0];
+          if (stat === 'charLevel') {
+            const arr = [];
+            for (let l = 1; l <= 18; l++) arr.push(roundVal(l * mult));
+            result.base = arr;
+          } else {
+            const rankVals = vals.slice(1, 6);
+            if (rankVals.length > 0) {
+              const allSame = rankVals.every(v => Math.abs(v - rankVals[0]) < 0.0001);
+              if (allSame) {
+                result.scalings.push({ ratio: roundVal(rankVals[0]), stat });
+              } else {
+                result.scalings.push({ ratio: rankVals.map(v => roundVal(v)), stat });
+              }
+            } else {
+              result.scalings.push({ ratio: roundVal(vals[0]), stat });
+            }
+          }
+        }
+      }
+      break;
+    }
+    
+    case 'StatBySubPartCalculationPart': {
+      const stat = getStatName(part.mStat);
+      if (part.mSubpart) {
+        if (part.mSubpart.__type === 'ByCharLevelBreakpointsCalculationPart') {
+          let val = part.mSubpart.mLevel1Value || 0;
+          const breakpoints = part.mSubpart.mBreakpoints || [];
+          const arr = [];
+          for (let l = 1; l <= 18; l++) {
+            const bp = breakpoints.find(b => b.mLevel === l);
+            if (bp) val += (bp.mAdditionalBonusAtThisLevel || 0);
+            arr.push(roundVal(val));
+          }
+          result.scalings.push({ ratio: arr, stat });
+        } else if (part.mSubpart.mDataValue) {
+          const subDvName = part.mSubpart.mDataValue;
+          const vals = dataValuesMap[subDvName.toLowerCase()];
+          if (vals && vals.length > 0) {
+            const rankVals = vals.slice(1, 6);
+            if (rankVals.length > 0) {
+              const allSame = rankVals.every(v => Math.abs(v - rankVals[0]) < 0.0001);
+              result.scalings.push({
+                ratio: allSame ? roundVal(rankVals[0]) : rankVals.map(v => roundVal(v)),
+                stat
+              });
+            } else {
+              result.scalings.push({ ratio: roundVal(vals[0]), stat });
+            }
+          }
+        } else if (part.mSubpart.mCoefficient) {
+          result.scalings.push({ ratio: roundVal(part.mSubpart.mCoefficient), stat });
+        }
+      }
+      break;
+    }
+
+    case 'EffectValueCalculationPart': {
+      const idx = part.mEffectIndex !== undefined ? part.mEffectIndex : part.mEffectValueIndex;
+      if (idx !== undefined && ddSpell && ddSpell.effect && ddSpell.effect[idx]) {
+        const effArr = ddSpell.effect[idx];
+        if (Array.isArray(effArr) && effArr.length > 0) {
+          const rankVals = effArr.slice(0, 5).map(v => roundVal(v * (isPercent ? 100 : 1)));
+          result.base = rankVals;
+        }
+      }
+      break;
+    }
+
+    case 'ProductOfSubPartsCalculationPart':
+    case 'SumOfSubPartsCalculationPart':
+    case 'ClampSubPartsCalculationPart': {
+      const subparts = part.mSubparts || [part.mPart1, part.mPart2, part.mPart3].filter(Boolean);
+      for (const sub of subparts) {
+        parseFormulaPart(sub, result, isPercent, dataValuesMap, allCalcs, ddSpell);
+      }
+      break;
+    }
+
+    default:
+      break;
+  }
+}
+
+function parseCalculation(calcName, calcDef, dataValuesMap, allCalcs, ddSpell = null) {
   if (!calcDef) return null;
   
   const result = { base: [], scalings: [], type: 'magic' };
@@ -46,8 +226,8 @@ function parseCalculation(calcName, calcDef, dataValuesMap, allCalcs) {
   if (calcDef.__type === 'GameCalculationModified') {
     const refCalcName = calcDef.mModifiedGameCalculation;
     if (refCalcName && allCalcs[refCalcName]) {
-      const baseCalc = parseCalculation(refCalcName, allCalcs[refCalcName], dataValuesMap, allCalcs);
-      if (baseCalc && calcDef.mMultiplier) {
+      const baseCalc = parseCalculation(refCalcName, allCalcs[refCalcName], dataValuesMap, allCalcs, ddSpell);
+      if (baseCalc) {
         let mult = 1;
         if (typeof calcDef.mMultiplier === 'number') {
           mult = calcDef.mMultiplier;
@@ -59,158 +239,34 @@ function parseCalculation(calcName, calcDef, dataValuesMap, allCalcs) {
           }
         }
         baseCalc.base = baseCalc.base.map(v => roundVal(v * mult));
-        baseCalc.scalings = baseCalc.scalings.map(s => ({
+        baseCalc.scalings = (baseCalc.scalings || []).map(s => ({
           ...s,
           ratio: Array.isArray(s.ratio)
             ? s.ratio.map(r => roundVal(r * mult))
             : roundVal(s.ratio * mult)
         }));
+        if (isPercent) {
+          baseCalc.type = 'status';
+        }
+        return baseCalc;
       }
-      if (isPercent) {
-        baseCalc.type = 'status';
-        baseCalc.base = baseCalc.base.map(v => roundVal(v * (v > 1 ? 1 : 100)));
-      }
-      return baseCalc;
     }
     return null;
   }
-  
-  const parts = calcDef.mFormulaParts;
-  if (!parts || !Array.isArray(parts)) return null;
-  
-  for (const part of parts) {
-    switch (part.__type) {
-      case 'ByCharLevelInterpolationCalculationPart': {
-        const startVal = part.mStartValue || 0;
-        const endVal = part.mEndValue || 0;
-        const arr = [];
-        const mult = isPercent ? 100 : 1;
-        for (let l = 1; l <= 18; l++) {
-          const val = startVal + (endVal - startVal) * ((l - 1) / 17);
-          arr.push(roundVal(val * mult));
-        }
-        result.base = arr;
-        break;
-      }
 
-      case 'ByCharLevelBreakpointsCalculationPart': {
-        let val = part.mLevel1Value || 0;
-        const breakpoints = part.mBreakpoints || [];
-        const arr = [];
-        const mult = isPercent ? 100 : 1;
-        for (let l = 1; l <= 18; l++) {
-          const bp = breakpoints.find(b => b.mLevel === l);
-          if (bp) val += (bp.mAdditionalBonusAtThisLevel || 0);
-          arr.push(roundVal(val * mult));
-        }
-        result.base = arr;
-        break;
-      }
-
-      case 'NamedDataValueCalculationPart': {
-        const dvName = part.mDataValue;
-        if (dvName) {
-          const vals = dataValuesMap[dvName.toLowerCase()];
-          if (vals) {
-            const rankVals = vals.slice(1, 6);
-            if (rankVals.length > 0) {
-              result.base = rankVals.map(v => roundVal(v * (isPercent ? (v > 1 ? 1 : 100) : 1)));
-            }
-          }
-        }
-        break;
-      }
-      
-      case 'BuffCounterByNamedDataValueCalculationPart': {
-        const dvName = part.mDataValue;
-        if (dvName) {
-          const vals = dataValuesMap[dvName.toLowerCase()];
-          if (vals && vals.length > 0) {
-            const rankVals = vals.slice(1, 6);
-            result.base = rankVals.length > 0 ? rankVals.map(v => roundVal(v * (isPercent ? (v > 1 ? 1 : 100) : 1))) : [roundVal(vals[0])];
-          }
-        }
-        break;
-      }
-
-      case 'BuffCounterByCoefficientCalculationPart': {
-        if (part.mCoefficient) {
-          result.base = [roundVal(part.mCoefficient * (isPercent ? 100 : 1))];
-        }
-        break;
-      }
-
-      case 'NumberCalculationPart': {
-        if (part.mNumber !== undefined) {
-          result.base = [roundVal(part.mNumber * (isPercent ? (part.mNumber > 1 ? 1 : 100) : 1))];
-        }
-        break;
-      }
-
-      case 'ByCharLevelFormulaCalculationPart': {
-        const startVal = part.mStartValue || part.mLevel1Value || 0;
-        const endVal = part.mEndValue || startVal;
-        const arr = [];
-        const mult = isPercent ? 100 : 1;
-        for (let l = 1; l <= 18; l++) {
-          const val = startVal + (endVal - startVal) * ((l - 1) / 17);
-          arr.push(roundVal(val * mult));
-        }
-        result.base = arr;
-        break;
-      }
-
-      case 'StatByCoefficientCalculationPart': {
-        const ratio = part.mCoefficient || 0;
-        const stat = getStatName(part.mStat);
-        if (ratio !== 0) {
-          result.scalings.push({ ratio: roundVal(ratio), stat });
-        }
-        break;
-      }
-      
-      case 'StatByNamedDataValueCalculationPart': {
-        const dvName = part.mDataValue;
-        const stat = getStatName(part.mStat);
-        if (dvName) {
-          const vals = dataValuesMap[dvName.toLowerCase()];
-          if (vals) {
-            const rankVals = vals.slice(1, 6);
-            const allSame = rankVals.every(v => Math.abs(v - rankVals[0]) < 0.0001);
-            if (allSame) {
-              result.scalings.push({ ratio: roundVal(rankVals[0]), stat });
-            } else {
-              result.scalings.push({ ratio: rankVals.map(v => roundVal(v)), stat });
-            }
-          }
-        }
-        break;
-      }
-      
-      case 'StatBySubPartCalculationPart': {
-        const stat = getStatName(part.mStat);
-        if (part.mSubpart) {
-          const subDvName = part.mSubpart.mDataValue;
-          if (subDvName) {
-            const vals = dataValuesMap[subDvName.toLowerCase()];
-            if (vals) {
-              const rankVals = vals.slice(1, 6);
-              const allSame = rankVals.every(v => Math.abs(v - rankVals[0]) < 0.0001);
-              result.scalings.push({
-                ratio: allSame ? roundVal(rankVals[0]) : rankVals.map(v => roundVal(v)),
-                stat
-              });
-            }
-          }
-        }
-        break;
-      }
-      
-      default:
-        break;
+  if (calcDef.__type === 'GameCalculationConditional') {
+    const refCalcName = calcDef.mDefaultCalculation || calcDef.mConditionalCalculation;
+    if (refCalcName && allCalcs[refCalcName]) {
+      return parseCalculation(refCalcName, allCalcs[refCalcName], dataValuesMap, allCalcs, ddSpell);
     }
+    return null;
   }
-  
+
+  const parts = calcDef.mFormulaParts || [];
+  for (const part of parts) {
+    parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSpell);
+  }
+
   if (result.base.length > 0 || result.scalings.length > 0) {
     if (isPercent) {
       result.type = 'status';
@@ -218,10 +274,6 @@ function parseCalculation(calcName, calcDef, dataValuesMap, allCalcs) {
     return result;
   }
   return null;
-}
-
-function roundVal(v) {
-  return Math.round(v * 100) / 100;
 }
 
 function processChampion(champId) {
@@ -267,36 +319,94 @@ function processChampion(champId) {
   }
 
   if (binData) {
-    // Extract PASSIVE formulas (check key, ObjectName, and mImgIconName)
+    // 1. Locate PASSIVE spell strictly via mCharacterPassiveSpell / passiveSpell
     const passiveFormulas = {};
+    let passiveSpellKey = null;
 
     for (const [k, obj] of Object.entries(binData)) {
+      if (obj.mCharacterPassiveSpell) {
+        passiveSpellKey = obj.mCharacterPassiveSpell;
+        break;
+      }
+      if (obj.passiveSpell) {
+        passiveSpellKey = obj.passiveSpell;
+        break;
+      }
+    }
+
+    const passiveObjKeys = new Set();
+    if (passiveSpellKey) {
+      const targetLower = passiveSpellKey.toLowerCase();
+      const targetBaseName = targetLower.split('/').pop();
+      for (const k of Object.keys(binData)) {
+        const kLower = k.toLowerCase();
+        if (kLower === targetLower || kLower.endsWith('/' + targetBaseName)) {
+          passiveObjKeys.add(k);
+        }
+      }
+    }
+
+    if (passiveObjKeys.size === 0) {
+      for (const [k, obj] of Object.entries(binData)) {
+        const spell = obj?.mSpell || (obj?.DataValues ? obj : null);
+        if (!spell) continue;
+        const objName = (obj.ObjectName || '').toLowerCase();
+        const keyLower = k.toLowerCase();
+
+        if ((keyLower.includes('passiveability/') && !keyLower.endsWith('passiveability')) || (objName.endsWith('passive') && !objName.includes('attack'))) {
+          passiveObjKeys.add(k);
+        }
+      }
+    }
+
+    for (const pKey of passiveObjKeys) {
+      const obj = binData[pKey];
       const spell = obj?.mSpell || (obj?.DataValues ? obj : null);
       if (!spell) continue;
 
-      const objName = (obj.ObjectName || '').toLowerCase();
-      const iconName = (spell.mImgIconName ? spell.mImgIconName[0] : '').toLowerCase();
-      const keyLower = k.toLowerCase();
+      const dataValues = spell.DataValues || [];
+      const calculations = spell.mSpellCalculations || {};
 
-      const isPassiveObj = keyLower.includes('passive') || keyLower.endsWith('p') || 
-                          objName.includes('passive') || objName.endsWith('p') || 
-                          iconName.includes('passive') || iconName.includes('_p.');
+      const dvMap = {};
+      for (const dv of dataValues) {
+        if (dv.name && dv.values) {
+          dvMap[dv.name.toLowerCase()] = dv.values;
+        }
+      }
 
-      if (isPassiveObj) {
-        const dataValues = spell.DataValues || [];
-        const calculations = spell.mSpellCalculations || {};
-
-        const dvMap = {};
-        for (const dv of dataValues) {
-          if (dv.name && dv.values) {
-            dvMap[dv.name.toLowerCase()] = dv.values;
+      for (const [calcName, calcDef] of Object.entries(calculations)) {
+        if (calcName.startsWith('{')) continue; // Skip raw hash keys
+        const parsed = parseCalculation(calcName, calcDef, { ...globalDvMap, ...dvMap }, calculations);
+        if (parsed && (parsed.base.length > 0 || parsed.scalings.length > 0)) {
+          // If base is all 0s but scalings exist, check if there's level base scaling
+          const allZeroBase = parsed.base.length > 0 && parsed.base.every(v => v === 0);
+          if (!allZeroBase || parsed.scalings.length > 0) {
+            passiveFormulas[calcName] = parsed;
           }
         }
+      }
 
-        for (const [calcName, calcDef] of Object.entries(calculations)) {
-          const parsed = parseCalculation(calcName, calcDef, dvMap, calculations);
-          if (parsed && (parsed.base.length > 0 || parsed.scalings.length > 0)) {
-            passiveFormulas[calcName] = parsed;
+      // Filter key DataValues for passive (only if not already covered by a calculation)
+      if (dataValues.length > 0) {
+        for (const dv of dataValues) {
+          if (!dv.name || !dv.values || dv.values.length === 0) continue;
+          if (dv.name.startsWith('{')) continue;
+          const nameLower = dv.name.toLowerCase();
+          
+          // Skip redundant ratio DataValues if calculation already has ratios
+          if (nameLower.endsWith('ratio') || nameLower.endsWith('percent')) continue;
+
+          if (nameLower.includes('damage') || nameLower.includes('heal') || nameLower.includes('cooldown') || nameLower.includes('shield')) {
+            const vals = dv.values.slice(1, 6).filter(v => typeof v === 'number');
+            if (vals.length > 0) {
+              const allSame = vals.every(v => Math.abs(v - vals[0]) < 0.0001);
+              if (!passiveFormulas[dv.name]) {
+                passiveFormulas[dv.name] = {
+                  base: allSame ? [roundVal(vals[0])] : vals.map(v => roundVal(v)),
+                  type: nameLower.includes('cooldown') ? 'magic' : 'status'
+                };
+              }
+            }
           }
         }
       }
@@ -363,7 +473,6 @@ function processChampion(champId) {
       
       if (spellFormula[placeholder]) continue;
 
-      // Extract target sub-name if prefix exists (e.g. spell.glacialstorm:slowamount -> slowamount)
       let targetName = cleanName;
       if (cleanName.includes(':')) {
         targetName = cleanName.split(':').pop().trim();
@@ -381,23 +490,29 @@ function processChampion(champId) {
       ];
       
       // 1. Check mSpellCalculations in local spell or global map
-      const calcKey = Object.keys(calculations).find(k => candidateKeys.includes(k.toLowerCase())) ||
-                     Object.keys(globalCalcsMap).find(k => candidateKeys.includes(k.toLowerCase()));
+      let calcKey = Object.keys(calculations).find(k => candidateKeys.includes(k.toLowerCase())) ||
+                    Object.keys(globalCalcsMap).find(k => candidateKeys.includes(k.toLowerCase()));
       
+      if (!calcKey) {
+        const cleanLower = cleanName.toLowerCase();
+        calcKey = Object.keys(calculations).find(k => k.toLowerCase().includes(cleanLower) || cleanLower.includes(k.toLowerCase())) ||
+                  Object.keys(globalCalcsMap).find(k => k.toLowerCase().includes(cleanLower) || cleanLower.includes(k.toLowerCase()));
+      }
+
       const calcObj = calcKey ? (calculations[calcKey] || globalCalcsMap[calcKey]) : null;
       if (calcKey && calcObj) {
-        const parsed = parseCalculation(calcKey, calcObj, { ...globalDvMap, ...dvMap }, calculations);
+        const parsed = parseCalculation(calcKey, calcObj, { ...globalDvMap, ...dvMap }, calculations, ddSpell);
         if (parsed) {
           if (multiplier !== 1) {
             parsed.base = parsed.base.map(v => roundVal(v * multiplier));
-            parsed.scalings = parsed.scalings.map(s => ({
+            parsed.scalings = (parsed.scalings || []).map(s => ({
               ...s,
               ratio: Array.isArray(s.ratio)
                 ? s.ratio.map(r => roundVal(r * multiplier))
                 : roundVal(s.ratio * multiplier)
             }));
           }
-          if (parsed.scalings.length === 0) delete parsed.scalings;
+          if (parsed.scalings && parsed.scalings.length === 0) delete parsed.scalings;
           spellFormula[placeholder] = parsed;
           continue;
         }
@@ -408,16 +523,16 @@ function processChampion(champId) {
                     Object.keys(globalDvMap).find(k => candidateKeys.includes(k.toLowerCase()));
       if (dvKey) {
         const vals = dvMap[dvKey] || globalDvMap[dvKey];
-        let rankVals = vals.slice(1, 6);
-        rankVals = rankVals.map(v => roundVal(v * multiplier));
-        
-        const allSame = rankVals.every(v => Math.abs(v - rankVals[0]) < 0.0001);
-        const formula = {
-          base: allSame ? [rankVals[0]] : rankVals,
-          type: 'status'
-        };
-        spellFormula[placeholder] = formula;
-        continue;
+        let rankVals = vals.slice(1, 6).map(v => roundVal(v * multiplier));
+        if (rankVals.length > 0) {
+          const allSame = rankVals.every(v => Math.abs(v - rankVals[0]) < 0.0001);
+          const formula = {
+            base: allSame ? [rankVals[0]] : rankVals,
+            type: 'status'
+          };
+          spellFormula[placeholder] = formula;
+          continue;
+        }
       }
 
       // 3. Check mMaxAmmo & mAmmoRechargeTime in mSpell
@@ -447,7 +562,7 @@ function processChampion(champId) {
         }
       }
 
-      // 3. Fallback: DDragon effect[N] vector (e.g. e1, e2, e3...)
+      // 4. Fallback: DDragon effect[N] vector (e.g. e1, e2, e3...)
       const eMatch = cleanName.match(/^e([0-9]+)$/i);
       if (eMatch) {
         const effIndex = parseInt(eMatch[1], 10);
@@ -485,7 +600,7 @@ function processChampion(champId) {
         }
       }
 
-      // 4. Fallback: DDragon vars (e.g. {{ a1 }}, {{ f1 }})
+      // 5. Fallback: DDragon vars (e.g. {{ a1 }}, {{ f1 }})
       if (ddSpell.vars) {
         const varMatch = ddSpell.vars.find(v => v.key && v.key.toLowerCase() === cleanName.toLowerCase());
         if (varMatch) {
@@ -505,7 +620,7 @@ function processChampion(champId) {
         }
       }
 
-      // 5. Fallback: f1, f2, f3 DataValues index fallback (e.g. f1 -> 1st DataValue, f2 -> 2nd DataValue)
+      // 6. Fallback: f1, f2, f3 DataValues index fallback
       const fMatch = cleanName.match(/^f([0-9]+)$/i);
       if (fMatch && dataValues.length > 0) {
         const fIndex = parseInt(fMatch[1], 10) - 1;
