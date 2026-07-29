@@ -753,6 +753,8 @@ import {
   calculateStats,
   calculateMonsterBuffStats,
   getChampionDefaultAdaptiveType,
+  calculateSpellDamage,
+  detectItemPassives,
 } from '@/services'
 import type { DraftSlot } from '@/types'
 import { useCalculatorStore } from '@/stores/calculator'
@@ -871,6 +873,7 @@ const getCalculatedStatsForSlot = (slot: DraftSlot) => {
 
   return {
     ad: Math.round((base.ad.total + mStats.bonusAD) * mStats.adMultiplier),
+    baseAd: Math.round(base.ad.base * mStats.adMultiplier),
     ap: Math.round((base.ap.total + mStats.bonusAP) * mStats.apMultiplier),
     mana: base.mp.total,
     hp: base.hp.total + mStats.bonusShield,
@@ -883,6 +886,7 @@ const getCalculatedStatsForSlot = (slot: DraftSlot) => {
     magicPenPercent: base.magicPenPercent.total,
     abilityHaste: Math.round(base.abilityHaste.total + mStats.bonusAH),
     tenacity: Math.round(base.tenacity.total + mStats.bonusTenacity),
+    adaptiveType: getChampionDefaultAdaptiveType(slot.champion.id, slot.champion.tags),
   }
 }
 
@@ -953,48 +957,13 @@ const teamfightSimulationResults = computed(() => {
     const actorName = actorSlot.champion.name
     const action = actStep.action
 
-    const hasMuramana =
-      actorSlot.items.some(
-        (i) =>
-          i && (i.name.toLowerCase().includes('muramana') || i.id === '3004' || i.id === '3042'),
-      ) || false
-    const hasBlackCleaver =
-      actorSlot.items.some(
-        (i) => i && (i.name.toLowerCase().includes('black cleaver') || i.id === '3071'),
-      ) || false
-    const hasBloodletter =
-      actorSlot.items.some(
-        (i) =>
-          i &&
-          (i.name.toLowerCase().includes("bloodletter's curse") ||
-            i.id === '8010' ||
-            i.id === '4010'),
-      ) || false
-    const hasAbyssalMask =
-      actorSlot.items.some(
-        (i) =>
-          i &&
-          (i.name.toLowerCase().includes('abyssal mask') || i.id === '8020' || i.id === '3001'),
-      ) || false
-    const hasBlackfireTorch =
-      actorSlot.items.some(
-        (i) =>
-          i &&
-          (i.name.toLowerCase().includes('blackfire') ||
-            i.name.toLowerCase().includes('fuoco nero') ||
-            i.id === '2503' ||
-            i.id === '3009' ||
-            i.id === '8021'),
-      ) || false
-    const hasLudensEcho =
-      actorSlot.items.some(
-        (i) =>
-          i &&
-          (i.name.toLowerCase().includes('luden') ||
-            i.id === '6655' ||
-            i.id === '3188' ||
-            i.id === '226655'),
-      ) || false
+    const itemPassives = detectItemPassives(actorSlot.items)
+    const hasMuramana = itemPassives.hasMuramana
+    const hasBlackCleaver = itemPassives.hasBlackCleaver
+    const hasBloodletter = itemPassives.hasBloodletter
+    const hasAbyssalMask = itemPassives.hasAbyssalMask
+    const hasBlackfireTorch = itemPassives.hasBlackfireTorch
+    const hasLudensEcho = itemPassives.hasLudens
 
     // Blackfire Torch dynamic AP scaling (+4% AP per enemy champion hit, max 5 = 20%)
     if (hasBlackfireTorch && ['Q', 'W', 'E', 'R', 'P'].includes(action)) {
@@ -1054,96 +1023,46 @@ const teamfightSimulationResults = computed(() => {
             defState.vileDecayStacks++
         }
 
-        // Calculate post-shred effective resists
-        const effArmor = Math.max(
-          0,
-          defState.baseArmor * (1 - defState.blackCleaverStacks * 0.05) * (1 - att.armorPen / 100) -
-            att.lethality,
-        )
-        const physMult = 100 / (100 + effArmor)
+        const spellRes = calculateSpellDamage({
+          champion: actorSlot.champion,
+          action,
+          spellRanks: actorSlot.spellRanks,
+          attacker: {
+            ad: att.ad,
+            baseAd: att.baseAd,
+            ap: att.ap,
+            crit: att.crit,
+            level: actorSlot.level,
+            hp: att.hp,
+            maxHp: att.hp,
+            mana: att.mana,
+            armorPen: att.armorPen,
+            lethality: att.lethality,
+            magicPenPercent: att.magicPenPercent,
+            magicPenFlat: att.magicPenFlat,
+            adaptiveType: att.adaptiveType,
+          },
+          defender: {
+            currentHp: defState.currentHp,
+            maxHp: defState.maxHp,
+            armor: defState.baseArmor,
+            mr: defState.baseMr,
+            blackCleaverStacks: defState.blackCleaverStacks,
+            vileDecayStacks: defState.vileDecayStacks,
+          },
+          options: {
+            aatroxQSeq,
+            hasAbyssalMask,
+          },
+        })
 
-        const effMr = Math.max(
-          0,
-          defState.baseMr *
-            (1 - defState.vileDecayStacks * 0.075) *
-            (1 - att.magicPenPercent / 100) -
-            att.magicPenFlat,
-        )
-        const magicMult = (100 / (100 + effMr)) * (hasAbyssalMask ? 1.12 : 1.0)
-
-        let rawDmg = 0
-        let dmgType: 'physical' | 'magic' | 'true' = isApAttacker ? 'magic' : 'physical'
-        let hitMult = isApAttacker ? magicMult : physMult
-
-        // Missing HP ratio for execution / Seraphine Q spells
-        const missingHpPct = Math.max(
-          0,
-          Math.min(100, ((defState.maxHp - defState.currentHp) / defState.maxHp) * 100),
-        )
-
-        if (actorSlot.champion?.id === 'Aatrox' && action === 'Q') {
-          const qRank =
-            actorSlot.spellRanks?.q ||
-            (actorSlot.level >= 9 ? 5 : Math.max(1, Math.min(5, Math.ceil(actorSlot.level / 2))))
-          const base = [10, 30, 50, 70, 90][qRank - 1] || 10
-          const ratio = [0.6, 0.65, 0.7, 0.75, 0.8][qRank - 1] || 0.6
-
-          const seqMult = aatroxQSeq === 1 ? 1.0 : aatroxQSeq === 2 ? 1.25 : 1.5
-          const sweetspotMult = 1.6 // Sweetspot edge bonus (+60%)
-
-          rawDmg = (base + att.ad * ratio) * seqMult * sweetspotMult
-          dmgType = 'physical'
-          hitMult = physMult
-        } else if (actorSlot.champion?.id === 'Aatrox' && action === 'W') {
-          const wRank =
-            actorSlot.spellRanks?.w ||
-            (actorSlot.level >= 9 ? 5 : Math.max(1, Math.min(5, Math.ceil(actorSlot.level / 2))))
-          const base = [30, 60, 90, 120, 150][wRank - 1] || 30
-          rawDmg = base + att.ad * 0.4
-          dmgType = 'physical'
-          hitMult = physMult
-        } else if (actorSlot.champion?.id === 'Seraphine' && action === 'Q') {
-          const missingAmp = (Math.min(75, missingHpPct) / 75) * 0.75
-          rawDmg = (120 + att.ap * 0.6) * (1 + missingAmp)
-          dmgType = 'magic'
-          hitMult = magicMult
-        } else if (actorSlot.champion?.id === 'Amumu' && action === 'W') {
-          const wRank =
-            actorSlot.spellRanks?.w ||
-            (actorSlot.level >= 9 ? 5 : Math.max(1, Math.min(5, Math.ceil(actorSlot.level / 2))))
-          const baseDmgSec = 10 // 5 per 0.5s tick = 10 per sec
-          const baseHpPctSec = [1, 1.25, 1.5, 1.75, 2][wRank - 1] || 1 // (0.5% .. 1% per 0.5s tick) * 2
-          const apBonusHpPctSec = att.ap * 0.005 // +0.25% per 100 AP per 0.5s tick = +0.5% per 100 AP per sec
-          const totalHpPctSec = baseHpPctSec + apBonusHpPctSec
-          const hpDmgSec = (totalHpPctSec / 100) * defState.maxHp
-          rawDmg = baseDmgSec + hpDmgSec
-          dmgType = 'magic'
-          hitMult = magicMult
-        } else if (actorSlot.champion?.id === 'Amumu' && action === 'Q') {
-          const qRank = actorSlot.spellRanks?.q || 5
-          const baseDmg = [70, 95, 120, 145, 170][qRank - 1] || 70
-          rawDmg = baseDmg + att.ap * 0.85
-          dmgType = 'magic'
-          hitMult = magicMult
-        } else if (actorSlot.champion?.id === 'Amumu' && action === 'E') {
-          const eRank = actorSlot.spellRanks?.e || 5
-          const baseDmg = [65, 100, 135, 170, 205][eRank - 1] || 65
-          rawDmg = baseDmg + att.ap * 0.5
-          dmgType = 'magic'
-          hitMult = magicMult
-        } else if (actorSlot.champion?.id === 'Amumu' && action === 'R') {
-          const rRank = actorSlot.spellRanks?.r || 3
-          const baseDmg = [150, 250, 350][rRank - 1] || 150
-          rawDmg = baseDmg + att.ap * 0.8
-          dmgType = 'magic'
-          hitMult = magicMult
-        } else if (action === 'AA') {
-          rawDmg = att.ad * (att.crit > 0 ? 1.75 : 1.0)
-          dmgType = 'physical'
-          hitMult = physMult
-        } else {
-          rawDmg = isApAttacker ? 180 + att.ap * 0.7 : 160 + att.ad * 0.75
-        }
+        const rawDmg = spellRes.rawDmg
+        const dmgType = spellRes.dmgType
+        const hitMult = spellRes.hitMult
+        const effArmor = spellRes.effArmor
+        const effMr = spellRes.effMr
+        const physMult = spellRes.physMult
+        const magicMult = spellRes.magicMult
 
         const finalDmg = Math.round(rawDmg * hitMult)
         defState.currentHp = Math.max(0, defState.currentHp - finalDmg)
