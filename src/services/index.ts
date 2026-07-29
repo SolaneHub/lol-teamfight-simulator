@@ -1,5 +1,7 @@
 export * from './champions/championService'
+export * from './champions/spellCalculatorService'
 export * from './items/itemService'
+export * from './items/itemPassiveService'
 export * from './runes/runeService'
 export * from './draft/draftService'
 export * from './monsters/monsterService'
