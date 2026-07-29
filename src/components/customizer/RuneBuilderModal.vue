@@ -11,7 +11,10 @@
         <img
           v-if="activeCustomizerSlot?.champion"
           :src="getChampionSplashUrl(activeCustomizerSlot.champion.id)"
-          class="absolute inset-0 w-full h-full object-cover select-none pointer-events-none brightness-[0.35]"
+          :class="[
+            'absolute inset-0 w-full h-full object-cover select-none pointer-events-none brightness-[0.35]',
+            activeCustomizerSlot.side === 'blue' ? '-scale-x-100' : '',
+          ]"
           :style="{ objectPosition: getChampionPosition(activeCustomizerSlot.champion.id) }"
         />
         <div

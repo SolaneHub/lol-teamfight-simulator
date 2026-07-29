@@ -18,7 +18,7 @@
             :src="getChampionSplashUrl(activeCustomizerSlot.champion?.id || '')"
             :class="[
               'absolute inset-0 w-full h-full object-cover select-none pointer-events-none brightness-50',
-              activeCustomizerSlot.side === 'red' ? '-scale-x-100' : '',
+              activeCustomizerSlot.side === 'blue' ? '-scale-x-100' : '',
             ]"
             :style="{
               objectPosition: getChampionPosition(activeCustomizerSlot.champion?.id || ''),

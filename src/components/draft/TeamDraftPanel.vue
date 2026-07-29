@@ -39,7 +39,7 @@
             :src="getChampionSplashUrl(slot.champion.id)"
             :class="[
               'absolute inset-0 w-full h-full object-cover select-none pointer-events-none',
-              side === 'red' ? '-scale-x-100' : '',
+              side === 'blue' ? '-scale-x-100' : '',
             ]"
             :style="{ objectPosition: getChampionPosition(slot.champion.id) }"
           />
