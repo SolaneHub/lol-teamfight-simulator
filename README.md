@@ -73,6 +73,23 @@ out/               # Pre-fetched champion data
 
 ---
 
+## 📋 Champion Progress Tracker
+
+Use this checklist to track champion data validation, custom spell formulas, and simulation support status.
+
+### Completed Champions
+- [x] **Aatrox** — Spells parsed, dynamic E omnivamp healing scaling on bonus HP resolved, passive formatted.
+
+### Pending Champions (Work in Progress / To Be Validated)
+- [ ] Ahri
+- [ ] Akali
+- [ ] Amumu
+- [ ] Annie
+- [ ] Ashe
+- [ ] *The remaining 160+ champions from Data Dragon*
+
+---
+
 ## 📜 License
 
 MIT — feel free to fork and experiment!
