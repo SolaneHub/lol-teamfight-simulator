@@ -5,6 +5,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
 import fs from 'node:fs'
 import path from 'node:path'
+import { VitePWA } from 'vite-plugin-pwa'
 
 import type { ViteDevServer, Connect } from 'vite'
 
@@ -62,6 +63,45 @@ export default defineConfig({
     vueDevTools(),
     tailwindcss(),
     serveAndCopyOutPlugin(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      manifest: {
+        name: 'LoL Teamfight Simulator',
+        short_name: 'LoL Teamfight Sim',
+        description: 'Simulator for League of Legends teamfights',
+        theme_color: '#020617',
+        background_color: '#020617',
+        display: 'standalone',
+        icons: [
+          {
+            src: 'favicon.ico',
+            sizes: '48x48 32x32 16x16',
+            type: 'image/x-icon'
+          }
+        ]
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/ddragon\.leagueoflegends\.com\/cdn\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'riot-ddragon-cdn',
+              expiration: {
+                maxEntries: 1000,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 Days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          }
+        ]
+      }
+    })
   ],
   resolve: {
     alias: {
@@ -69,3 +109,4 @@ export default defineConfig({
     },
   },
 })
+
