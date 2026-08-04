@@ -1,6 +1,6 @@
 import type { Champion, ChampionImage, ChampionPassive, ChampionSpells } from '../../types'
 
-const BASE_URL = `${import.meta.env?.BASE_URL || '/'}ddragon/16.14.1/data/en_US`
+const BASE_URL = 'https://ddragon.leagueoflegends.com/cdn/16.14.1/data/en_US'
 const CHAMP_FULL_URL = `${BASE_URL}/championFull.json`
 
 const CHAMP_IMG_URL = 'https://ddragon.leagueoflegends.com/cdn/16.14.1/img/champion'
