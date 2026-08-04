@@ -570,9 +570,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDraftStore } from '@/stores/draft'
+import { useDDragonStore } from '@/stores/ddragon'
 import {
   getChampionPosition,
   calculateStats,
@@ -597,18 +598,8 @@ const draftStore = useDraftStore()
 const { activeCustomizerSlot } = storeToRefs(draftStore)
 const { removeRunePage, removeItemFromSlot, toggleMasterwork, setSpellRank } = draftStore
 
-const spellFormulasData = ref<Record<string, Record<string, unknown>>>({})
-
-onMounted(async () => {
-  try {
-    const res = await fetch(`${import.meta.env.BASE_URL}data/spellFormulas.json`)
-    if (res.ok) {
-      spellFormulasData.value = await res.json()
-    }
-  } catch (err) {
-    console.error('Failed to load spellFormulas.json:', err)
-  }
-})
+const ddragonStore = useDDragonStore()
+const { spellFormulasData } = storeToRefs(ddragonStore)
 
 const hoveredRune = ref<Rune | RuneKeystone | Record<string, unknown> | null>(null)
 const hoveredItem = ref<Item | null>(null)
@@ -802,6 +793,27 @@ const getStatLabel = (statKey: string): string => {
   }
 }
 
+const getStatColorClass = (statKey: string): string => {
+  switch (statKey) {
+    case 'totalAp':
+      return 'text-cyan-400 font-semibold'
+    case 'bonusAd':
+    case 'totalAd':
+      return 'text-orange-400 font-semibold'
+    case 'bonusHp':
+    case 'totalHp':
+      return 'text-emerald-400 font-semibold'
+    case 'armor':
+      return 'text-yellow-400 font-semibold'
+    case 'magicResist':
+      return 'text-teal-300 font-semibold'
+    case 'abilityHaste':
+      return 'text-teal-300 font-semibold'
+    default:
+      return 'text-slate-300 font-semibold'
+  }
+}
+
 const interpolateSpellTooltip = (
   spell: ChampionSpells | Record<string, unknown> | undefined | null,
   _lvl: number,
@@ -812,11 +824,10 @@ const interpolateSpellTooltip = (
   const sp = spell as ChampionSpells
   let tooltip = sp.tooltip || sp.description || ''
 
-  // Fallback to description if tooltip is a raw nested localization key (e.g. {{ Spell_AkshanW_... }})
+  // Fallback to description if tooltip is a raw nested localization key
   if (/^\{\{\s*Spell_/i.test(tooltip.trim())) {
     tooltip = sp.description || tooltip
   }
-  // Strip any embedded raw {{ Spell_... }} tags
   tooltip = tooltip.replace(/\{\{\s*Spell_[^}]+\}\}/gi, '')
 
   // Format all Riot HTML tags with vibrant Tailwind classes
@@ -826,79 +837,304 @@ const interpolateSpellTooltip = (
     activeCustomizerSlot.value?.champion?.spells.findIndex((s) => s.id === sp.id) ?? 0
   const rank = getSpellRank(spellIdx)
 
-  // Look up formula in our custom external JSON database
-  const champFormulas = spellFormulasData.value[champId]
-  if (champFormulas && champFormulas[sp.id]) {
-    const spellConfig = champFormulas[sp.id] as Record<string, unknown>
+  const champFormulas =
+    spellFormulasData.value[champId] || spellFormulasData.value[champId.toLowerCase()]
+  const spellConfig = (champFormulas ? champFormulas[sp.id] : null) as Record<
+    string,
+    unknown
+  > | null
 
-    for (const [placeholder, config] of Object.entries(spellConfig)) {
-      let replacementValue = ''
+  // Find all {{ placeholder }} occurrences in the tooltip
+  const placeholdersInTooltip = Array.from(tooltip.matchAll(/\{\{\s*([^}]+?)\s*\}\}/g))
 
-      if (typeof config === 'string' || typeof config === 'number') {
-        replacementValue = config.toString()
-      } else if (config && typeof config === 'object') {
-        const baseArr = ((config as Record<string, unknown>).base as number[]) || []
-        const base = baseArr[rank - 1] ?? baseArr[baseArr.length - 1] ?? 0
-        const scalings =
-          ((config as Record<string, unknown>).scalings as Array<{
-            ratio: number | number[]
-            stat: string
-          }>) || []
-        const dmgType = ((config as Record<string, unknown>).type as string) || ''
+  for (const match of placeholdersInTooltip) {
+    const rawPlaceholder = match[1]?.trim()
+    if (!rawPlaceholder) continue
 
-        let colorClass = 'text-slate-200'
-        if (dmgType === 'magic') colorClass = 'text-cyan-400'
-        else if (dmgType === 'physical') colorClass = 'text-orange-400'
-        else if (dmgType === 'true') colorClass = 'text-white font-bold'
-        else if (dmgType === 'cc' || dmgType === 'status') colorClass = 'text-purple-400'
+    // Skip known empty system placeholders
+    if (
+      [
+        'spellmodifierdescriptionappend',
+        'specialabilityoverride',
+        'spellmodifierdescription',
+      ].includes(rawPlaceholder.toLowerCase())
+    ) {
+      continue
+    }
 
-        if (scalings.length === 0) {
-          replacementValue = `<span class="${colorClass} font-semibold">${base}</span>`
-        } else {
-          let scalingBonus = 0
-          const scalingDetails: string[] = []
+    let multiplier = 1
+    let cleanName = rawPlaceholder
+    let isNegativeMultiplier = false
 
-          for (const scale of scalings) {
-            const ratioVal = Array.isArray(scale.ratio)
-              ? (scale.ratio[rank - 1] ?? scale.ratio[scale.ratio.length - 1] ?? 0)
-              : (scale.ratio ?? 0)
+    // Check for multiplier (e.g. {{ wslowpercentage * -100 }} or {{ e1*100 }})
+    if (cleanName.includes('*')) {
+      const parts = cleanName.split('*')
+      cleanName = parts[0]?.trim() || cleanName
+      const multVal = parseFloat(parts[1]?.trim() || '1')
+      if (!isNaN(multVal)) {
+        multiplier = multVal
+        if (multVal < 0) isNegativeMultiplier = true
+      }
+    }
 
-            const statValue = getStatValue(stats, scale.stat)
-            scalingBonus += statValue * ratioVal
+    const calcEffectiveMultiplier = (val: number): number => {
+      let m = multiplier
+      // Avoid double 100x multiplication if val is already scaled (>= 1 or <= -1)
+      if (Math.abs(multiplier) === 100 && Math.abs(val) >= 1) {
+        m = multiplier < 0 ? -1 : 1
+      }
+      return m
+    }
 
-            const statLabel = getStatLabel(scale.stat)
-            const ratioPct = Math.round(ratioVal * 10000) / 100
-            scalingDetails.push(`${ratioPct}% ${statLabel}`)
+    let replacementValue: string | null = null
+
+    // 1. Search in spellFormulas.json config
+    if (spellConfig) {
+      const candidateKeys = [
+        rawPlaceholder,
+        cleanName,
+        cleanName.toLowerCase(),
+        `calc_${cleanName.toLowerCase()}`,
+        cleanName.toLowerCase().replace(/^calc_/, ''),
+      ]
+
+      let matchedKey = Object.keys(spellConfig).find(
+        (k) => candidateKeys.includes(k) || candidateKeys.includes(k.toLowerCase()),
+      )
+
+      // Positional fallback: e1 / f1 maps to 1st calc, e2 / f2 maps to 2nd calc in spellConfig
+      if (!matchedKey) {
+        const efMatch = cleanName.match(/^[ef]([0-9]+)$/i)
+        if (efMatch) {
+          const posIdx = parseInt(efMatch[1] || '1', 10) - 1
+          const keys = Object.keys(spellConfig)
+          if (keys[posIdx]) {
+            matchedKey = keys[posIdx]
           }
-
-          const rawTotal = base + scalingBonus
-          const totalValue = Number.isInteger(rawTotal)
-            ? rawTotal
-            : Math.round(rawTotal * 1000) / 1000
-
-          let detailsText = base.toString()
-          if (scalingDetails.length > 0) {
-            detailsText += ` + ${scalingDetails.join(' + ')}`
-          }
-
-          replacementValue = `<span class="${colorClass} font-semibold">${totalValue}</span> <span class="text-slate-555 text-base">(${detailsText})</span>`
         }
       }
 
-      // Escape special regex characters in placeholder
-      const escaped = placeholder.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')
-      tooltip = tooltip.replace(new RegExp(`\\{\\{\\s*${escaped}\\s*\\}\\}`, 'g'), replacementValue)
+      if (matchedKey && spellConfig[matchedKey]) {
+        const config = spellConfig[matchedKey]
+        if (typeof config === 'string' || typeof config === 'number') {
+          const num = parseFloat(config.toString())
+          const effM = calcEffectiveMultiplier(num)
+          let val = Math.round(num * effM * 100) / 100
+          if (isNegativeMultiplier) val = Math.abs(val)
+          replacementValue = val.toString()
+        } else if (config && typeof config === 'object') {
+          const baseArr = ((config as Record<string, unknown>).base as number[]) || []
+          const baseRaw = baseArr[rank - 1] ?? baseArr[baseArr.length - 1] ?? 0
+          const effM = calcEffectiveMultiplier(baseRaw)
+
+          const keyLower = cleanName.toLowerCase()
+          const isRatio =
+            keyLower.includes('vamp') ||
+            keyLower.includes('lifesteal') ||
+            keyLower.includes('ratio') ||
+            keyLower.includes('percent') ||
+            keyLower.includes('pct') ||
+            (Math.abs(baseRaw) > 0 && Math.abs(baseRaw) < 1.0)
+
+          let base = baseRaw * effM
+          let suffix = ''
+          if (isRatio && Math.abs(baseRaw) < 1.0 && Math.abs(effM) === 1) {
+            base = base * 100
+            suffix = '%'
+          }
+          base = Math.round(base)
+          if (isNegativeMultiplier) base = Math.abs(base)
+
+          const scalings =
+            ((config as Record<string, unknown>).scalings as Array<{
+              ratio: number | number[]
+              stat: string
+            }>) || []
+          const dmgType = ((config as Record<string, unknown>).type as string) || ''
+
+          let colorClass = 'text-slate-200'
+          if (dmgType === 'magic') colorClass = 'text-cyan-400'
+          else if (dmgType === 'physical') colorClass = 'text-orange-400'
+          else if (dmgType === 'true') colorClass = 'text-white font-bold'
+          else if (dmgType === 'cc' || dmgType === 'status') colorClass = 'text-purple-400'
+
+          if (scalings.length === 0) {
+            replacementValue = `<span class="${colorClass} font-semibold">${base}${suffix}</span>`
+          } else {
+            let scalingBonus = 0
+            const scalingDetails: string[] = []
+
+            for (const scale of scalings) {
+              const rawRatio = Array.isArray(scale.ratio)
+                ? (scale.ratio[rank - 1] ?? scale.ratio[scale.ratio.length - 1] ?? 0)
+                : (scale.ratio ?? 0)
+              const ratioVal = rawRatio * effM
+
+              const statValue = getStatValue(stats, scale.stat)
+              scalingBonus += statValue * ratioVal
+
+              let statLabel = getStatLabel(scale.stat)
+              const statColor = getStatColorClass(scale.stat)
+              let ratioPct = Math.round(ratioVal * 10000) / 100
+              if (isNegativeMultiplier) ratioPct = Math.abs(ratioPct)
+
+              if (
+                (scale.stat === 'bonusHp' || scale.stat === 'totalHp') &&
+                ratioVal > 0 &&
+                ratioVal < 0.005
+              ) {
+                ratioPct = Math.round(ratioVal * 1000000) / 100
+                statLabel = `per 100 ${statLabel}`
+              }
+
+              scalingDetails.push(`<span class="${statColor}">${ratioPct}% ${statLabel}</span>`)
+            }
+
+            const rawTotal = baseRaw * effM + scalingBonus
+            let totalValue = Math.round(
+              rawTotal * (isRatio && Math.abs(baseRaw) < 1.0 && Math.abs(effM) === 1 ? 100 : 1),
+            )
+            if (isNegativeMultiplier) totalValue = Math.abs(totalValue)
+
+            const primaryStatColor = scalings[0] ? getStatColorClass(scalings[0].stat) : colorClass
+            let detailsText =
+              base > 0 ? `<span class="${primaryStatColor}">${base}${suffix}</span>` : ''
+            if (scalingDetails.length > 0) {
+              detailsText += (detailsText ? ' + ' : '') + scalingDetails.join(' + ')
+            }
+
+            replacementValue = `<span class="${colorClass} font-semibold">${totalValue}${suffix}</span>`
+            if (detailsText) {
+              replacementValue += ` <span class="text-slate-400 font-normal text-base">(${detailsText})</span>`
+            }
+          }
+        }
+      }
+    }
+
+    // 2. Fallback: DDragon Native effect / vars / effectBurn vectors
+    if (!replacementValue) {
+      const rawSp = sp as unknown as Record<string, unknown>
+      const efMatch = cleanName.match(/^[ef]([0-9]+)$/i)
+      if (efMatch) {
+        const effIndex = parseInt(efMatch[1] || '0', 10)
+        const effArr = sp.effect ? sp.effect[effIndex] : null
+        const effectBurn = rawSp.effectBurn as string[] | undefined
+
+        if (Array.isArray(effArr) && effArr.length > 0) {
+          const rawVal = effArr[rank - 1] ?? effArr[0] ?? 0
+          const effM = calcEffectiveMultiplier(rawVal)
+          let val = Math.round(rawVal * effM * 100) / 100
+          if (isNegativeMultiplier) val = Math.abs(val)
+          replacementValue = `<span class="text-cyan-400 font-semibold">${val}</span>`
+        } else if (effectBurn && effectBurn[effIndex]) {
+          const burnParts = effectBurn[effIndex].split('/')
+          const burnVal = burnParts[rank - 1] ?? burnParts[0] ?? effectBurn[effIndex]
+          const numVal = parseFloat(burnVal)
+          if (!isNaN(numVal)) {
+            const effM = calcEffectiveMultiplier(numVal)
+            let val = Math.round(numVal * effM * 100) / 100
+            if (isNegativeMultiplier) val = Math.abs(val)
+            replacementValue = `<span class="text-cyan-400 font-semibold">${val}</span>`
+          } else {
+            replacementValue = `<span class="text-cyan-400 font-semibold">${burnVal}</span>`
+          }
+        }
+      }
+
+      if (!replacementValue && sp.vars) {
+        const varMatch = sp.vars.find(
+          (v) => typeof v.key === 'string' && v.key.toLowerCase() === cleanName.toLowerCase(),
+        )
+        if (varMatch) {
+          let stat = 'totalAp'
+          if (varMatch.link === 'bonusattackdamage') stat = 'bonusAd'
+          else if (varMatch.link === 'attackdamage') stat = 'totalAd'
+          else if (varMatch.link === 'bonushealth') stat = 'bonusHp'
+
+          const rawCoeff = Array.isArray(varMatch.coeff)
+            ? (varMatch.coeff[rank - 1] ?? varMatch.coeff[0] ?? 0)
+            : (varMatch.coeff ?? 0)
+          const ratioVal = rawCoeff * multiplier
+
+          const baseArr = sp.effect ? sp.effect[1] : null
+          const baseRaw = baseArr ? (baseArr[rank - 1] ?? baseArr[0] ?? 0) : 0
+
+          const keyLower = cleanName.toLowerCase()
+          const isRatio =
+            keyLower.includes('vamp') ||
+            keyLower.includes('lifesteal') ||
+            keyLower.includes('ratio') ||
+            keyLower.includes('percent') ||
+            keyLower.includes('pct') ||
+            (Math.abs(baseRaw) > 0 && Math.abs(baseRaw) < 1.0)
+
+          let base = baseRaw * multiplier
+          let suffix = ''
+          if (isRatio && Math.abs(baseRaw) < 1.0 && Math.abs(multiplier) === 1) {
+            base = base * 100
+            suffix = '%'
+          }
+          base = Math.round(base)
+
+          const statValue = getStatValue(stats, stat)
+          const bonusVal = statValue * ratioVal
+          const totalVal = Math.round(
+            (baseRaw * multiplier + bonusVal) *
+              (isRatio && Math.abs(baseRaw) < 1.0 && Math.abs(multiplier) === 1 ? 100 : 1),
+          )
+          const statLabel = getStatLabel(stat)
+          const statColor = getStatColorClass(stat)
+          const ratioPct = Math.round(ratioVal * 10000) / 100
+
+          let detailsText = base > 0 ? `<span class="${statColor}">${base}${suffix}</span>` : ''
+          if (ratioPct > 0) {
+            detailsText +=
+              (detailsText ? ' + ' : '') +
+              `<span class="${statColor}">${ratioPct}% ${statLabel}</span>`
+          }
+
+          replacementValue = `<span class="text-cyan-400 font-semibold">${totalVal}${suffix}</span>`
+          if (detailsText) {
+            replacementValue += ` <span class="text-slate-400 font-normal text-base">(${detailsText})</span>`
+          }
+        }
+      }
+
+      // 3. Fallback to first effectBurn array value if still not replaced
+      if (!replacementValue) {
+        const rawSp = sp as unknown as Record<string, unknown>
+        const effectBurn = rawSp.effectBurn as string[] | undefined
+        if (effectBurn && effectBurn[1]) {
+          const burnParts = effectBurn[1].split('/')
+          const burnVal = burnParts[rank - 1] ?? burnParts[0] ?? effectBurn[1]
+          replacementValue = `<span class="text-cyan-400 font-semibold">${burnVal}</span>`
+        }
+      }
+    }
+
+    if (replacementValue) {
+      tooltip = tooltip.split(match[0]).join(replacementValue)
     }
   }
 
-  // Remove known empty system placeholders (like spellmodifierdescriptionappend)
+  // Clean up remaining empty system placeholders
   tooltip = tooltip.replace(
     /\{\{\s*(spellmodifierdescriptionappend|specialabilityoverride|spellmodifierdescription)\s*\}\}/gi,
     '',
   )
 
-  // Generic fallback replacement for raw placeholders of other champions
-  tooltip = tooltip.replace(/\{\{\s*[^}]+\s*\}\}/g, '???')
+  // Final safety fallback: try extracting from effectBurn before stripping
+  tooltip = tooltip.replace(/\{\{\s*([ef])([0-9]+)\s*\}\}/gi, (_match, _p1, p2) => {
+    const rawSp = sp as unknown as Record<string, unknown>
+    const effectBurn = rawSp.effectBurn as string[] | undefined
+    const idx = parseInt(p2, 10)
+    if (effectBurn && effectBurn[idx]) {
+      const parts = effectBurn[idx].split('/')
+      return `<span class="text-cyan-400 font-semibold">${parts[rank - 1] ?? parts[0]}</span>`
+    }
+    return ''
+  })
 
   return tooltip
 }
@@ -953,8 +1189,19 @@ const interpolatePassiveDescription = (
           const statValue = getStatValue(stats, scale.stat)
           scalingBonus += statValue * ratioVal
 
-          const statLabel = getStatLabel(scale.stat)
-          scalingDetails.push(`${Math.round(ratioVal * 100)}% ${statLabel}`)
+          let statLabel = getStatLabel(scale.stat)
+          let ratioPct = Math.round(ratioVal * 100)
+
+          if (
+            (scale.stat === 'bonusHp' || scale.stat === 'totalHp') &&
+            ratioVal > 0 &&
+            ratioVal < 0.05
+          ) {
+            ratioPct = Math.round(ratioVal * 10000) / 100
+            statLabel = `per 100 ${statLabel}`
+          }
+
+          scalingDetails.push(`${ratioPct}% ${statLabel}`)
         }
 
         const keyLower = key.toLowerCase()
@@ -962,21 +1209,29 @@ const interpolatePassiveDescription = (
           keyLower.includes('ratio') ||
           keyLower.includes('percent') ||
           keyLower.includes('pct') ||
-          keyLower.includes('chance')
+          keyLower.includes('chance') ||
+          keyLower.includes('mod') ||
+          keyLower.includes('bonus') ||
+          keyLower.includes('reduction') ||
+          keyLower.includes('pdamage') ||
+          (base > 0 && base < 1)
         const isCooldown = keyLower.includes('cooldown') || keyLower.includes('duration')
 
         const rawVal = base + scalingBonus
-        let displayVal = Math.round(rawVal * 100) / 100
+        let displayVal = rawVal
         let unitSuffix = ''
 
         if (isRatio) {
           unitSuffix = '%'
-          if (displayVal <= 1 && displayVal > 0) {
-            displayVal = Math.round(displayVal * 10000) / 100
+          if (displayVal <= 1.05 && displayVal > 0) {
+            displayVal = displayVal * 100
           }
         } else if (isCooldown) {
           unitSuffix = 's'
         }
+
+        displayVal = Math.round(displayVal)
+        const formattedBase = Math.round(isRatio && base <= 1.05 && base > 0 ? base * 100 : base)
 
         let colorClass = 'text-cyan-400'
         if (dmgType === 'physical') colorClass = 'text-orange-400'
@@ -984,8 +1239,31 @@ const interpolatePassiveDescription = (
         else if (dmgType === 'cc' || dmgType === 'status') colorClass = 'text-purple-400'
 
         let valHtml = `<span class="${colorClass} font-semibold">${displayVal}${unitSuffix}</span>`
+        const skipRangeKeys = ['damage', 'pdamage', 'cooldown', 'monsterdamagecap']
+        const cleanKeyLower = cleanKey.toLowerCase()
+
+        if (
+          baseArr.length > 1 &&
+          !skipRangeKeys.includes(cleanKeyLower) &&
+          !skipRangeKeys.includes(keyLower)
+        ) {
+          const firstVal = baseArr[0] ?? 0
+          const lastVal = baseArr[baseArr.length - 1] ?? 0
+          if (Math.abs(firstVal - lastVal) > 0.0001) {
+            let formFirst = firstVal
+            let formLast = lastVal
+            if (isRatio) {
+              formFirst = firstVal <= 1.05 && firstVal > 0 ? firstVal * 100 : firstVal
+              formLast = lastVal <= 1.05 && lastVal > 0 ? lastVal * 100 : lastVal
+            }
+            formFirst = Math.round(formFirst)
+            formLast = Math.round(formLast)
+            valHtml += ` <span class="text-slate-500 font-normal">(${formFirst}${unitSuffix} - ${formLast}${unitSuffix})</span>`
+          }
+        }
+
         if (scalingDetails.length > 0) {
-          valHtml += ` <span class="text-slate-500 text-base">(${base}${unitSuffix} + ${scalingDetails.join(' + ')})</span>`
+          valHtml += ` <span class="text-slate-500 text-base">(${formattedBase}${unitSuffix} + ${scalingDetails.join(' + ')})</span>`
         }
 
         statItems.push(`<span class="text-slate-400">${label}:</span> ${valHtml}`)
