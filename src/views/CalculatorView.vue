@@ -161,7 +161,7 @@
             >1. Attacking Champion</label
           >
           <div
-            class="min-h-[56px] bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-1.5"
+            class="min-h-14 bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-1.5"
           >
             <button
               v-for="s in selectedAttackerSlots"
@@ -222,7 +222,7 @@
             </button>
           </div>
           <div
-            class="min-h-[56px] bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-1.5"
+            class="min-h-14 bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-1.5"
           >
             <label
               v-for="s in selectedDefenderSlots"
@@ -255,7 +255,7 @@
           <label class="text-base font-bold text-transparent uppercase select-none">&nbsp;</label>
           <button
             @click="submitTeamfightAction"
-            class="h-14 w-full px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold rounded-xl font-mono text-base transition-all shadow-lg shadow-orange-500/20 cursor-pointer flex items-center justify-center gap-2"
+            class="h-14 w-full px-4 bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold rounded-xl font-mono text-base transition-all shadow-lg shadow-orange-500/20 cursor-pointer flex items-center justify-center gap-2"
           >
             <span>➕ Add Action</span>
           </button>
@@ -302,6 +302,31 @@
             >
               ⚙️
             </button>
+          </div>
+
+          <!-- Keystone & Rune Row -->
+          <div
+            v-if="slot.primaryKeystone"
+            class="flex items-center justify-between bg-slate-950/70 p-2.5 rounded-lg border border-slate-800"
+          >
+            <div
+              class="flex items-center gap-2 cursor-pointer group"
+              @mouseenter="showRuneTooltip(slot.primaryKeystone, 'Primary Keystone')"
+              @mouseleave="hideRuneTooltip"
+              @mousemove="onMouseMove"
+            >
+              <div
+                class="h-8 w-8 rounded-full bg-slate-900 border border-amber-500/50 p-0.5 flex items-center justify-center shrink-0 group-hover:border-amber-400 transition-all"
+              >
+                <img
+                  :src="getRuneIconUrl(slot.primaryKeystone.icon)"
+                  class="h-full w-full object-contain"
+                />
+              </div>
+              <span class="text-base font-bold text-amber-300 group-hover:underline">{{
+                slot.primaryKeystone.name
+              }}</span>
+            </div>
           </div>
 
           <!-- Stats Grid -->
@@ -448,6 +473,43 @@
                       class="text-base text-purple-400 font-semibold"
                       >[🩸 Vile Decay {{ res.vileDecayStacks }}x]</span
                     >
+                    <span
+                      v-if="res.conquerorStacks > 0"
+                      class="text-base text-amber-300 font-semibold"
+                      >[⚡ Conqueror {{ res.conquerorStacks }}x{{
+                        res.conquerorStacks === 12 ? ' (MAX)' : ''
+                      }}]</span
+                    >
+                    <span
+                      v-if="res.lethalTempoStacks > 0"
+                      class="text-base text-cyan-300 font-semibold"
+                      >[⚡ Lethal Tempo {{ res.lethalTempoStacks }}x{{
+                        res.lethalTempoStacks === 6
+                          ? ` (MAX +${res.lethalTempoOnHitDmg || 0} Dmg)`
+                          : ''
+                      }}]</span
+                    >
+                    <span
+                      v-if="res.ptaExposed"
+                      class="text-base text-amber-400 font-bold bg-amber-950/80 px-2 py-0.5 rounded border border-amber-500/50"
+                      >🎯 PtA EXPOSED (+8% Dmg)</span
+                    >
+                    <span
+                      v-else-if="res.ptaStacks > 0"
+                      class="text-base text-amber-300 font-semibold"
+                      >[🎯 PtA {{ res.ptaStacks }}/3]</span
+                    >
+                    <span v-if="res.coupDeGrace" class="text-base text-rose-300 font-semibold"
+                      >[🗡️ Coup de Grace (+8%)]</span
+                    >
+                    <span v-if="res.cutDown" class="text-base text-amber-300 font-semibold"
+                      >[🩸 Cut Down (+8%)]</span
+                    >
+                    <span
+                      v-if="res.lastStandBonusPct && res.lastStandBonusPct > 0"
+                      class="text-base text-red-400 font-semibold"
+                      >[🛡️ Last Stand (+{{ res.lastStandBonusPct }}%)]</span
+                    >
                   </div>
                   <div class="flex items-center gap-3">
                     <span class="text-base text-slate-400">HP: {{ res.remainingHp }}</span>
@@ -513,6 +575,31 @@
             </button>
           </div>
 
+          <!-- Keystone & Rune Row -->
+          <div
+            v-if="slot.primaryKeystone"
+            class="flex items-center justify-between bg-slate-950/70 p-2.5 rounded-lg border border-slate-800"
+          >
+            <div
+              class="flex items-center gap-2 cursor-pointer group"
+              @mouseenter="showRuneTooltip(slot.primaryKeystone, 'Primary Keystone')"
+              @mouseleave="hideRuneTooltip"
+              @mousemove="onMouseMove"
+            >
+              <div
+                class="h-8 w-8 rounded-full bg-slate-900 border border-amber-500/50 p-0.5 flex items-center justify-center shrink-0 group-hover:border-amber-400 transition-all"
+              >
+                <img
+                  :src="getRuneIconUrl(slot.primaryKeystone.icon)"
+                  class="h-full w-full object-contain"
+                />
+              </div>
+              <span class="text-base font-bold text-amber-300 group-hover:underline">{{
+                slot.primaryKeystone.name
+              }}</span>
+            </div>
+          </div>
+
           <!-- Live HP Bar -->
           <div
             class="flex flex-col gap-1.5 font-mono text-base bg-slate-950 p-3 rounded-lg border border-slate-800"
@@ -537,10 +624,10 @@
                 class="h-full transition-all duration-300"
                 :class="
                   getDefenderEndState(slot.id).hpPct > 50
-                    ? 'bg-gradient-to-r from-emerald-500 to-green-400'
+                    ? 'bg-linear-to-r from-emerald-500 to-green-400'
                     : getDefenderEndState(slot.id).hpPct > 20
-                      ? 'bg-gradient-to-r from-amber-500 to-yellow-400'
-                      : 'bg-gradient-to-r from-rose-600 to-red-500'
+                      ? 'bg-linear-to-r from-amber-500 to-yellow-400'
+                      : 'bg-linear-to-r from-rose-600 to-red-500'
                 "
                 :style="{ width: getDefenderEndState(slot.id).hpPct + '%' }"
               ></div>
@@ -634,7 +721,7 @@
               class="h-3 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative"
             >
               <div
-                class="h-full bg-gradient-to-r from-emerald-500 to-rose-500 transition-all duration-300"
+                class="h-full bg-linear-to-r from-emerald-500 to-rose-500 transition-all duration-300"
                 :style="{ width: getDefenderEndState(slot.id).hpPct + '%' }"
               ></div>
             </div>
@@ -723,6 +810,35 @@
                 <span v-if="res.vileDecayStacks > 0" class="text-purple-400 font-semibold"
                   >[VD {{ res.vileDecayStacks }}x]</span
                 >
+                <span v-if="res.conquerorStacks > 0" class="text-amber-300 font-semibold"
+                  >[⚡ Conq {{ res.conquerorStacks }}x{{
+                    res.conquerorStacks === 12 ? ' (MAX)' : ''
+                  }}]</span
+                >
+                <span v-if="res.lethalTempoStacks > 0" class="text-cyan-300 font-semibold"
+                  >[⚡ LT {{ res.lethalTempoStacks }}x{{
+                    res.lethalTempoStacks === 6
+                      ? ` (MAX +${res.lethalTempoOnHitDmg || 0} Dmg)`
+                      : ''
+                  }}]</span
+                >
+                <span v-if="res.ptaExposed" class="text-amber-400 font-bold"
+                  >[🎯 PtA EXPOSED (+8%)]</span
+                >
+                <span v-else-if="res.ptaStacks > 0" class="text-amber-300 font-semibold"
+                  >[🎯 PtA {{ res.ptaStacks }}/3]</span
+                >
+                <span v-if="res.coupDeGrace" class="text-rose-300 font-semibold"
+                  >[🗡️ CdG (+8%)]</span
+                >
+                <span v-if="res.cutDown" class="text-amber-300 font-semibold"
+                  >[🩸 Cut Down (+8%)]</span
+                >
+                <span
+                  v-if="res.lastStandBonusPct && res.lastStandBonusPct > 0"
+                  class="text-red-400 font-semibold"
+                  >[🛡️ Last Stand (+{{ res.lastStandBonusPct }}%)]</span
+                >
               </div>
             </div>
           </div>
@@ -739,6 +855,8 @@
         </div>
       </div>
     </div>
+    <!-- Rune Tooltip Popup -->
+    <RuneTooltip :rune="hoveredRune" :mouse-pos="mousePos" />
   </div>
 </template>
 
@@ -750,14 +868,35 @@ import { storeToRefs } from 'pinia'
 import {
   getChampionIconUrl,
   getItemIconUrl,
+  getRuneIconUrl,
   calculateStats,
   calculateMonsterBuffStats,
   getChampionDefaultAdaptiveType,
   calculateSpellDamage,
   detectItemPassives,
 } from '@/services'
-import type { DraftSlot } from '@/types'
+import type { DraftSlot, Rune } from '@/types'
 import { useCalculatorStore } from '@/stores/calculator'
+import RuneTooltip, { type RuneTooltipData } from '@/components/customizer/RuneTooltip.vue'
+
+const hoveredRune = ref<RuneTooltipData | null>(null)
+const mousePos = ref({ x: 0, y: 0 })
+
+const onMouseMove = (e: MouseEvent) => {
+  mousePos.value = { x: e.clientX, y: e.clientY }
+}
+
+const showRuneTooltip = (rune: Rune | RuneTooltipData | null | undefined, category: string) => {
+  if (!rune) return
+  hoveredRune.value = {
+    ...rune,
+    category: category || 'Primary Keystone',
+  }
+}
+
+const hideRuneTooltip = () => {
+  hoveredRune.value = null
+}
 
 const router = useRouter()
 const draftStore = useDraftStore()
@@ -890,6 +1029,27 @@ const getCalculatedStatsForSlot = (slot: DraftSlot) => {
   }
 }
 
+interface TargetResult {
+  targetSlotId: number
+  targetName: string
+  amount: number
+  type: 'physical' | 'magic' | 'true'
+  effectiveArmor: number
+  effectiveMr: number
+  blackCleaverStacks: number
+  vileDecayStacks: number
+  conquerorStacks: number
+  lethalTempoStacks: number
+  lethalTempoOnHitDmg?: number
+  ptaStacks: number
+  ptaExposed: boolean
+  coupDeGrace?: boolean
+  cutDown?: boolean
+  lastStandBonusPct?: number
+  isKo: boolean
+  remainingHp: number
+}
+
 // TEAMFIGHT SIMULATION ENGINE
 const teamfightSimulationResults = computed(() => {
   const defenderStateMap: Record<
@@ -908,6 +1068,9 @@ const teamfightSimulationResults = computed(() => {
 
   const castCounters: Record<number, number> = {}
   const aatroxQSeqMap: Record<number, number> = {}
+  const attackerConquerorMap: Record<number, number> = {}
+  const attackerLethalTempoMap: Record<number, number> = {}
+  const targetPtaMap: Record<string, { stacks: number; exposed: boolean }> = {}
 
   // Initialize Defender States
   selectedDefenderSlots.value.forEach((slot) => {
@@ -931,18 +1094,7 @@ const teamfightSimulationResults = computed(() => {
     actorSlotId: number
     actorName: string
     action: string
-    targetResults: Array<{
-      targetSlotId: number
-      targetName: string
-      amount: number
-      type: 'physical' | 'magic' | 'true'
-      effectiveArmor: number
-      effectiveMr: number
-      vileDecayStacks: number
-      blackCleaverStacks: number
-      isKo: boolean
-      remainingHp: number
-    }>
+    targetResults: TargetResult[]
     totalStepDamage: number
   }> = []
 
@@ -951,8 +1103,54 @@ const teamfightSimulationResults = computed(() => {
       blueDraft.value.find((b) => b.id === actStep.actorSlotId) || selectedAttackerSlots.value[0]
     if (!actorSlot || !actorSlot.champion) return
 
-    const att = getCalculatedStatsForSlot(actorSlot)
-    if (!att) return
+    const keystoneName = (actorSlot.primaryKeystone?.name || '').toLowerCase()
+    const hasConqueror = keystoneName.includes('conqueror')
+    const hasLethalTempo = keystoneName.includes('lethal tempo')
+    const hasPtA = keystoneName.includes('press the attack')
+
+    let currentConquerorStacks = attackerConquerorMap[actorSlot.id] || 0
+    let currentLethalTempoStacks = attackerLethalTempoMap[actorSlot.id] || 0
+
+    if (['Q', 'W', 'E', 'R', 'P', 'AA'].includes(actStep.action)) {
+      const isMelee = (actorSlot.champion.stats.attackrange || 125) <= 225
+      if (hasConqueror) {
+        currentConquerorStacks = Math.min(12, currentConquerorStacks + (isMelee ? 2 : 1))
+        attackerConquerorMap[actorSlot.id] = currentConquerorStacks
+      }
+      if (hasLethalTempo && actStep.action === 'AA') {
+        currentLethalTempoStacks = Math.min(6, currentLethalTempoStacks + 1)
+        attackerLethalTempoMap[actorSlot.id] = currentLethalTempoStacks
+      }
+    }
+
+    // Get actor stats dynamically updated with current keystone stacks
+    const baseStats = calculateStats({
+      ...actorSlot,
+      conquerorStacks: currentConquerorStacks,
+      lethalTempoStacks: currentLethalTempoStacks,
+    })
+    if (!baseStats) return
+    const isAttacker = blueDraft.value.some((b) => b.id === actorSlot.id)
+    const mStats = calculateMonsterBuffStats(isAttacker ? attackerBuffs.value : defenderBuffs.value)
+
+    const att = {
+      ad: Math.round((baseStats.ad.total + mStats.bonusAD) * mStats.adMultiplier),
+      baseAd: Math.round(baseStats.ad.base * mStats.adMultiplier),
+      ap: Math.round((baseStats.ap.total + mStats.bonusAP) * mStats.apMultiplier),
+      as: Math.round(baseStats.as.total * 100) / 100,
+      mana: baseStats.mp.total,
+      hp: baseStats.hp.total + mStats.bonusShield,
+      armor: Math.round(baseStats.armor.total * mStats.armorMultiplier),
+      mr: Math.round(baseStats.mr.total * mStats.mrMultiplier),
+      crit: baseStats.crit.total,
+      lethality: baseStats.lethality.total,
+      armorPen: baseStats.armorPen.total,
+      magicPenFlat: baseStats.magicPenFlat.total,
+      magicPenPercent: baseStats.magicPenPercent.total,
+      abilityHaste: Math.round(baseStats.abilityHaste.total + mStats.bonusAH),
+      tenacity: Math.round(baseStats.tenacity.total + mStats.bonusTenacity),
+      adaptiveType: getChampionDefaultAdaptiveType(actorSlot.champion.id, actorSlot.champion.tags),
+    }
 
     const actorName = actorSlot.champion.name
     const action = actStep.action
@@ -994,19 +1192,6 @@ const teamfightSimulationResults = computed(() => {
       aatroxQSeqMap[actorSlot.id] = aatroxQSeq
     }
 
-    interface TargetResult {
-      targetSlotId: number
-      targetName: string
-      amount: number
-      type: 'physical' | 'magic' | 'true'
-      effectiveArmor: number
-      effectiveMr: number
-      blackCleaverStacks: number
-      vileDecayStacks: number
-      isKo: boolean
-      remainingHp: number
-    }
-
     let stepTotalDmg = 0
     const targetResults: TargetResult[] = []
 
@@ -1015,6 +1200,25 @@ const teamfightSimulationResults = computed(() => {
         const defState = defenderStateMap[targetId]
         if (!defState) return
 
+        // Press the Attack Stacking
+        const ptaKey = `${actorSlot.id}_${targetId}`
+        if (!targetPtaMap[ptaKey]) {
+          targetPtaMap[ptaKey] = { stacks: 0, exposed: false }
+        }
+        const ptaState = targetPtaMap[ptaKey]
+        let ptaProcDmg = 0
+
+        if (hasPtA && action === 'AA') {
+          if (!ptaState.exposed) {
+            ptaState.stacks++
+            if (ptaState.stacks >= 3) {
+              ptaState.exposed = true
+              const lvl = actorSlot.level || 1
+              ptaProcDmg = Math.round(40 + (lvl - 1) * (140 / 17))
+            }
+          }
+        }
+
         // Stack shred items on hit
         if (['Q', 'W', 'E', 'R', 'P', 'AA'].includes(action)) {
           if (!isApAttacker && hasBlackCleaver && defState.blackCleaverStacks < 6)
@@ -1022,6 +1226,28 @@ const teamfightSimulationResults = computed(() => {
           if (isApAttacker && hasBloodletter && defState.vileDecayStacks < 4)
             defState.vileDecayStacks++
         }
+
+        const actorRunes = [
+          actorSlot.primaryKeystone,
+          actorSlot.primaryRune1,
+          actorSlot.primaryRune2,
+          actorSlot.primaryRune3,
+          actorSlot.secondaryRune1,
+          actorSlot.secondaryRune2,
+          ...(actorSlot.runes || []),
+        ]
+        const hasCoupDeGrace = actorRunes.some((r) => {
+          const str = `${r?.name || ''} ${r?.key || ''}`.toLowerCase()
+          return str.includes('coup') || str.includes('grace')
+        })
+        const hasLastStand = actorRunes.some((r) => {
+          const str = `${r?.name || ''} ${r?.key || ''}`.toLowerCase()
+          return str.includes('last stand') || str.includes('laststand')
+        })
+        const hasCutDown = actorRunes.some((r) => {
+          const str = `${r?.name || ''} ${r?.key || ''}`.toLowerCase()
+          return str.includes('cut down') || str.includes('cutdown')
+        })
 
         const spellRes = calculateSpellDamage({
           champion: actorSlot.champion,
@@ -1053,6 +1279,9 @@ const teamfightSimulationResults = computed(() => {
           options: {
             aatroxQSeq,
             hasAbyssalMask,
+            hasCoupDeGrace,
+            hasLastStand,
+            hasCutDown,
           },
         })
 
@@ -1061,25 +1290,58 @@ const teamfightSimulationResults = computed(() => {
         const hitMult = spellRes.hitMult
         const effArmor = spellRes.effArmor
         const effMr = spellRes.effMr
-        const physMult = spellRes.physMult
-        const magicMult = spellRes.magicMult
 
-        const finalDmg = Math.round(rawDmg * hitMult)
+        // Lethal Tempo Max-Stack (6x) Bonus Adaptive On-Hit Damage
+        let ltOnHitProcDmg = 0
+        if (hasLethalTempo && action === 'AA' && currentLethalTempoStacks >= 6) {
+          const lvl = actorSlot.level || 1
+          const baseOnHit = 6 + (lvl - 1) * (24 / 17)
+          const champBaseAs = actorSlot.champion?.stats?.attackspeed || 0.65
+          const bonusAsPct = Math.max(0, ((att.as || 0.65) - champBaseAs) / champBaseAs) * 100
+          const physMult = spellRes.physMult
+          const magicMult = spellRes.magicMult
+          const rawLtDmg = baseOnHit * (1 + bonusAsPct / 100)
+          ltOnHitProcDmg = Math.round(rawLtDmg * (isApAttacker ? magicMult : physMult))
+        }
+
+        let finalDmg = Math.round(rawDmg * hitMult)
+
+        // Apply PtA Exposed 8% damage bonus if exposed
+        if (ptaState.exposed) {
+          finalDmg = Math.round(finalDmg * 1.08)
+        }
+
+        finalDmg += ptaProcDmg + ltOnHitProcDmg
+
         defState.currentHp = Math.max(0, defState.currentHp - finalDmg)
         if (defState.currentHp === 0) defState.isKo = true
 
         stepTotalDmg += finalDmg
         totalTeamDamage += finalDmg
 
+        let nameSuffix = ''
+        if (ptaProcDmg > 0 && ltOnHitProcDmg > 0) nameSuffix = ' (PtA + LT Proc)'
+        else if (ptaProcDmg > 0) nameSuffix = ' (PtA Proc)'
+        else if (ltOnHitProcDmg > 0) nameSuffix = ' (LT Proc)'
+        else if (isEcho) nameSuffix = ' (Echo)'
+
         targetResults.push({
           targetSlotId: targetId,
-          targetName: isEcho ? `${defState.name} (Echo)` : defState.name,
+          targetName: `${defState.name}${nameSuffix}`,
           amount: finalDmg,
           type: dmgType,
           effectiveArmor: Math.round(effArmor),
           effectiveMr: Math.round(effMr),
           blackCleaverStacks: defState.blackCleaverStacks,
           vileDecayStacks: defState.vileDecayStacks,
+          conquerorStacks: hasConqueror ? currentConquerorStacks : 0,
+          lethalTempoStacks: hasLethalTempo ? currentLethalTempoStacks : 0,
+          lethalTempoOnHitDmg: ltOnHitProcDmg,
+          ptaStacks: hasPtA ? ptaState.stacks : 0,
+          ptaExposed: ptaState.exposed,
+          coupDeGrace: spellRes.isCoupDeGraceProc,
+          cutDown: spellRes.isCutDownProc,
+          lastStandBonusPct: spellRes.lastStandBonusPct,
           isKo: defState.isKo,
           remainingHp: defState.currentHp,
         })
@@ -1091,12 +1353,12 @@ const teamfightSimulationResults = computed(() => {
           if (action === 'AA') {
             shockRawDmg = maxMana * 0.015
           } else {
-            const isRanged = (actorSlot.champion?.stats?.attackrange || 125) > 300
+            const isRanged = (actorSlot.champion?.stats?.attackrange ?? 125) > 300
             const manaPct = isRanged ? 0.027 : 0.035
             shockRawDmg = maxMana * manaPct + att.ad * 0.06
           }
 
-          const shockFinalDmg = Math.round(shockRawDmg * physMult)
+          const shockFinalDmg = Math.round(shockRawDmg * spellRes.physMult)
           if (shockFinalDmg > 0) {
             defState.currentHp = Math.max(0, defState.currentHp - shockFinalDmg)
             if (defState.currentHp === 0) defState.isKo = true
@@ -1111,10 +1373,14 @@ const teamfightSimulationResults = computed(() => {
                 : `${defState.name} (Muramana)`,
               amount: shockFinalDmg,
               type: 'physical',
-              effectiveArmor: Math.round(effArmor),
-              effectiveMr: Math.round(effMr),
+              effectiveArmor: Math.round(spellRes.effArmor),
+              effectiveMr: Math.round(spellRes.effMr),
               blackCleaverStacks: defState.blackCleaverStacks,
               vileDecayStacks: defState.vileDecayStacks,
+              conquerorStacks: hasConqueror ? currentConquerorStacks : 0,
+              lethalTempoStacks: hasLethalTempo ? currentLethalTempoStacks : 0,
+              ptaStacks: hasPtA ? ptaState.stacks : 0,
+              ptaExposed: ptaState.exposed,
               isKo: defState.isKo,
               remainingHp: defState.currentHp,
             })
@@ -1124,7 +1390,7 @@ const teamfightSimulationResults = computed(() => {
         // Blackfire Torch (Baleful Blaze Burn: 60 + 6% AP over 3s)
         if (hasBlackfireTorch && ['Q', 'W', 'E', 'R', 'P'].includes(action) && !defState.isKo) {
           const burnRawDmg = 60 + att.ap * 0.06
-          const burnFinalDmg = Math.round(burnRawDmg * magicMult)
+          const burnFinalDmg = Math.round(burnRawDmg * spellRes.magicMult)
           if (burnFinalDmg > 0) {
             defState.currentHp = Math.max(0, defState.currentHp - burnFinalDmg)
             if (defState.currentHp === 0) defState.isKo = true
@@ -1139,10 +1405,14 @@ const teamfightSimulationResults = computed(() => {
                 : `${defState.name} (Blackfire Burn)`,
               amount: burnFinalDmg,
               type: 'magic',
-              effectiveArmor: Math.round(effArmor),
-              effectiveMr: Math.round(effMr),
+              effectiveArmor: Math.round(spellRes.effArmor),
+              effectiveMr: Math.round(spellRes.effMr),
               blackCleaverStacks: defState.blackCleaverStacks,
               vileDecayStacks: defState.vileDecayStacks,
+              conquerorStacks: hasConqueror ? currentConquerorStacks : 0,
+              lethalTempoStacks: hasLethalTempo ? currentLethalTempoStacks : 0,
+              ptaStacks: hasPtA ? ptaState.stacks : 0,
+              ptaExposed: ptaState.exposed,
               isKo: defState.isKo,
               remainingHp: defState.currentHp,
             })
@@ -1165,7 +1435,7 @@ const teamfightSimulationResults = computed(() => {
             ludenRawDmg = 75 + att.ap * 0.05
           }
 
-          const ludenFinalDmg = Math.round(ludenRawDmg * magicMult)
+          const ludenFinalDmg = Math.round(ludenRawDmg * spellRes.magicMult)
 
           if (ludenFinalDmg > 0) {
             defState.currentHp = Math.max(0, defState.currentHp - ludenFinalDmg)
@@ -1181,10 +1451,14 @@ const teamfightSimulationResults = computed(() => {
                 : `${defState.name} (Luden Proc)`,
               amount: ludenFinalDmg,
               type: 'magic',
-              effectiveArmor: Math.round(effArmor),
-              effectiveMr: Math.round(effMr),
+              effectiveArmor: Math.round(spellRes.effArmor),
+              effectiveMr: Math.round(spellRes.effMr),
               blackCleaverStacks: defState.blackCleaverStacks,
               vileDecayStacks: defState.vileDecayStacks,
+              conquerorStacks: hasConqueror ? currentConquerorStacks : 0,
+              lethalTempoStacks: hasLethalTempo ? currentLethalTempoStacks : 0,
+              ptaStacks: hasPtA ? ptaState.stacks : 0,
+              ptaExposed: ptaState.exposed,
               isKo: defState.isKo,
               remainingHp: defState.currentHp,
             })

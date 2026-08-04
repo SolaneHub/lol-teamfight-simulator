@@ -30,6 +30,9 @@ export interface SpellDamageInput {
   options?: {
     aatroxQSeq?: number
     hasAbyssalMask?: boolean
+    hasCoupDeGrace?: boolean
+    hasLastStand?: boolean
+    hasCutDown?: boolean
   }
 }
 
@@ -43,6 +46,9 @@ export interface SpellDamageResult {
   magicMult: number
   isUtilityOrShield?: boolean
   shieldAmount?: number
+  isCoupDeGraceProc?: boolean
+  isCutDownProc?: boolean
+  lastStandBonusPct?: number
 }
 
 /**
@@ -66,6 +72,32 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
   const missingHp = Math.max(0, defMaxHp - defCurrentHp)
   const missingHpPct = Math.max(0, Math.min(100, (missingHp / defMaxHp) * 100))
 
+  // Precision Row Runes (Coup de Grace, Cut Down, Last Stand)
+  let runeMultiplier = 1.0
+  let isCoupDeGraceProc = false
+  let isCutDownProc = false
+  let lastStandBonusPct = 0
+
+  const defHpPct = (defCurrentHp / defMaxHp) * 100
+  if (options?.hasCoupDeGrace && defHpPct < 40) {
+    runeMultiplier *= 1.08
+    isCoupDeGraceProc = true
+  }
+
+  if (options?.hasCutDown && defHpPct > 60) {
+    runeMultiplier *= 1.08
+    isCutDownProc = true
+  }
+
+  const attHp = attacker.hp ?? attacker.maxHp
+  const attMaxHp = Math.max(1, attacker.maxHp || 1000)
+  const attHpPct = (attHp / attMaxHp) * 100
+  if (options?.hasLastStand && attHpPct < 60) {
+    const bonusPct = Math.round(5 + Math.min(6, ((60 - attHpPct) / 30) * 6))
+    lastStandBonusPct = bonusPct
+    runeMultiplier *= 1 + bonusPct / 100
+  }
+
   // Calculate post-shred effective resists
   const effArmor = Math.max(
     0,
@@ -74,7 +106,7 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
       (1 - (attacker.armorPen || 0) / 100) -
       (attacker.lethality || 0),
   )
-  const physMult = 100 / (100 + effArmor)
+  const physMult = (100 / (100 + effArmor)) * runeMultiplier
 
   const effMr = Math.max(
     0,
@@ -83,7 +115,7 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
       (1 - (attacker.magicPenPercent || 0) / 100) -
       (attacker.magicPenFlat || 0),
   )
-  const magicMult = (100 / (100 + effMr)) * (options?.hasAbyssalMask ? 1.12 : 1.0)
+  const magicMult = (100 / (100 + effMr)) * (options?.hasAbyssalMask ? 1.12 : 1.0) * runeMultiplier
 
   // Default spell ranks
   const qRank =
@@ -108,7 +140,18 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
     rawDmg = attAd * (attacker.crit > 0 ? 1.75 : 1.0)
     dmgType = 'physical'
     hitMult = physMult
-    return { rawDmg, dmgType, hitMult, effArmor, effMr, physMult, magicMult }
+    return {
+      rawDmg,
+      dmgType,
+      hitMult,
+      effArmor,
+      effMr,
+      physMult,
+      magicMult,
+      isCoupDeGraceProc,
+      isCutDownProc,
+      lastStandBonusPct,
+    }
   }
 
   // 2. Champion Passives (P) Dynamic HP Calculations
@@ -318,5 +361,8 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
     magicMult,
     isUtilityOrShield,
     shieldAmount,
+    isCoupDeGraceProc,
+    isCutDownProc,
+    lastStandBonusPct,
   }
 }

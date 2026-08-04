@@ -151,7 +151,7 @@
                         class="h-full w-full object-contain select-none pointer-events-none brightness-50"
                       />
                     </div>
-                    <div class="min-w-0">
+                    <div class="min-w-0 flex flex-col justify-center">
                       <span class="text-base font-semibold text-white block truncate">
                         {{ activeCustomizerSlot.primaryKeystone?.name || 'Keystone Not Selected' }}
                       </span>
@@ -738,6 +738,7 @@ const getSpellRank = (spellIdx: number): number => {
 const getSpellHaste = (spellIdx: number): number => {
   if (!activeCustomizerStats.value) return 0
   const baseHaste = activeCustomizerStats.value.abilityHaste.total || 0
+  const basicHaste = activeCustomizerStats.value.abilityHaste.basicAbilityHaste || 0
   if (spellIdx === 3) {
     const hasUltimateHunter = [
       activeCustomizerSlot.value?.primaryRune1,
@@ -748,7 +749,7 @@ const getSpellHaste = (spellIdx: number): number => {
     ].some((r) => r?.key === 'UltimateHunter')
     return baseHaste + (hasUltimateHunter ? 31 : 0)
   }
-  return baseHaste
+  return baseHaste + basicHaste
 }
 
 const getStatValue = (
