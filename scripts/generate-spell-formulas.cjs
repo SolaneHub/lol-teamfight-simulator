@@ -11,9 +11,19 @@
 const fs = require('fs');
 const path = require('path');
 
-const DDRAGON_DIR = path.join(__dirname, '..', 'public', 'ddragon', '16.14.1', 'data', 'en_US', 'champion');
+// Parse command line arguments for --patch
+const args = process.argv.slice(2);
+let patchVersion = 'latest';
+const patchIdx = args.indexOf('--patch');
+if (patchIdx !== -1 && args[patchIdx + 1]) {
+  patchVersion = args[patchIdx + 1];
+}
+const outputPatchName = patchVersion;
+
+let DDRAGON_DIR = '';
+let OUTPUT_FILE = '';
 const OUT_DIR = path.join(__dirname, '..', 'out', 'champions');
-const OUTPUT_FILE = path.join(__dirname, '..', 'public', 'data', 'spellFormulas.json');
+const DEFAULT_OUTPUT_FILE = path.join(__dirname, '..', 'public', 'data', 'spellFormulas.json');
 
 // Stat coefficient type mapping
 const STAT_MAP = {
@@ -26,7 +36,7 @@ const STAT_MAP = {
   6: 'magicResist',
   7: 'attackSpeed',
   11: 'abilityHaste',
-  12: 'charLevel',  // level scaling
+  12: 'bonusHp',     // bonus HP scaling (e.g. Aatrox E EVampHPRatio)
   15: 'totalAp',
   18: 'lifesteal',
   20: 'totalAd',
@@ -38,7 +48,20 @@ function getStatName(mStat) {
 }
 
 function roundVal(v) {
-  return Math.round(v * 10000) / 10000;
+  return Math.round(v * 1000000) / 1000000;
+}
+
+function addBaseValues(target, source) {
+  if (!target || target.length === 0) return source;
+  if (!source || source.length === 0) return target;
+  const maxLen = Math.max(target.length, source.length);
+  const res = [];
+  for (let i = 0; i < maxLen; i++) {
+    const tVal = target[i] !== undefined ? target[i] : (target[target.length - 1] ?? 0);
+    const sVal = source[i] !== undefined ? source[i] : (source[source.length - 1] ?? 0);
+    res.push(roundVal(tVal + sVal));
+  }
+  return res;
 }
 
 function parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSpell) {
@@ -49,7 +72,8 @@ function parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSp
     case 'ByCharLevelFormulaCalculationPart': {
       if (Array.isArray(part.values) && part.values.length > 0) {
         const mult = isPercent ? (part.values[0] > 1 ? 1 : 100) : 1;
-        result.base = part.values.slice(0, 18).map(v => roundVal(v * mult));
+        const newVals = part.values.slice(0, 18).map(v => roundVal(v * mult));
+        result.base = addBaseValues(result.base, newVals);
       } else {
         const startVal = part.mStartValue !== undefined ? part.mStartValue : (part.mLevel1Value || 0);
         const endVal = part.mEndValue !== undefined ? part.mEndValue : startVal;
@@ -59,7 +83,7 @@ function parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSp
           const val = startVal + (endVal - startVal) * ((l - 1) / 17);
           arr.push(roundVal(val * mult));
         }
-        result.base = arr;
+        result.base = addBaseValues(result.base, arr);
       }
       break;
     }
@@ -74,7 +98,7 @@ function parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSp
         if (bp) val += (bp.mAdditionalBonusAtThisLevel || 0);
         arr.push(roundVal(val * mult));
       }
-      result.base = arr;
+      result.base = addBaseValues(result.base, arr);
       break;
     }
 
@@ -87,9 +111,9 @@ function parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSp
           const rankVals = vals.slice(1, 6);
           const mult = isPercent ? (vals[0] > 1 ? 1 : 100) : 1;
           if (rankVals.length > 0) {
-            result.base = rankVals.map(v => roundVal(v * mult));
+            result.base = addBaseValues(result.base, rankVals.map(v => roundVal(v * mult)));
           } else {
-            result.base = [roundVal(vals[0] * mult)];
+            result.base = addBaseValues(result.base, [roundVal(vals[0] * mult)]);
           }
         }
       }
@@ -98,7 +122,7 @@ function parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSp
 
     case 'BuffCounterByCoefficientCalculationPart': {
       if (part.mCoefficient !== undefined) {
-        result.base = [roundVal(part.mCoefficient * (isPercent ? 100 : 1))];
+        result.base = addBaseValues(result.base, [roundVal(part.mCoefficient * (isPercent ? 100 : 1))]);
       }
       break;
     }
@@ -106,7 +130,7 @@ function parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSp
     case 'NumberCalculationPart': {
       if (part.mNumber !== undefined) {
         const mult = isPercent ? (part.mNumber > 1 ? 1 : 100) : 1;
-        result.base = [roundVal(part.mNumber * mult)];
+        result.base = addBaseValues(result.base, [roundVal(part.mNumber * mult)]);
       }
       break;
     }
@@ -118,7 +142,7 @@ function parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSp
         if (stat === 'charLevel') {
           const arr = [];
           for (let l = 1; l <= 18; l++) arr.push(roundVal(l * ratio));
-          result.base = arr;
+          result.base = addBaseValues(result.base, arr);
         } else {
           result.scalings.push({ ratio: roundVal(ratio), stat });
         }
@@ -136,7 +160,7 @@ function parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSp
           if (stat === 'charLevel') {
             const arr = [];
             for (let l = 1; l <= 18; l++) arr.push(roundVal(l * mult));
-            result.base = arr;
+            result.base = addBaseValues(result.base, arr);
           } else {
             const rankVals = vals.slice(1, 6);
             if (rankVals.length > 0) {
@@ -147,7 +171,7 @@ function parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSp
                 result.scalings.push({ ratio: rankVals.map(v => roundVal(v)), stat });
               }
             } else {
-              result.scalings.push({ ratio: roundVal(vals[0]), stat });
+              result.scalings.push({ ratio: roundVal(mult), stat });
             }
           }
         }
@@ -196,7 +220,7 @@ function parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSp
         const effArr = ddSpell.effect[idx];
         if (Array.isArray(effArr) && effArr.length > 0) {
           const rankVals = effArr.slice(0, 5).map(v => roundVal(v * (isPercent ? 100 : 1)));
-          result.base = rankVals;
+          result.base = addBaseValues(result.base, rankVals);
         }
       }
       break;
@@ -267,6 +291,29 @@ function parseCalculation(calcName, calcDef, dataValuesMap, allCalcs, ddSpell = 
     parseFormulaPart(part, result, isPercent, dataValuesMap, allCalcs, ddSpell);
   }
 
+  // Handle top-level multiplier for any calculation
+  if (calcDef.mMultiplier) {
+    let mult = 1;
+    if (typeof calcDef.mMultiplier === 'number') {
+      mult = calcDef.mMultiplier;
+    } else if (calcDef.mMultiplier.mNumber !== undefined) {
+      mult = calcDef.mMultiplier.mNumber;
+    } else if (calcDef.mMultiplier.mDataValue) {
+      const multiplierDV = calcDef.mMultiplier.mDataValue;
+      const multValues = dataValuesMap[multiplierDV?.toLowerCase()];
+      if (multValues && multValues.length > 0) {
+        mult = multValues[0];
+      }
+    }
+    result.base = result.base.map(v => roundVal(v * mult));
+    result.scalings = (result.scalings || []).map(s => ({
+      ...s,
+      ratio: Array.isArray(s.ratio)
+        ? s.ratio.map(r => roundVal(r * mult))
+        : roundVal(s.ratio * mult)
+    }));
+  }
+
   if (result.base.length > 0 || result.scalings.length > 0) {
     if (isPercent) {
       result.type = 'status';
@@ -276,15 +323,18 @@ function parseCalculation(calcName, calcDef, dataValuesMap, allCalcs, ddSpell = 
   return null;
 }
 
-function processChampion(champId) {
+function processChampion(champId, champDataInput = null) {
   const champFormulas = {};
   const folderName = champId.toLowerCase();
   
-  const ddragonFile = path.join(DDRAGON_DIR, `${champId}.json`);
-  if (!fs.existsSync(ddragonFile)) return null;
-  
-  const ddragonData = JSON.parse(fs.readFileSync(ddragonFile, 'utf8'));
-  const champData = ddragonData.data[champId];
+  let champData = champDataInput;
+  if (!champData) {
+    const ddragonFile = path.join(DDRAGON_DIR, `${champId}.json`);
+    if (fs.existsSync(ddragonFile)) {
+      const ddragonData = JSON.parse(fs.readFileSync(ddragonFile, 'utf8'));
+      champData = ddragonData.data[champId];
+    }
+  }
   if (!champData) return null;
   
   const binFile = path.join(OUT_DIR, folderName, 'data', `${folderName}.bin.json`);
@@ -647,20 +697,90 @@ function processChampion(champId) {
   return null;
 }
 
-function main() {
+const https = require('https');
+
+function downloadJson(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, (res) => {
+      if (res.statusCode !== 200) {
+        reject(new Error(`Failed to load ${url}, status: ${res.statusCode}`));
+        return;
+      }
+      let rawData = '';
+      res.on('data', (chunk) => { rawData += chunk; });
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(rawData));
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }).on('error', (err) => {
+      reject(err);
+    });
+  });
+}
+
+async function main() {
   console.log('Generating spellFormulas.json for all champions (spells + passive)...\n');
   
-  const champFiles = fs.readdirSync(DDRAGON_DIR).filter(f => f.endsWith('.json'));
+  if (patchVersion === 'latest') {
+    try {
+      console.log('Fetching latest version from Riot API...');
+      const versions = await downloadJson('https://ddragon.leagueoflegends.com/api/versions.json');
+      const validVersions = versions.filter((v) => /^\d+\.\d+\.\d+$/.test(v));
+      if (validVersions.length > 0) {
+        patchVersion = validVersions[0];
+        console.log(`Latest patch version resolved: ${patchVersion}`);
+      }
+    } catch (e) {
+      console.warn('Failed to fetch latest patch version, falling back to 16.14.1:', e.message);
+      patchVersion = '16.14.1';
+    }
+  }
+
+  DDRAGON_DIR = path.join(__dirname, '..', 'public', 'ddragon', patchVersion, 'data', 'en_US', 'champion');
+  OUTPUT_FILE = path.join(__dirname, '..', 'public', 'data', patchIdx !== -1 ? `spellFormulas-${outputPatchName}.json` : 'spellFormulas.json');
+
+  let championNames = [];
+  let useCDN = false;
+
+  if (fs.existsSync(DDRAGON_DIR)) {
+    const champFiles = fs.readdirSync(DDRAGON_DIR).filter(f => f.endsWith('.json'));
+    championNames = champFiles.map(f => f.replace('.json', ''));
+  } else {
+    console.log(`DDRAGON_DIR not found. Fetching champion list from Riot CDN for patch ${patchVersion}...`);
+    useCDN = true;
+    try {
+      const listData = await downloadJson(`https://ddragon.leagueoflegends.com/cdn/${patchVersion}/data/en_US/champion.json`);
+      championNames = Object.keys(listData.data);
+    } catch (e) {
+      console.error('Failed to download champion list from CDN:', e.message);
+      // Fallback: use directory names in OUT_DIR
+      if (fs.existsSync(OUT_DIR)) {
+        championNames = fs.readdirSync(OUT_DIR)
+          .filter(f => fs.statSync(path.join(OUT_DIR, f)).isDirectory())
+          // Capitalize first letter as fallback
+          .map(f => f.charAt(0).toUpperCase() + f.slice(1));
+      }
+    }
+  }
+
   const allFormulas = {};
   let successCount = 0;
   let failCount = 0;
   let totalSpells = 0;
   let totalPassives = 0;
   
-  for (const file of champFiles) {
-    const champId = file.replace('.json', '');
+  for (const champId of championNames) {
     try {
-      const formulas = processChampion(champId);
+      let champData = null;
+      if (useCDN) {
+        const champDDragon = await downloadJson(`https://ddragon.leagueoflegends.com/cdn/${patchVersion}/data/en_US/champion/${champId}.json`);
+        champData = champDDragon.data[champId];
+      }
+      
+      const formulas = processChampion(champId, champData);
       if (formulas) {
         allFormulas[champId] = formulas;
         const spellCount = Object.keys(formulas).filter(k => k !== 'passive').length;
@@ -675,7 +795,16 @@ function main() {
     }
   }
   
+  // Make sure output folder exists
+  const parentDir = path.dirname(OUTPUT_FILE);
+  if (!fs.existsSync(parentDir)) {
+    fs.mkdirSync(parentDir, { recursive: true });
+  }
+
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(allFormulas, null, 2));
+  // Write to default fallback path too
+  fs.writeFileSync(DEFAULT_OUTPUT_FILE, JSON.stringify(allFormulas, null, 2));
+
   console.log(`========================================`);
   console.log(`Champions mapped: ${successCount}`);
   console.log(`Total spells mapped: ${totalSpells}`);
@@ -683,4 +812,7 @@ function main() {
   console.log(`Output: ${OUTPUT_FILE}`);
 }
 
-main();
+main().catch(err => {
+  console.error('Fatal error running generator:', err);
+  process.exit(1);
+});
