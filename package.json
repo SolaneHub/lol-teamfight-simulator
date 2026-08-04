@@ -14,7 +14,8 @@
     "lint:eslint": "eslint . --fix --cache",
     "format": "prettier --write --experimental-cli src/",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepare": "husky"
   },
   "dependencies": {
     "axios": "^1.18.1",
@@ -28,6 +29,7 @@
     "@tsconfig/node24": "^24.0.4",
     "@types/node": "^24.13.2",
     "@vitejs/plugin-vue": "^6.0.7",
+    "husky": "^9.1.7",
     "@vue/eslint-config-typescript": "^14.8.0",
     "@vue/tsconfig": "^0.9.1",
     "eslint": "^10.5.0",
