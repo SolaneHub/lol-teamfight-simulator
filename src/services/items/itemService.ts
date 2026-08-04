@@ -141,10 +141,13 @@ export const mapItem = (id: string, raw: Record<string, unknown> | null | undefi
   }
 }
 
-export const getItemIconUrl = (item: Item): string => {
+export const getItemIconUrl = (item: Item, patch?: string): string => {
   if (!item) return ''
   if (item.iconPath) {
     const filename = item.iconPath.split('/').pop()?.toLowerCase() || ''
+    if (patch) {
+      return `https://raw.communitydragon.org/${patch}/plugins/rcp-be-lol-game-data/global/default/assets/items/icons2d/${filename}`
+    }
     return `${import.meta.env.BASE_URL}out/items/icons/${filename}`
   }
   if (item.image?.full) {
@@ -375,10 +378,29 @@ export const isJungleItem = (item: Item | Record<string, unknown>): boolean => {
 }
 
 export const itemService = {
-  async getItems(): Promise<Item[]> {
+  async getItems(patch?: string): Promise<Item[]> {
     try {
-      const res = await fetch(`${import.meta.env.BASE_URL}out/items/items.json`)
-      const itemData = await res.json()
+      let itemData: unknown = null
+      if (patch) {
+        try {
+          const cdragonRes = await fetch(
+            `https://raw.communitydragon.org/${patch}/plugins/rcp-be-lol-game-data/global/default/v1/items.json`,
+          )
+          if (cdragonRes.ok) {
+            itemData = await cdragonRes.json()
+          }
+        } catch (e) {
+          console.warn(
+            `Failed to fetch items from CDragon for patch ${patch}, falling back to local out/items/items.json:`,
+            e,
+          )
+        }
+      }
+
+      if (!itemData) {
+        const res = await fetch(`${import.meta.env.BASE_URL}out/items/items.json`)
+        itemData = await res.json()
+      }
 
       const upgradedItemIds = [
         3040, 3042, 3121, 3002, 6701, 3010, 3013, 3866, 3867, 3168, 3170, 3171, 3172, 3173, 3174,

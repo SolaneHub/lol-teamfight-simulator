@@ -1,11 +1,24 @@
 import type { Champion, ChampionImage, ChampionPassive, ChampionSpells } from '../../types'
 
-const BASE_URL = 'https://ddragon.leagueoflegends.com/cdn/16.14.1/data/en_US'
-const CHAMP_FULL_URL = `${BASE_URL}/championFull.json`
+let activePatch = 'latest'
 
-const CHAMP_IMG_URL = 'https://ddragon.leagueoflegends.com/cdn/16.14.1/img/champion'
-const PASSIVE_IMG_URL = 'https://ddragon.leagueoflegends.com/cdn/16.14.1/img/passive'
-const SPELL_IMG_URL = 'https://ddragon.leagueoflegends.com/cdn/16.14.1/img/spell'
+export const setActivePatch = (patch: string) => {
+  if (patch) activePatch = patch
+}
+
+export const getActivePatch = (): string => activePatch
+
+export const getBaseUrl = (patch: string = activePatch) =>
+  `https://ddragon.leagueoflegends.com/cdn/${patch}/data/en_US`
+
+export const getChampImgUrl = (patch: string = activePatch) =>
+  `https://ddragon.leagueoflegends.com/cdn/${patch}/img/champion`
+
+export const getPassiveImgUrl = (patch: string = activePatch) =>
+  `https://ddragon.leagueoflegends.com/cdn/${patch}/img/passive`
+
+export const getSpellImgUrl = (patch: string = activePatch) =>
+  `https://ddragon.leagueoflegends.com/cdn/${patch}/img/spell`
 
 export function formatTooltipTags(text: string): string {
   if (!text) return ''
@@ -85,11 +98,12 @@ export const getChampionSplashUrl = (champId: string, skinNum: number = 0): stri
 
 export const getChampionIconUrl = (
   champ?: string | Champion | { id?: string; key?: string } | null,
+  patch?: string,
 ): string => {
   if (!champ) return ''
   const champId = typeof champ === 'string' ? champ : champ.id || champ.key || ''
   if (!champId) return ''
-  return `${CHAMP_IMG_URL}/${champId}.png`
+  return `${getChampImgUrl(patch)}/${champId}.png`
 }
 
 export const getChampionPassiveUrl = (champ?: Champion | string | null): string => {
@@ -285,11 +299,20 @@ export const getChampionPosition = (champId: string): string => {
 }
 
 export const championService = {
-  async getChampions(): Promise<Champion[]> {
+  async getChampions(patch?: string): Promise<Champion[]> {
+    const targetPatch = patch || getActivePatch()
+    const baseUrl = getBaseUrl(targetPatch)
+    const champImgUrl = getChampImgUrl(targetPatch)
+    const passiveImgUrl = getPassiveImgUrl(targetPatch)
+    const spellImgUrl = getSpellImgUrl(targetPatch)
+    const champFullUrl = `${baseUrl}/championFull.json`
+
     try {
-      const response = await fetch(CHAMP_FULL_URL)
+      const response = await fetch(champFullUrl)
       if (!response.ok) {
-        throw new Error(`Failed to fetch champions: ${response.statusText}`)
+        throw new Error(
+          `Failed to fetch champions for patch ${targetPatch}: ${response.statusText}`,
+        )
       }
       const data = await response.json()
       const rawData: Record<string, unknown> = data.data || {}
@@ -307,7 +330,7 @@ export const championService = {
           key: champ.key as string,
           name: champ.name as string,
           title: champ.title as string,
-          icon: `${CHAMP_IMG_URL}/${champImg.full || (champ.id as string) + '.png'}`,
+          icon: `${champImgUrl}/${champImg.full || (champ.id as string) + '.png'}`,
           image: champ.image as ChampionImage,
           tags: (champ.tags as string[]) || [],
           partype: (champ.partype as string) || 'Mana',
@@ -339,7 +362,7 @@ export const championService = {
           passive: {
             name: (passive.name as string) || '',
             description: (passive.description as string) || '',
-            icon: `${PASSIVE_IMG_URL}/${passiveImg.full}`,
+            icon: `${passiveImgUrl}/${passiveImg.full}`,
             image: champ.passive as ChampionPassive['image'],
           },
           spells: spells.map((spell) => {
@@ -349,7 +372,7 @@ export const championService = {
               name: spell.name as string,
               description: spell.description as string,
               tooltip: spell.tooltip as string,
-              icon: `${SPELL_IMG_URL}/${spellImg.full}`,
+              icon: `${spellImgUrl}/${spellImg.full}`,
               image: spell.image as ChampionSpells['image'],
               cooldown: spell.cooldown as number[],
               cost: spell.cost as number[],

@@ -66,8 +66,10 @@
         </div>
       </div>
 
-      <!-- Right Spacer to balance the grid -->
-      <div class="hidden md:block"></div>
+      <!-- Right: Patch Selector -->
+      <div class="flex justify-end items-center w-full md:w-auto">
+        <PatchSelector />
+      </div>
     </header>
 
     <!-- CONTENT PANELS -->
@@ -80,6 +82,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useDDragonStore } from '@/stores/ddragon'
+import PatchSelector from '@/components/PatchSelector.vue'
 
 const ddragonStore = useDDragonStore()
 

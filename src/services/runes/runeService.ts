@@ -34,14 +34,41 @@ export const mapRuneKeystone = (raw: Record<string, unknown> | null | undefined)
 })
 
 export const runeService = {
-  async getRunes(): Promise<RuneKeystone[]> {
+  async getRunes(patch?: string): Promise<RuneKeystone[]> {
     try {
-      const [perksRes, stylesRes] = await Promise.all([
-        fetch(`${import.meta.env.BASE_URL}out/runes/perks.json`),
-        fetch(`${import.meta.env.BASE_URL}out/runes/perkstyles.json`),
-      ])
-      const perksData = await perksRes.json()
-      const perkstylesData = await stylesRes.json()
+      let perksData: unknown = null
+      let perkstylesData: unknown = null
+
+      if (patch) {
+        try {
+          const [perksRes, stylesRes] = await Promise.all([
+            fetch(
+              `https://raw.communitydragon.org/${patch}/plugins/rcp-be-lol-game-data/global/default/v1/perks.json`,
+            ),
+            fetch(
+              `https://raw.communitydragon.org/${patch}/plugins/rcp-be-lol-game-data/global/default/v1/perkstyles.json`,
+            ),
+          ])
+          if (perksRes.ok && stylesRes.ok) {
+            perksData = await perksRes.json()
+            perkstylesData = await stylesRes.json()
+          }
+        } catch (e) {
+          console.warn(
+            `Failed to fetch runes from CDragon for patch ${patch}, falling back to local files:`,
+            e,
+          )
+        }
+      }
+
+      if (!perksData || !perkstylesData) {
+        const [perksRes, stylesRes] = await Promise.all([
+          fetch(`${import.meta.env.BASE_URL}out/runes/perks.json`),
+          fetch(`${import.meta.env.BASE_URL}out/runes/perkstyles.json`),
+        ])
+        perksData = await perksRes.json()
+        perkstylesData = await stylesRes.json()
+      }
 
       const perksMap = new Map<number, Record<string, unknown>>()
       ;(perksData as Record<string, unknown>[]).forEach((p) => {
