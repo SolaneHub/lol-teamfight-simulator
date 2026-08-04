@@ -27,6 +27,9 @@ export interface DraftSlot {
   shardOffensive?: 'adaptive' | 'as' | 'haste' | string | null
   shardFlex?: 'adaptive' | 'ms' | 'scaling_hp' | string | null
   shardDefensive?: 'scaling_hp' | 'tenacity' | 'flat_hp' | string | null
+  // Stacks / Buffs
+  conquerorStacks?: number
+  lethalTempoStacks?: number
   statShards?: (string | null)[]
   runes?: (Rune | null)[]
 }

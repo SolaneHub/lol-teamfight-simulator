@@ -1,4 +1,4 @@
-import type { DraftSlot } from '@/types'
+import type { DraftSlot, Rune } from '@/types'
 import { getChampionDefaultAdaptiveType } from '../champions/championService'
 import { parseStatsFromDescription } from '../items/itemService'
 
@@ -148,21 +148,36 @@ export const calculateStats = (slot: DraftSlot) => {
   let shardHaste = 0
   let shardMsPct = 0
   let shardTenacity = 0
+  let bonusBasicHaste = 0
 
-  if (slot.statShards && Array.isArray(slot.statShards)) {
-    for (const shard of slot.statShards) {
-      if (!shard) continue
-      if (shard === 'health') shardHp += 65
-      else if (shard === 'scalingHealth') shardHp += 10 + (lvl - 1) * 9
-      else if (shard === 'armor') shardArmor += 6
-      else if (shard === 'magicResist') shardMr += 8
-      else if (shard === 'adaptive') {
-        shardAd += 5.4
-        shardAp += 9
-      } else if (shard === 'attackSpeed') bonusAsPercent += 0.1
-      else if (shard === 'abilityHaste') shardHaste += 8
-      else if (shard === 'moveSpeed') shardMsPct += 0.02
-      else if (shard === 'tenacity') shardTenacity += 10
+  const statShards: (string | null | undefined)[] = [
+    slot.shardOffensive,
+    slot.shardFlex,
+    slot.shardDefensive,
+    ...(slot.statShards || []),
+  ]
+
+  for (const shard of statShards) {
+    if (!shard) continue
+    if (shard === 'flat_hp' || shard === 'health') {
+      shardHp += 65
+    } else if (shard === 'scaling_hp' || shard === 'scalingHealth') {
+      shardHp += 10 + (lvl - 1) * 10
+    } else if (shard === 'armor') {
+      shardArmor += 6
+    } else if (shard === 'magicResist') {
+      shardMr += 8
+    } else if (shard === 'adaptive') {
+      shardAd += 5.4
+      shardAp += 9
+    } else if (shard === 'as' || shard === 'attackSpeed') {
+      bonusAsPercent += 0.1
+    } else if (shard === 'haste' || shard === 'abilityHaste') {
+      shardHaste += 8
+    } else if (shard === 'ms' || shard === 'moveSpeed') {
+      shardMsPct += 0.02
+    } else if (shard === 'tenacity') {
+      shardTenacity += 10
     }
   }
 
@@ -191,24 +206,84 @@ export const calculateStats = (slot: DraftSlot) => {
 
   // Sum Rune Passives
   let hasOvergrowth = false
-  if (slot.runes && Array.isArray(slot.runes)) {
-    for (const rune of slot.runes) {
-      if (!rune) continue
-      const runeName = (rune.name || '').toLowerCase()
-      if (runeName.includes('overgrowth')) {
-        hasOvergrowth = true
-      } else if (runeName.includes('conditioning') && lvl >= 12) {
-        bonusArmor += 8
-        bonusMr += 8
-        bonusArmor = bonusArmor * 1.03
-        bonusMr = bonusMr * 1.03
-      } else if (runeName.includes('legend: alacrity')) {
-        bonusAsPercent += 0.18
-      } else if (runeName.includes('legend: bloodline')) {
-        bonusLifeSteal += 5.35
-      } else if (runeName.includes('legend: haste')) {
-        bonusHaste += 15
+  const activeRunes: (Rune | null | undefined)[] = [
+    slot.primaryKeystone,
+    slot.primaryRune1,
+    slot.primaryRune2,
+    slot.primaryRune3,
+    slot.secondaryRune1,
+    slot.secondaryRune2,
+    ...(slot.runes || []),
+  ]
+
+  for (const rune of activeRunes) {
+    if (!rune) continue
+    const runeName = (rune.name || '').toLowerCase()
+    if (runeName.includes('overgrowth')) {
+      hasOvergrowth = true
+    } else if (runeName.includes('conditioning') && lvl >= 12) {
+      bonusArmor += 8
+      bonusMr += 8
+      bonusArmor = bonusArmor * 1.03
+      bonusMr = bonusMr * 1.03
+    } else if (runeName.includes('legend: alacrity') || runeName.includes('alacrity')) {
+      bonusAsPercent += 0.18
+    } else if (runeName.includes('legend: bloodline') || runeName.includes('bloodline')) {
+      bonusLifeSteal += 5.35
+      bonusHp += 85
+    } else if (
+      runeName.includes('legend: haste') ||
+      (runeName.includes('haste') && runeName.includes('legend'))
+    ) {
+      bonusBasicHaste += 15
+    } else if (
+      runeName.includes('eyeball collection') ||
+      runeName.includes('zombie ward') ||
+      runeName.includes('ghost poro')
+    ) {
+      if (isApAdaptive) {
+        bonusAp += 30
+      } else {
+        bonusAd += 18
       }
+    } else if (runeName.includes('absolute focus')) {
+      const apVal = 1.8 + (lvl - 1) * (16.2 / 17)
+      const adVal = 1.08 + (lvl - 1) * (9.72 / 17)
+      if (isApAdaptive) {
+        bonusAp += apVal
+      } else {
+        bonusAd += adVal
+      }
+    } else if (runeName.includes('gathering storm')) {
+      const apBonus = lvl >= 16 ? 48 : lvl >= 11 ? 24 : lvl >= 6 ? 8 : 0
+      if (isApAdaptive) {
+        bonusAp += apBonus
+      } else {
+        bonusAd += apBonus * 0.6
+      }
+    } else if (runeName.includes('conqueror')) {
+      const stacks = Math.min(12, Math.max(0, slot.conquerorStacks ?? 12))
+      const adaptivePerStack = 1.8 + (lvl - 1) * (1.8 / 17)
+      const totalAdaptive = stacks * adaptivePerStack
+      if (isApAdaptive) {
+        bonusAp += totalAdaptive * 1.0
+      } else {
+        bonusAd += totalAdaptive * 0.6
+      }
+      if (stacks >= 12) {
+        const isMelee = (stats.attackrange || 125) <= 225
+        bonusOmnivamp += isMelee ? 8 : 5
+      }
+    } else if (runeName.includes('lethal tempo')) {
+      const stacks = Math.min(6, Math.max(0, slot.lethalTempoStacks ?? 6))
+      const asPerStack = 0.05 + (lvl - 1) * (0.11 / 17)
+      bonusAsPercent += stacks * asPerStack
+    } else if (runeName.includes('celerity')) {
+      bonusMsPercent += 0.01
+    } else if (runeName.includes('magical footwear')) {
+      bonusMsFlat += 10
+    } else if (runeName.includes('transcendence') && lvl >= 8) {
+      bonusHaste += 10
     }
   }
 
@@ -342,7 +417,10 @@ export const calculateStats = (slot: DraftSlot) => {
   const totalMagicPenFlat = Math.round(bonusMagicPenFlat)
   const totalMagicPenPercent = Math.round(bonusMagicPenPercent)
   const totalHaste = Math.round(bonusHaste)
+  const totalBasicHaste = Math.round(bonusBasicHaste)
   const cdrPercent = Math.round((totalHaste / (totalHaste + 100)) * 100)
+  const grandTotalBasicHaste = totalHaste + totalBasicHaste
+  const basicCdrPercent = Math.round((grandTotalBasicHaste / (grandTotalBasicHaste + 100)) * 100)
   const totalLifeSteal = Math.round(bonusLifeSteal)
   const totalOmnivamp = Math.round(bonusOmnivamp)
   const totalTenacity = Math.round(bonusTenacity)
@@ -363,7 +441,14 @@ export const calculateStats = (slot: DraftSlot) => {
     armorPen: { base: 0, bonus: bonusArmorPen, total: totalArmorPen },
     magicPenFlat: { base: 0, bonus: bonusMagicPenFlat, total: totalMagicPenFlat },
     magicPenPercent: { base: 0, bonus: bonusMagicPenPercent, total: totalMagicPenPercent },
-    abilityHaste: { base: 0, bonus: bonusHaste, total: totalHaste, cdrPercent },
+    abilityHaste: {
+      base: 0,
+      bonus: bonusHaste,
+      total: totalHaste,
+      cdrPercent,
+      basicAbilityHaste: totalBasicHaste,
+      basicCdrPercent,
+    },
     hpRegen: { base: baseHpRegen, bonusPercent: bonusHpRegenPct, total: totalHpRegen },
     mpRegen: { base: baseMpRegen, bonusPercent: bonusMpRegenPct, total: totalMpRegen },
     lifeSteal: { base: 0, bonus: bonusLifeSteal, total: totalLifeSteal },
