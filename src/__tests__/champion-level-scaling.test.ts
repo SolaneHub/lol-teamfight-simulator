@@ -9,7 +9,7 @@ describe('Full 173 Champions Level & Rank Scaling Unit Test Suite', () => {
 
   const ddragonPath = path.resolve(
     __dirname,
-    '../../public/ddragon/16.14.1/data/en_US/championFull.json',
+    './fixtures/championFull.json',
   )
   const championsData = JSON.parse(fs.readFileSync(ddragonPath, 'utf8')).data
   const allChampionIds = Object.keys(spellFormulasData)

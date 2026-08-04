@@ -9,7 +9,7 @@ describe('Champion Build Stat Computations', () => {
     // Resolve paths
     const champPath = path.resolve(
       __dirname,
-      '../../public/ddragon/16.14.1/data/en_US/championFull.json',
+      './fixtures/championFull.json',
     )
     const itemsPath = path.resolve(__dirname, '../../out/items/items.json')
 
