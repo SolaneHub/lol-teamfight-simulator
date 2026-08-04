@@ -174,7 +174,7 @@
                   <div
                     v-for="rune in slot.runes"
                     :key="rune.id"
-                    @click="toggleSecondaryRune(rune)"
+                    @click="toggleSecondaryRune(rune, slot.runes)"
                     @mouseenter="showRuneTooltip(rune, 'Secondary Rune')"
                     @mouseleave="hideRuneTooltip"
                     @mousemove="onMouseMove"

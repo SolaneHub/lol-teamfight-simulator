@@ -364,21 +364,39 @@ export const useDraftStore = defineStore('draft', () => {
     else if (slotIdx === 3) activeCustomizerSlot.value.primaryRune3 = rune
   }
 
-  const toggleSecondaryRune = (rune: Rune) => {
+  const toggleSecondaryRune = (rune: Rune, rowRunes?: Rune[]) => {
     if (!activeCustomizerSlot.value) return
     const slot = activeCustomizerSlot.value
     if (slot.secondaryRune1?.id === rune.id) {
       slot.secondaryRune1 = null
-    } else if (slot.secondaryRune2?.id === rune.id) {
+      return
+    }
+    if (slot.secondaryRune2?.id === rune.id) {
       slot.secondaryRune2 = null
-    } else {
-      if (!slot.secondaryRune1) {
-        slot.secondaryRune1 = rune
-      } else if (!slot.secondaryRune2) {
-        slot.secondaryRune2 = rune
-      } else {
-        slot.secondaryRune2 = rune
+      return
+    }
+
+    let currentLineRunes: Rune[] = rowRunes || []
+    if (!currentLineRunes.length && slot.secondaryPath?.slots) {
+      const parentSlot = slot.secondaryPath.slots.find((s) => s.runes.some((r) => r.id === rune.id))
+      if (parentSlot) {
+        currentLineRunes = parentSlot.runes
       }
+    }
+
+    const isRune1InSameRow = currentLineRunes.some((r) => r.id === slot.secondaryRune1?.id)
+    const isRune2InSameRow = currentLineRunes.some((r) => r.id === slot.secondaryRune2?.id)
+
+    if (isRune1InSameRow) {
+      slot.secondaryRune1 = rune
+    } else if (isRune2InSameRow) {
+      slot.secondaryRune2 = rune
+    } else if (!slot.secondaryRune1) {
+      slot.secondaryRune1 = rune
+    } else if (!slot.secondaryRune2) {
+      slot.secondaryRune2 = rune
+    } else {
+      slot.secondaryRune2 = rune
     }
   }
 

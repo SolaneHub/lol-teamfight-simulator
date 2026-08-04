@@ -161,6 +161,32 @@
             </td>
           </tr>
 
+          <!-- Basic AH (Sub-row for Q, W, E) -->
+          <tr
+            v-if="
+              activeCustomizerStats.abilityHaste.basicAbilityHaste &&
+              activeCustomizerStats.abilityHaste.basicAbilityHaste > 0
+            "
+            class="bg-slate-950/40 text-base"
+          >
+            <td class="px-4 py-1.5 font-semibold text-teal-400 pl-8 flex items-center gap-1.5">
+              <span>└ Basic Ability Haste (Q/W/E)</span>
+            </td>
+            <td class="px-4 py-1.5 text-right text-slate-500">0</td>
+            <td class="px-4 py-1.5 text-right text-teal-400 font-semibold">
+              +{{ activeCustomizerStats.abilityHaste.basicAbilityHaste }}
+            </td>
+            <td class="px-4 py-1.5 text-right font-bold text-teal-300">
+              {{
+                activeCustomizerStats.abilityHaste.total +
+                activeCustomizerStats.abilityHaste.basicAbilityHaste
+              }}
+              <span class="text-slate-400 text-base font-normal ml-1">
+                ({{ activeCustomizerStats.abilityHaste.basicCdrPercent }}% CDR)
+              </span>
+            </td>
+          </tr>
+
           <!-- Crit -->
           <tr>
             <td class="px-4 py-2 font-semibold text-slate-300">Critical Strike Chance</td>
