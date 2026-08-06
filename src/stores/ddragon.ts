@@ -27,8 +27,8 @@ export const useDDragonStore = defineStore('ddragon', () => {
         latestPatchVersion.value = validVersions[0]
       }
 
-      // Take top 4 patches (latest + 3 previous)
-      const topPatches = ['latest', ...validVersions.slice(1, 4)]
+      // Take top 2 patches (latest + 1 previous)
+      const topPatches = ['latest', ...validVersions.slice(1, 2)]
       availablePatches.value = topPatches
 
       if (currentPatch.value === 'latest' || !topPatches.includes(currentPatch.value)) {
