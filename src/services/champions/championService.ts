@@ -317,73 +317,78 @@ export const championService = {
       const data = await response.json()
       const rawData: Record<string, unknown> = data.data || {}
 
-      return Object.values(rawData || {}).map((champObj: unknown) => {
-        const champ = champObj as Record<string, unknown>
-        const stats = (champ.stats as Record<string, number>) || {}
-        const passive = (champ.passive as Record<string, unknown>) || {}
-        const passiveImg = (passive.image as Record<string, string>) || {}
-        const spells = (champ.spells as Record<string, unknown>[]) || []
-        const champImg = (champ.image as Record<string, string>) || {}
+      return Object.values(rawData || {})
+        .filter((champObj: unknown) => {
+          const id = (champObj as Record<string, unknown>)?.id as string
+          return id && !id.startsWith('Jade_')
+        })
+        .map((champObj: unknown) => {
+          const champ = champObj as Record<string, unknown>
+          const stats = (champ.stats as Record<string, number>) || {}
+          const passive = (champ.passive as Record<string, unknown>) || {}
+          const passiveImg = (passive.image as Record<string, string>) || {}
+          const spells = (champ.spells as Record<string, unknown>[]) || []
+          const champImg = (champ.image as Record<string, string>) || {}
 
-        return {
-          id: champ.id as string,
-          key: champ.key as string,
-          name: champ.name as string,
-          title: champ.title as string,
-          icon: `${champImgUrl}/${champImg.full || (champ.id as string) + '.png'}`,
-          image: champ.image as ChampionImage,
-          tags: (champ.tags as string[]) || [],
-          partype: (champ.partype as string) || 'Mana',
-          stats: {
-            hp: stats.hp ?? 500,
-            hpperlevel: stats.hpperlevel ?? 0,
-            mp: stats.mp ?? 300,
-            mpperlevel: stats.mpperlevel ?? 0,
-            movespeed: stats.movespeed ?? 330,
-            armor: stats.armor ?? 30,
-            armorperlevel: stats.armorperlevel ?? 0,
-            spellblock: stats.spellblock ?? 30,
-            spellblockperlevel: stats.spellblockperlevel ?? 0,
-            magicResist: stats.spellblock ?? stats.magicResist ?? 30,
-            magicResistPerLevel: stats.spellblockperlevel ?? stats.magicResistPerLevel ?? 0,
-            attackrange: stats.attackrange ?? 125,
-            hpregen: stats.hpregen ?? 6,
-            hpregenperlevel: stats.hpregenperlevel ?? 0,
-            mpregen: stats.mpregen ?? 6,
-            mpregenperlevel: stats.mpregenperlevel ?? 0,
-            crit: stats.crit ?? 0,
-            critperlevel: stats.critperlevel ?? 0,
-            attackdamage: stats.attackdamage ?? 60,
-            attackdamageperlevel: stats.attackdamageperlevel ?? 0,
-            attackspeedperlevel: stats.attackspeedperlevel ?? 0,
-            attackspeed: stats.attackspeed ?? 0.625,
-            attackspeedratio: stats.attackspeedratio || stats.attackspeed || 0.625,
-          },
-          passive: {
-            name: (passive.name as string) || '',
-            description: (passive.description as string) || '',
-            icon: `${passiveImgUrl}/${passiveImg.full}`,
-            image: champ.passive as ChampionPassive['image'],
-          },
-          spells: spells.map((spell) => {
-            const spellImg = (spell.image as Record<string, string>) || {}
-            return {
-              id: spell.id as string,
-              name: spell.name as string,
-              description: spell.description as string,
-              tooltip: spell.tooltip as string,
-              icon: `${spellImgUrl}/${spellImg.full}`,
-              image: spell.image as ChampionSpells['image'],
-              cooldown: spell.cooldown as number[],
-              cost: spell.cost as number[],
-              costType: spell.costType as string,
-              maxrank: spell.maxrank as number,
-              effect: spell.effect as (number[] | null)[],
-              vars: spell.vars as Record<string, unknown>[],
-            }
-          }),
-        }
-      })
+          return {
+            id: champ.id as string,
+            key: champ.key as string,
+            name: champ.name as string,
+            title: champ.title as string,
+            icon: `${champImgUrl}/${champImg.full || (champ.id as string) + '.png'}`,
+            image: champ.image as ChampionImage,
+            tags: (champ.tags as string[]) || [],
+            partype: (champ.partype as string) || 'Mana',
+            stats: {
+              hp: stats.hp ?? 500,
+              hpperlevel: stats.hpperlevel ?? 0,
+              mp: stats.mp ?? 300,
+              mpperlevel: stats.mpperlevel ?? 0,
+              movespeed: stats.movespeed ?? 330,
+              armor: stats.armor ?? 30,
+              armorperlevel: stats.armorperlevel ?? 0,
+              spellblock: stats.spellblock ?? 30,
+              spellblockperlevel: stats.spellblockperlevel ?? 0,
+              magicResist: stats.spellblock ?? stats.magicResist ?? 30,
+              magicResistPerLevel: stats.spellblockperlevel ?? stats.magicResistPerLevel ?? 0,
+              attackrange: stats.attackrange ?? 125,
+              hpregen: stats.hpregen ?? 6,
+              hpregenperlevel: stats.hpregenperlevel ?? 0,
+              mpregen: stats.mpregen ?? 6,
+              mpregenperlevel: stats.mpregenperlevel ?? 0,
+              crit: stats.crit ?? 0,
+              critperlevel: stats.critperlevel ?? 0,
+              attackdamage: stats.attackdamage ?? 60,
+              attackdamageperlevel: stats.attackdamageperlevel ?? 0,
+              attackspeedperlevel: stats.attackspeedperlevel ?? 0,
+              attackspeed: stats.attackspeed ?? 0.625,
+              attackspeedratio: stats.attackspeedratio || stats.attackspeed || 0.625,
+            },
+            passive: {
+              name: (passive.name as string) || '',
+              description: (passive.description as string) || '',
+              icon: `${passiveImgUrl}/${passiveImg.full}`,
+              image: champ.passive as ChampionPassive['image'],
+            },
+            spells: spells.map((spell) => {
+              const spellImg = (spell.image as Record<string, string>) || {}
+              return {
+                id: spell.id as string,
+                name: spell.name as string,
+                description: spell.description as string,
+                tooltip: spell.tooltip as string,
+                icon: `${spellImgUrl}/${spellImg.full}`,
+                image: spell.image as ChampionSpells['image'],
+                cooldown: spell.cooldown as number[],
+                cost: spell.cost as number[],
+                costType: spell.costType as string,
+                maxrank: spell.maxrank as number,
+                effect: spell.effect as (number[] | null)[],
+                vars: spell.vars as Record<string, unknown>[],
+              }
+            }),
+          }
+        })
     } catch (error) {
       console.error('Error fetching champion data:', error)
       throw error
