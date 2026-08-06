@@ -17,22 +17,27 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22.x
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Fetch Latest Riot Versions & Generate Formulas
         run: |
           # Fetch versions from Riot API
           VERSIONS_JSON=$(curl -s https://ddragon.leagueoflegends.com/api/versions.json)
           
-          # Extract top 4 valid patch version strings (e.g., "16.15.1", "16.14.1", etc.)
-          TOP_PATCHES=$(echo "$VERSIONS_JSON" | jq -r '.[] | select(test("^[0-9]+\\.[0-9]+\\.[0-9]+$"))' | head -n 4)
+          # Extract top 2 valid patch version strings (e.g., "16.15.1", "16.14.1")
+          TOP_PATCHES=$(echo "$VERSIONS_JSON" | jq -r '.[] | select(test("^[0-9]+\\.[0-9]+\\.[0-9]+$"))' | head -n 2)
           
           echo "Top active patches to process:"
           echo "$TOP_PATCHES"
