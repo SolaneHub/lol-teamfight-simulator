@@ -10,6 +10,7 @@ export interface DraftSlot {
   level: number
   items: (Item | null)[]
   masterworkItems?: boolean[]
+  itemStacks?: (number | undefined)[]
   spellRanks?: { q: number; w: number; e: number; r: number }
 
   // Runes Setup
@@ -30,6 +31,8 @@ export interface DraftSlot {
   // Stacks / Buffs
   conquerorStacks?: number
   lethalTempoStacks?: number
+  darkHarvestStacks?: number
+  hailOfBladesActive?: boolean
   statShards?: (string | null)[]
   runes?: (Rune | null)[]
 }

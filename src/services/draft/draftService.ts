@@ -127,6 +127,23 @@ export const calculateStats = (slot: DraftSlot) => {
       bonusMsPercent += msVal > 1 ? msVal / 100 : msVal
     }
 
+    // Dark Seal / Mejai's Soulstealer Stacks calculation
+    const name = item.name.toLowerCase()
+    if (name.includes('dark seal') || name.includes('mejai')) {
+      const isMejai = name.includes('mejai')
+      const defaultStacks = isMejai ? 25 : 10
+      const currentStacks =
+        slot.itemStacks && slot.itemStacks[i] !== undefined
+          ? Math.min(defaultStacks, Math.max(0, slot.itemStacks[i]!))
+          : defaultStacks
+      const apPerStack = isMejai ? 5 : 4
+      bonusAp += currentStacks * apPerStack
+
+      if (isMejai && currentStacks >= 10) {
+        bonusMsPercent += 0.1
+      }
+    }
+
     // Parse advanced stats from description
     const parsed = parseStatsFromDescription(item.description)
     bonusCrit += s.FlatCritChanceMod ? s.FlatCritChanceMod * 100 : parsed.critChance
@@ -278,6 +295,12 @@ export const calculateStats = (slot: DraftSlot) => {
       const stacks = Math.min(6, Math.max(0, slot.lethalTempoStacks ?? 6))
       const asPerStack = 0.05 + (lvl - 1) * (0.11 / 17)
       bonusAsPercent += stacks * asPerStack
+    } else if (runeName.includes('hail of blades') || runeName.includes('hailofblades')) {
+      const isMelee = (stats.attackrange || 125) <= 225
+      const isActive = slot.hailOfBladesActive ?? true
+      if (isActive) {
+        bonusAsPercent += isMelee ? 1.10 : 0.80
+      }
     } else if (runeName.includes('celerity')) {
       bonusMsPercent += 0.01
     } else if (runeName.includes('magical footwear')) {

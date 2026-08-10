@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import type { Champion, Item, RuneKeystone, Rune, DraftSlot } from '@/types'
 
 export const useDraftStore = defineStore('draft', () => {
@@ -433,47 +433,45 @@ export const useDraftStore = defineStore('draft', () => {
     }
   }
 
-  // Item customizer operations
+  const setItemStack = (itemIndex: number, stacks: number) => {
+    if (!activeCustomizerSlot.value) return
+    if (!activeCustomizerSlot.value.itemStacks) {
+      activeCustomizerSlot.value.itemStacks = Array(
+        activeCustomizerSlot.value.items.length,
+      ).fill(undefined)
+    }
+    const item = activeCustomizerSlot.value.items[itemIndex]
+    const name = item?.name.toLowerCase() || ''
+    const maxStacks = name.includes('mejai') ? 25 : name.includes('dark seal') ? 10 : 0
+    const clamped = Math.min(maxStacks, Math.max(0, isNaN(stacks) ? 0 : stacks))
+    activeCustomizerSlot.value.itemStacks[itemIndex] = clamped
+  }
+
   const selectItemForSlot = (idx: number, item: Item) => {
     if (activeCustomizerSlot.value) {
       activeCustomizerSlot.value.items[idx] = item
-    }
-  }
-
-  // LocalStorage Persistence
-  const savedDraft =
-    typeof localStorage !== 'undefined' ? localStorage.getItem('lol_sim_draft') : null
-  if (savedDraft) {
-    try {
-      const parsed = JSON.parse(savedDraft)
-      if (parsed.blueDraft && Array.isArray(parsed.blueDraft)) blueDraft.value = parsed.blueDraft
-      if (parsed.redDraft && Array.isArray(parsed.redDraft)) redDraft.value = parsed.redDraft
-      if (parsed.selectedSlotId) selectedSlotId.value = parsed.selectedSlotId
-    } catch (e) {
-      console.error('Failed to restore draft state', e)
-    }
-  }
-
-  watch(
-    [blueDraft, redDraft, selectedSlotId],
-    () => {
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(
-          'lol_sim_draft',
-          JSON.stringify({
-            blueDraft: blueDraft.value,
-            redDraft: redDraft.value,
-            selectedSlotId: selectedSlotId.value,
-          }),
-        )
+      if (!activeCustomizerSlot.value.itemStacks) {
+        activeCustomizerSlot.value.itemStacks = Array(
+          activeCustomizerSlot.value.items.length,
+        ).fill(undefined)
       }
-    },
-    { deep: true, immediate: true },
-  )
+      const name = item.name.toLowerCase()
+      if (name.includes('mejai')) {
+        activeCustomizerSlot.value.itemStacks[idx] = 25
+      } else if (name.includes('dark seal')) {
+        activeCustomizerSlot.value.itemStacks[idx] = 10
+      } else {
+        activeCustomizerSlot.value.itemStacks[idx] = undefined
+      }
+    }
+  }
 
   const removeItemFromSlot = (idx: number) => {
     if (activeCustomizerSlot.value) {
       activeCustomizerSlot.value.items[idx] = null
+      if (activeCustomizerSlot.value.itemStacks) {
+        activeCustomizerSlot.value.itemStacks[idx] = undefined
+      }
     }
   }
 
@@ -504,6 +502,7 @@ export const useDraftStore = defineStore('draft', () => {
     selectItemForSlot,
     removeItemFromSlot,
     toggleMasterwork,
+    setItemStack,
     setSpellRank,
   }
 })

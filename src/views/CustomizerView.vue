@@ -212,6 +212,25 @@
                     class="w-full h-full object-cover shrink-0"
                   />
 
+                  <!-- Dark Seal / Mejai Stacks Input Badge -->
+                  <div
+                    v-if="isStackableItem(item)"
+                    class="absolute bottom-1 left-1 h-7 px-1.5 rounded-md font-bold font-mono text-base backdrop-blur-md z-10 flex items-center gap-1 border bg-slate-950/85 border-cyan-500/80 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                    @click.stop
+                  >
+                    <span class="text-xs">⚡</span>
+                    <input
+                      type="number"
+                      :min="0"
+                      :max="getMaxStacksForItem(item)"
+                      :value="getItemStacks(idx, item)"
+                      @input="handleItemStackInput(idx, $event)"
+                      @click.stop
+                      class="w-7 bg-transparent text-center font-bold font-mono text-cyan-300 focus:outline-none focus:bg-cyan-950/50 rounded border-b border-cyan-400/50 text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    <span class="text-[10px] text-cyan-400/80 font-mono font-normal">/{{ getMaxStacksForItem(item) }}</span>
+                  </div>
+
                   <!-- Ornn Masterwork Badge & Toggle Button -->
                   <button
                     v-if="item.gold.total >= 2200 && !item.name.includes('Ornn')"
@@ -596,7 +615,7 @@ import ItemTooltip from '@/components/customizer/ItemTooltip.vue'
 const draftStore = useDraftStore()
 
 const { activeCustomizerSlot } = storeToRefs(draftStore)
-const { removeRunePage, removeItemFromSlot, toggleMasterwork, setSpellRank } = draftStore
+const { removeRunePage, removeItemFromSlot, toggleMasterwork, setItemStack, setSpellRank } = draftStore
 
 const ddragonStore = useDDragonStore()
 const { spellFormulasData } = storeToRefs(ddragonStore)
@@ -686,6 +705,31 @@ const hideItemTooltip = () => {
 const isMasterwork = (idx: number): boolean => {
   if (!activeCustomizerSlot.value || !activeCustomizerSlot.value.masterworkItems) return false
   return !!activeCustomizerSlot.value.masterworkItems[idx]
+}
+
+const isStackableItem = (item: Item | null): boolean => {
+  if (!item) return false
+  const name = item.name.toLowerCase()
+  return name.includes('dark seal') || name.includes('mejai')
+}
+
+const getMaxStacksForItem = (item: Item | null): number => {
+  if (!item) return 0
+  const name = item.name.toLowerCase()
+  return name.includes('mejai') ? 25 : name.includes('dark seal') ? 10 : 0
+}
+
+const getItemStacks = (idx: number, item: Item): number => {
+  if (!activeCustomizerSlot.value) return 0
+  const current = activeCustomizerSlot.value.itemStacks?.[idx]
+  if (current !== undefined) return current
+  return getMaxStacksForItem(item)
+}
+
+const handleItemStackInput = (idx: number, event: Event) => {
+  const target = event.target as HTMLInputElement
+  const val = parseInt(target.value, 10)
+  setItemStack(idx, isNaN(val) ? 0 : val)
 }
 
 const activeCustomizerStats = computed(() => {
