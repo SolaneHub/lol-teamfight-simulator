@@ -304,30 +304,7 @@
             </button>
           </div>
 
-          <!-- Keystone & Rune Row -->
-          <div
-            v-if="slot.primaryKeystone"
-            class="flex items-center justify-between bg-slate-950/70 p-2.5 rounded-lg border border-slate-800"
-          >
-            <div
-              class="flex items-center gap-2 cursor-pointer group"
-              @mouseenter="showRuneTooltip(slot.primaryKeystone, 'Primary Keystone')"
-              @mouseleave="hideRuneTooltip"
-              @mousemove="onMouseMove"
-            >
-              <div
-                class="h-8 w-8 rounded-full bg-slate-900 border border-amber-500/50 p-0.5 flex items-center justify-center shrink-0 group-hover:border-amber-400 transition-all"
-              >
-                <img
-                  :src="getRuneIconUrl(slot.primaryKeystone.icon)"
-                  class="h-full w-full object-contain"
-                />
-              </div>
-              <span class="text-base font-bold text-amber-300 group-hover:underline">{{
-                slot.primaryKeystone.name
-              }}</span>
-            </div>
-          </div>
+
 
           <!-- Stats Grid -->
           <div
@@ -490,6 +467,26 @@
                       }}]</span
                     >
                     <span
+                      v-if="res.electrocuteProcDmg && res.electrocuteProcDmg > 0"
+                      class="text-base text-purple-400 font-bold bg-purple-950/80 px-2 py-0.5 rounded border border-purple-500/50"
+                      >⚡ ELECTROCUTE PROC (+{{ res.electrocuteProcDmg }} Dmg)</span
+                    >
+                    <span
+                      v-else-if="res.electrocuteStacks && res.electrocuteStacks > 0"
+                      class="text-base text-purple-300 font-semibold"
+                      >[⚡ Electrocute {{ Math.min(3, res.electrocuteStacks) }}/3]</span
+                    >
+                    <span
+                      v-if="res.darkHarvestProcDmg && res.darkHarvestProcDmg > 0"
+                      class="text-base text-rose-400 font-bold bg-rose-950/80 px-2 py-0.5 rounded border border-rose-500/50"
+                      >💀 DARK HARVEST PROC (+{{ res.darkHarvestProcDmg }} Dmg)</span
+                    >
+                    <span
+                      v-if="res.hobRemainingAttacks !== undefined"
+                      class="text-base text-rose-300 font-semibold"
+                      >[🗡️ Hail of Blades {{ res.hobRemainingAttacks > 0 ? `${res.hobRemainingAttacks} left` : 'EXHAUSTED' }}]</span
+                    >
+                    <span
                       v-if="res.ptaExposed"
                       class="text-base text-amber-400 font-bold bg-amber-950/80 px-2 py-0.5 rounded border border-amber-500/50"
                       >🎯 PtA EXPOSED (+8% Dmg)</span
@@ -575,30 +572,7 @@
             </button>
           </div>
 
-          <!-- Keystone & Rune Row -->
-          <div
-            v-if="slot.primaryKeystone"
-            class="flex items-center justify-between bg-slate-950/70 p-2.5 rounded-lg border border-slate-800"
-          >
-            <div
-              class="flex items-center gap-2 cursor-pointer group"
-              @mouseenter="showRuneTooltip(slot.primaryKeystone, 'Primary Keystone')"
-              @mouseleave="hideRuneTooltip"
-              @mousemove="onMouseMove"
-            >
-              <div
-                class="h-8 w-8 rounded-full bg-slate-900 border border-amber-500/50 p-0.5 flex items-center justify-center shrink-0 group-hover:border-amber-400 transition-all"
-              >
-                <img
-                  :src="getRuneIconUrl(slot.primaryKeystone.icon)"
-                  class="h-full w-full object-contain"
-                />
-              </div>
-              <span class="text-base font-bold text-amber-300 group-hover:underline">{{
-                slot.primaryKeystone.name
-              }}</span>
-            </div>
-          </div>
+
 
           <!-- Live HP Bar -->
           <div
@@ -855,8 +829,6 @@
         </div>
       </div>
     </div>
-    <!-- Rune Tooltip Popup -->
-    <RuneTooltip :rune="hoveredRune" :mouse-pos="mousePos" />
   </div>
 </template>
 
@@ -868,35 +840,14 @@ import { storeToRefs } from 'pinia'
 import {
   getChampionIconUrl,
   getItemIconUrl,
-  getRuneIconUrl,
   calculateStats,
   calculateMonsterBuffStats,
   getChampionDefaultAdaptiveType,
   calculateSpellDamage,
   detectItemPassives,
 } from '@/services'
-import type { DraftSlot, Rune } from '@/types'
+import type { DraftSlot } from '@/types'
 import { useCalculatorStore } from '@/stores/calculator'
-import RuneTooltip, { type RuneTooltipData } from '@/components/customizer/RuneTooltip.vue'
-
-const hoveredRune = ref<RuneTooltipData | null>(null)
-const mousePos = ref({ x: 0, y: 0 })
-
-const onMouseMove = (e: MouseEvent) => {
-  mousePos.value = { x: e.clientX, y: e.clientY }
-}
-
-const showRuneTooltip = (rune: Rune | RuneTooltipData | null | undefined, category: string) => {
-  if (!rune) return
-  hoveredRune.value = {
-    ...rune,
-    category: category || 'Primary Keystone',
-  }
-}
-
-const hideRuneTooltip = () => {
-  hoveredRune.value = null
-}
 
 const router = useRouter()
 const draftStore = useDraftStore()
@@ -1043,6 +994,11 @@ interface TargetResult {
   lethalTempoOnHitDmg?: number
   ptaStacks: number
   ptaExposed: boolean
+  electrocuteStacks?: number
+  electrocuteProcDmg?: number
+  darkHarvestStacks?: number
+  darkHarvestProcDmg?: number
+  hobRemainingAttacks?: number
   coupDeGrace?: boolean
   cutDown?: boolean
   lastStandBonusPct?: number
@@ -1070,7 +1026,10 @@ const teamfightSimulationResults = computed(() => {
   const aatroxQSeqMap: Record<number, number> = {}
   const attackerConquerorMap: Record<number, number> = {}
   const attackerLethalTempoMap: Record<number, number> = {}
+  const attackerHobMap: Record<number, number> = {}
   const targetPtaMap: Record<string, { stacks: number; exposed: boolean }> = {}
+  const targetElectrocuteMap: Record<string, { stacks: number; procced: boolean }> = {}
+  const targetDarkHarvestMap: Record<string, { procced: boolean }> = {}
 
   // Initialize Defender States
   selectedDefenderSlots.value.forEach((slot) => {
@@ -1093,6 +1052,7 @@ const teamfightSimulationResults = computed(() => {
     stepIndex: number
     actorSlotId: number
     actorName: string
+    actorKeystone?: unknown
     action: string
     targetResults: TargetResult[]
     totalStepDamage: number
@@ -1107,9 +1067,14 @@ const teamfightSimulationResults = computed(() => {
     const hasConqueror = keystoneName.includes('conqueror')
     const hasLethalTempo = keystoneName.includes('lethal tempo')
     const hasPtA = keystoneName.includes('press the attack')
+    const hasElectrocute = keystoneName.includes('electrocute')
+    const hasDarkHarvest = keystoneName.includes('dark harvest') || keystoneName.includes('darkharvest')
+
+    const hasHailOfBlades = keystoneName.includes('hail of blades') || keystoneName.includes('hailofblades')
 
     let currentConquerorStacks = attackerConquerorMap[actorSlot.id] || 0
     let currentLethalTempoStacks = attackerLethalTempoMap[actorSlot.id] || 0
+    const currentHobAttacksLeft = attackerHobMap[actorSlot.id] ?? 3
 
     if (['Q', 'W', 'E', 'R', 'P', 'AA'].includes(actStep.action)) {
       const isMelee = (actorSlot.champion.stats.attackrange || 125) <= 225
@@ -1121,13 +1086,21 @@ const teamfightSimulationResults = computed(() => {
         currentLethalTempoStacks = Math.min(6, currentLethalTempoStacks + 1)
         attackerLethalTempoMap[actorSlot.id] = currentLethalTempoStacks
       }
+      if (hasHailOfBlades && actStep.action === 'AA') {
+        if (currentHobAttacksLeft > 0) {
+          attackerHobMap[actorSlot.id] = Math.max(0, currentHobAttacksLeft - 1)
+        }
+      }
     }
+
+    const isHobActive = hasHailOfBlades && currentHobAttacksLeft > 0
 
     // Get actor stats dynamically updated with current keystone stacks
     const baseStats = calculateStats({
       ...actorSlot,
       conquerorStacks: currentConquerorStacks,
       lethalTempoStacks: currentLethalTempoStacks,
+      hailOfBladesActive: isHobActive,
     })
     if (!baseStats) return
     const isAttacker = blueDraft.value.some((b) => b.id === actorSlot.id)
@@ -1285,6 +1258,38 @@ const teamfightSimulationResults = computed(() => {
           },
         })
 
+        // Electrocute Stacking (3 unique attacks/abilities within 3s window)
+        const eleKey = `${actorSlot.id}_${targetId}`
+        if (!targetElectrocuteMap[eleKey]) {
+          targetElectrocuteMap[eleKey] = { stacks: 0, procced: false }
+        }
+        const eleState = targetElectrocuteMap[eleKey]
+        let electrocuteProcDmg = 0
+
+        if (hasElectrocute && ['Q', 'W', 'E', 'R', 'P', 'AA'].includes(action)) {
+          if (!eleState.procced) {
+            eleState.stacks++
+            if (eleState.stacks >= 3) {
+              eleState.procced = true
+              const lvl = actorSlot.level || 1
+              // Electrocute base damage: 50 - 190 (based on level) + 0.40 bonus AD OR + 0.25 AP
+              const baseEleDmg = 50 + (lvl - 1) * (140 / 17)
+              const baseAdValue = actorSlot.champion?.stats?.attackdamage || 0
+              const bonusEleDmg = isApAttacker ? att.ap * 0.25 : (att.ad - baseAdValue) * 0.40
+              const rawEleDmg = baseEleDmg + Math.max(0, bonusEleDmg)
+              const mult = isApAttacker ? spellRes.magicMult : spellRes.physMult
+              electrocuteProcDmg = Math.round(rawEleDmg * mult)
+            }
+          }
+        }
+
+        if (electrocuteProcDmg > 0) {
+          defState.currentHp = Math.max(0, defState.currentHp - electrocuteProcDmg)
+          if (defState.currentHp === 0) defState.isKo = true
+          stepTotalDmg += electrocuteProcDmg
+          totalTeamDamage += electrocuteProcDmg
+        }
+
         const rawDmg = spellRes.rawDmg
         const dmgType = spellRes.dmgType
         const hitMult = spellRes.hitMult
@@ -1325,6 +1330,35 @@ const teamfightSimulationResults = computed(() => {
         else if (ltOnHitProcDmg > 0) nameSuffix = ' (LT Proc)'
         else if (isEcho) nameSuffix = ' (Echo)'
 
+        // Dark Harvest Stacking & Proc (Damaging champions below 50% HP)
+        const dhKey = `${actorSlot.id}_${targetId}`
+        if (!targetDarkHarvestMap[dhKey]) {
+          targetDarkHarvestMap[dhKey] = { procced: false }
+        }
+        const dhState = targetDarkHarvestMap[dhKey]
+        let darkHarvestProcDmg = 0
+        const dhStacks = actorSlot.darkHarvestStacks ?? 5
+
+        const targetHpPct = (defState.currentHp / defState.maxHp) * 100
+        if (hasDarkHarvest && targetHpPct <= 50 && !dhState.procced && ['Q', 'W', 'E', 'R', 'P', 'AA'].includes(action)) {
+          dhState.procced = true
+          const lvl = actorSlot.level || 1
+          // Dark Harvest base damage: 20 - 60 (level scaling) + (9 * stacks) + 0.10 bonus AD OR + 0.05 AP
+          const baseDhDmg = 20 + (lvl - 1) * (40 / 17) + dhStacks * 9
+          const baseAdVal = actorSlot.champion?.stats?.attackdamage || 0
+          const bonusDhDmg = isApAttacker ? att.ap * 0.05 : (att.ad - baseAdVal) * 0.10
+          const rawDhDmg = baseDhDmg + Math.max(0, bonusDhDmg)
+          const mult = isApAttacker ? spellRes.magicMult : spellRes.physMult
+          darkHarvestProcDmg = Math.round(rawDhDmg * mult)
+        }
+
+        if (darkHarvestProcDmg > 0) {
+          defState.currentHp = Math.max(0, defState.currentHp - darkHarvestProcDmg)
+          if (defState.currentHp === 0) defState.isKo = true
+          stepTotalDmg += darkHarvestProcDmg
+          totalTeamDamage += darkHarvestProcDmg
+        }
+
         targetResults.push({
           targetSlotId: targetId,
           targetName: `${defState.name}${nameSuffix}`,
@@ -1339,6 +1373,11 @@ const teamfightSimulationResults = computed(() => {
           lethalTempoOnHitDmg: ltOnHitProcDmg,
           ptaStacks: hasPtA ? ptaState.stacks : 0,
           ptaExposed: ptaState.exposed,
+          electrocuteStacks: hasElectrocute ? eleState.stacks : 0,
+          electrocuteProcDmg: electrocuteProcDmg,
+          darkHarvestStacks: hasDarkHarvest ? dhStacks : 0,
+          darkHarvestProcDmg: darkHarvestProcDmg,
+          hobRemainingAttacks: hasHailOfBlades ? currentHobAttacksLeft : undefined,
           coupDeGrace: spellRes.isCoupDeGraceProc,
           cutDown: spellRes.isCutDownProc,
           lastStandBonusPct: spellRes.lastStandBonusPct,
@@ -1486,6 +1525,7 @@ const teamfightSimulationResults = computed(() => {
       stepIndex: idx + 1,
       actorSlotId: actStep.actorSlotId,
       actorName,
+      actorKeystone: actorSlot.primaryKeystone || null,
       action: stepActionName,
       targetResults,
       totalStepDamage: stepTotalDmg,
