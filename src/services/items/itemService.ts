@@ -383,17 +383,15 @@ export const itemService = {
       let itemData: unknown = null
       if (patch) {
         try {
+          const cdragonPatch = patch.split('.').slice(0, 2).join('.')
           const cdragonRes = await fetch(
-            `https://raw.communitydragon.org/${patch}/plugins/rcp-be-lol-game-data/global/default/v1/items.json`,
+            `https://raw.communitydragon.org/${cdragonPatch}/plugins/rcp-be-lol-game-data/global/default/v1/items.json`,
           )
           if (cdragonRes.ok) {
             itemData = await cdragonRes.json()
           }
-        } catch (e) {
-          console.warn(
-            `Failed to fetch items from CDragon for patch ${patch}, falling back to local out/items/items.json:`,
-            e,
-          )
+        } catch {
+          // Gracefully fallback to local JSON assets if remote CDragon CDN is unreachable
         }
       }
 

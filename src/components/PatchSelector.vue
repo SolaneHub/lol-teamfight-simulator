@@ -32,7 +32,10 @@ const { currentPatch, availablePatches, isLoading, isPatchLoading } = storeToRef
 
 const isLive = computed(() => currentPatch.value === 'latest')
 const precedingPatch = computed(() => {
-  return availablePatches.value.length > 1 ? availablePatches.value[1] : ''
+  if (availablePatches.value.length <= 1) return ''
+  const fullVer = availablePatches.value[1]
+  if (!fullVer) return ''
+  return fullVer.split('.').slice(0, 2).join('.')
 })
 
 const selectPatch = (live: boolean) => {

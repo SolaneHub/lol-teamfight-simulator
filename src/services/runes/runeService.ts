@@ -41,23 +41,21 @@ export const runeService = {
 
       if (patch) {
         try {
+          const cdragonPatch = patch.split('.').slice(0, 2).join('.')
           const [perksRes, stylesRes] = await Promise.all([
             fetch(
-              `https://raw.communitydragon.org/${patch}/plugins/rcp-be-lol-game-data/global/default/v1/perks.json`,
+              `https://raw.communitydragon.org/${cdragonPatch}/plugins/rcp-be-lol-game-data/global/default/v1/perks.json`,
             ),
             fetch(
-              `https://raw.communitydragon.org/${patch}/plugins/rcp-be-lol-game-data/global/default/v1/perkstyles.json`,
+              `https://raw.communitydragon.org/${cdragonPatch}/plugins/rcp-be-lol-game-data/global/default/v1/perkstyles.json`,
             ),
           ])
           if (perksRes.ok && stylesRes.ok) {
             perksData = await perksRes.json()
             perkstylesData = await stylesRes.json()
           }
-        } catch (e) {
-          console.warn(
-            `Failed to fetch runes from CDragon for patch ${patch}, falling back to local files:`,
-            e,
-          )
+        } catch {
+          // Gracefully fallback to local JSON assets if remote CDragon CDN is unreachable
         }
       }
 
