@@ -312,7 +312,9 @@ export const championService = {
 
       // Try local frozen DDragon data first
       try {
-        const localRes = await fetch(`${import.meta.env.BASE_URL}ddragon/${targetPatch}/championFull.json`)
+        const localRes = await fetch(
+          `${import.meta.env.BASE_URL}ddragon/${targetPatch}/championFull.json`,
+        )
         if (localRes.ok) {
           data = await localRes.json()
         }

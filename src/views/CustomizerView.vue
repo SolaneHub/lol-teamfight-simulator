@@ -228,7 +228,9 @@
                       @click.stop
                       class="w-7 bg-transparent text-center font-bold font-mono text-cyan-300 focus:outline-none focus:bg-cyan-950/50 rounded border-b border-cyan-400/50 text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
-                    <span class="text-[10px] text-cyan-400/80 font-mono font-normal">/{{ getMaxStacksForItem(item) }}</span>
+                    <span class="text-[10px] text-cyan-400/80 font-mono font-normal"
+                      >/{{ getMaxStacksForItem(item) }}</span
+                    >
                   </div>
 
                   <!-- Ornn Masterwork Badge & Toggle Button -->
@@ -615,7 +617,8 @@ import ItemTooltip from '@/components/customizer/ItemTooltip.vue'
 const draftStore = useDraftStore()
 
 const { activeCustomizerSlot } = storeToRefs(draftStore)
-const { removeRunePage, removeItemFromSlot, toggleMasterwork, setItemStack, setSpellRank } = draftStore
+const { removeRunePage, removeItemFromSlot, toggleMasterwork, setItemStack, setSpellRank } =
+  draftStore
 
 const ddragonStore = useDDragonStore()
 const { spellFormulasData } = storeToRefs(ddragonStore)

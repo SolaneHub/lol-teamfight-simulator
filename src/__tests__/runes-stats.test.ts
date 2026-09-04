@@ -68,7 +68,12 @@ const mockChampionAD: Champion = {
   spells: [],
 }
 
-const createSlot = (champion: Champion, runes: Rune[], level = 1, extraProps: Partial<DraftSlot> = {}): DraftSlot => ({
+const createSlot = (
+  champion: Champion,
+  runes: Rune[],
+  level = 1,
+  extraProps: Partial<DraftSlot> = {},
+): DraftSlot => ({
   id: 1,
   side: 'blue',
   role: 'Top',
@@ -88,8 +93,15 @@ const createSlot = (champion: Champion, runes: Rune[], level = 1, extraProps: Pa
 
 describe('Precision Tree Runes', () => {
   it('should calculate Conqueror AD/AP stats and omnivamp based on stacks', () => {
-    const conqueror: Rune = { id: 8010, key: 'Conqueror', icon: '', name: 'Conqueror', shortDesc: '', longDesc: '' }
-    
+    const conqueror: Rune = {
+      id: 8010,
+      key: 'Conqueror',
+      icon: '',
+      name: 'Conqueror',
+      shortDesc: '',
+      longDesc: '',
+    }
+
     // Ahri (AP) at 12 stacks level 1
     const slotAP = createSlot(mockChampionAP, [conqueror], 1, { conquerorStacks: 12 })
     const statsAP = calculateStats(slotAP)
@@ -104,7 +116,14 @@ describe('Precision Tree Runes', () => {
   })
 
   it('should calculate Lethal Tempo Attack Speed stacks correctly', () => {
-    const lethalTempo: Rune = { id: 8008, key: 'LethalTempo', icon: '', name: 'Lethal Tempo', shortDesc: '', longDesc: '' }
+    const lethalTempo: Rune = {
+      id: 8008,
+      key: 'LethalTempo',
+      icon: '',
+      name: 'Lethal Tempo',
+      shortDesc: '',
+      longDesc: '',
+    }
     const slot = createSlot(mockChampionAP, [lethalTempo], 1, { lethalTempoStacks: 6 })
     const stats = calculateStats(slot)
     const baseAs = 0.668
@@ -113,14 +132,28 @@ describe('Precision Tree Runes', () => {
   })
 
   it('should apply Legend: Haste basic ability haste', () => {
-    const legendHaste: Rune = { id: 9104, key: 'LegendHaste', icon: '', name: 'Legend: Haste', shortDesc: '', longDesc: '' }
+    const legendHaste: Rune = {
+      id: 9104,
+      key: 'LegendHaste',
+      icon: '',
+      name: 'Legend: Haste',
+      shortDesc: '',
+      longDesc: '',
+    }
     const slot = createSlot(mockChampionAP, [null as unknown as Rune, legendHaste])
     const stats = calculateStats(slot)
     expect(stats?.abilityHaste.basicAbilityHaste).toBe(15)
   })
 
   it('should apply Legend: Alacrity attack speed bonus', () => {
-    const legendAlacrity: Rune = { id: 9105, key: 'LegendAlacrity', icon: '', name: 'Legend: Alacrity', shortDesc: '', longDesc: '' }
+    const legendAlacrity: Rune = {
+      id: 9105,
+      key: 'LegendAlacrity',
+      icon: '',
+      name: 'Legend: Alacrity',
+      shortDesc: '',
+      longDesc: '',
+    }
     const slot = createSlot(mockChampionAP, [null as unknown as Rune, legendAlacrity])
     const stats = calculateStats(slot)
     const baseAs = 0.668
@@ -129,7 +162,14 @@ describe('Precision Tree Runes', () => {
   })
 
   it('should apply Legend: Bloodline life steal and bonus HP', () => {
-    const legendBloodline: Rune = { id: 9103, key: 'LegendBloodline', icon: '', name: 'Legend: Bloodline', shortDesc: '', longDesc: '' }
+    const legendBloodline: Rune = {
+      id: 9103,
+      key: 'LegendBloodline',
+      icon: '',
+      name: 'Legend: Bloodline',
+      shortDesc: '',
+      longDesc: '',
+    }
     const slot = createSlot(mockChampionAP, [null as unknown as Rune, legendBloodline])
     const stats = calculateStats(slot)
     expect(stats?.lifeSteal.total).toBe(5)
@@ -137,10 +177,17 @@ describe('Precision Tree Runes', () => {
   })
 
   it('should identify Press the Attack keystone for combat simulation procs', () => {
-    const pta: Rune = { id: 8005, key: 'PressTheAttack', icon: '', name: 'Press the Attack', shortDesc: 'Hitting an enemy champion 3 times procs bonus damage.', longDesc: '' }
+    const pta: Rune = {
+      id: 8005,
+      key: 'PressTheAttack',
+      icon: '',
+      name: 'Press the Attack',
+      shortDesc: 'Hitting an enemy champion 3 times procs bonus damage.',
+      longDesc: '',
+    }
     const slot = createSlot(mockChampionAD, [pta])
     expect(slot.primaryKeystone?.name).toBe('Press the Attack')
-    
+
     // PtA Proc Bonus Damage formula check at Level 1 (40 dmg) vs Level 18 (180 dmg)
     const getPtaProcDamage = (level: number) => Math.round(40 + (level - 1) * (140 / 17))
     expect(getPtaProcDamage(1)).toBe(40)
@@ -148,8 +195,20 @@ describe('Precision Tree Runes', () => {
   })
 
   it('should calculate Coup de Grace damage multiplier when target HP < 40%', () => {
-    const coupDeGrace: Rune = { id: 8014, key: 'CoupDeGrace', icon: '', name: 'Coup de Grace', shortDesc: 'Deal 8% more damage to champions below 40% health.', longDesc: '' }
-    const slot = createSlot(mockChampionAD, [null as unknown as Rune, null as unknown as Rune, null as unknown as Rune, coupDeGrace])
+    const coupDeGrace: Rune = {
+      id: 8014,
+      key: 'CoupDeGrace',
+      icon: '',
+      name: 'Coup de Grace',
+      shortDesc: 'Deal 8% more damage to champions below 40% health.',
+      longDesc: '',
+    }
+    const slot = createSlot(mockChampionAD, [
+      null as unknown as Rune,
+      null as unknown as Rune,
+      null as unknown as Rune,
+      coupDeGrace,
+    ])
     expect(slot.primaryRune3?.name).toBe('Coup de Grace')
 
     const getCoupDeGraceMultiplier = (targetHpPct: number) => (targetHpPct < 40 ? 1.08 : 1.0)
@@ -158,8 +217,20 @@ describe('Precision Tree Runes', () => {
   })
 
   it('should calculate Cut Down damage multiplier when target HP > 60%', () => {
-    const cutDown: Rune = { id: 8017, key: 'CutDown', icon: '', name: 'Cut Down', shortDesc: 'Deal 8% more damage to champions above 60% health.', longDesc: '' }
-    const slot = createSlot(mockChampionAD, [null as unknown as Rune, null as unknown as Rune, null as unknown as Rune, cutDown])
+    const cutDown: Rune = {
+      id: 8017,
+      key: 'CutDown',
+      icon: '',
+      name: 'Cut Down',
+      shortDesc: 'Deal 8% more damage to champions above 60% health.',
+      longDesc: '',
+    }
+    const slot = createSlot(mockChampionAD, [
+      null as unknown as Rune,
+      null as unknown as Rune,
+      null as unknown as Rune,
+      cutDown,
+    ])
     expect(slot.primaryRune3?.name).toBe('Cut Down')
 
     const getCutDownMultiplier = (targetHpPct: number) => (targetHpPct > 60 ? 1.08 : 1.0)
@@ -168,8 +239,20 @@ describe('Precision Tree Runes', () => {
   })
 
   it('should calculate Last Stand damage multiplier scaling when attacker HP < 60%', () => {
-    const lastStand: Rune = { id: 8299, key: 'LastStand', icon: '', name: 'Last Stand', shortDesc: 'Deal 5% to 11% more damage while low health.', longDesc: '' }
-    const slot = createSlot(mockChampionAD, [null as unknown as Rune, null as unknown as Rune, null as unknown as Rune, lastStand])
+    const lastStand: Rune = {
+      id: 8299,
+      key: 'LastStand',
+      icon: '',
+      name: 'Last Stand',
+      shortDesc: 'Deal 5% to 11% more damage while low health.',
+      longDesc: '',
+    }
+    const slot = createSlot(mockChampionAD, [
+      null as unknown as Rune,
+      null as unknown as Rune,
+      null as unknown as Rune,
+      lastStand,
+    ])
     expect(slot.primaryRune3?.name).toBe('Last Stand')
 
     const getLastStandBonusPct = (attackerHpPct: number) => {
@@ -189,7 +272,8 @@ describe('Domination Tree Runes', () => {
       key: 'Electrocute',
       icon: '',
       name: 'Electrocute',
-      shortDesc: 'Hitting a champion with 3 separate attacks or abilities within 3s deals bonus adaptive damage.',
+      shortDesc:
+        'Hitting a champion with 3 separate attacks or abilities within 3s deals bonus adaptive damage.',
       longDesc: '',
     }
     const slot = createSlot(mockChampionAP, [electrocute])
@@ -197,7 +281,7 @@ describe('Domination Tree Runes', () => {
 
     const getElectrocuteRawDmg = (level: number, ap: number, bonusAd: number, isAp: boolean) => {
       const baseEleDmg = 50 + (level - 1) * (140 / 17)
-      const bonusEleDmg = isAp ? ap * 0.25 : bonusAd * 0.40
+      const bonusEleDmg = isAp ? ap * 0.25 : bonusAd * 0.4
       return Math.round(baseEleDmg + Math.max(0, bonusEleDmg))
     }
 
@@ -220,9 +304,15 @@ describe('Domination Tree Runes', () => {
     const slot = createSlot(mockChampionAP, [darkHarvest], 1, { darkHarvestStacks: 10 })
     expect(slot.primaryKeystone?.name).toBe('Dark Harvest')
 
-    const getDarkHarvestRawDmg = (level: number, stacks: number, ap: number, bonusAd: number, isAp: boolean) => {
+    const getDarkHarvestRawDmg = (
+      level: number,
+      stacks: number,
+      ap: number,
+      bonusAd: number,
+      isAp: boolean,
+    ) => {
       const baseDhDmg = 20 + (level - 1) * (40 / 17) + stacks * 9
-      const bonusDhDmg = isAp ? ap * 0.05 : bonusAd * 0.10
+      const bonusDhDmg = isAp ? ap * 0.05 : bonusAd * 0.1
       return Math.round(baseDhDmg + Math.max(0, bonusDhDmg))
     }
 
@@ -247,14 +337,14 @@ describe('Domination Tree Runes', () => {
     const slotMelee = createSlot(mockChampionAD, [hailOfBlades], 1, { hailOfBladesActive: true })
     const statsMelee = calculateStats(slotMelee)
     const baseAsMelee = 0.625
-    const expectedAsMelee = Math.round((baseAsMelee + baseAsMelee * 1.10) * 1000) / 1000
+    const expectedAsMelee = Math.round((baseAsMelee + baseAsMelee * 1.1) * 1000) / 1000
     expect(statsMelee?.as.total).toBe(expectedAsMelee)
 
     // Ranged (Ahri) => +80% AS
     const slotRanged = createSlot(mockChampionAP, [hailOfBlades], 1, { hailOfBladesActive: true })
     const statsRanged = calculateStats(slotRanged)
     const baseAsRanged = 0.668
-    const expectedAsRanged = Math.round((baseAsRanged + baseAsRanged * 0.80) * 1000) / 1000
+    const expectedAsRanged = Math.round((baseAsRanged + baseAsRanged * 0.8) * 1000) / 1000
     expect(statsRanged?.as.total).toBe(expectedAsRanged)
   })
 })

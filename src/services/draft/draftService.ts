@@ -299,7 +299,7 @@ export const calculateStats = (slot: DraftSlot) => {
       const isMelee = (stats.attackrange || 125) <= 225
       const isActive = slot.hailOfBladesActive ?? true
       if (isActive) {
-        bonusAsPercent += isMelee ? 1.10 : 0.80
+        bonusAsPercent += isMelee ? 1.1 : 0.8
       }
     } else if (runeName.includes('celerity')) {
       bonusMsPercent += 0.01

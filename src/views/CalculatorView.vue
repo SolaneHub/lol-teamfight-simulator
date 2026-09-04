@@ -304,8 +304,6 @@
             </button>
           </div>
 
-
-
           <!-- Stats Grid -->
           <div
             v-if="getCalculatedStatsForSlot(slot)"
@@ -490,7 +488,12 @@
                     <span
                       v-if="res.hobRemainingAttacks !== undefined"
                       class="text-base text-rose-300 font-semibold"
-                      >[🗡️ Hail of Blades {{ res.hobRemainingAttacks > 0 ? `${res.hobRemainingAttacks} left` : 'EXHAUSTED' }}]</span
+                      >[🗡️ Hail of Blades
+                      {{
+                        res.hobRemainingAttacks > 0
+                          ? `${res.hobRemainingAttacks} left`
+                          : 'EXHAUSTED'
+                      }}]</span
                     >
                     <span
                       v-if="res.ptaExposed"
@@ -577,8 +580,6 @@
               ⚙️
             </button>
           </div>
-
-
 
           <!-- Live HP Bar -->
           <div
@@ -969,7 +970,7 @@ const getCalculatedStatsForSlot = (slot: DraftSlot) => {
 
   const itemPassives = detectItemPassives(slot.items)
   let blackfireBonusAp = 0
-  let baseAp = Math.round((base.ap.total + mStats.bonusAP) * mStats.apMultiplier)
+  const baseAp = Math.round((base.ap.total + mStats.bonusAP) * mStats.apMultiplier)
 
   if (itemPassives.hasBlackfireTorch) {
     // Find max targets hit by an ability action for this slot in current teamfightActions
@@ -1098,9 +1099,11 @@ const teamfightSimulationResults = computed(() => {
     const hasLethalTempo = keystoneName.includes('lethal tempo')
     const hasPtA = keystoneName.includes('press the attack')
     const hasElectrocute = keystoneName.includes('electrocute')
-    const hasDarkHarvest = keystoneName.includes('dark harvest') || keystoneName.includes('darkharvest')
+    const hasDarkHarvest =
+      keystoneName.includes('dark harvest') || keystoneName.includes('darkharvest')
 
-    const hasHailOfBlades = keystoneName.includes('hail of blades') || keystoneName.includes('hailofblades')
+    const hasHailOfBlades =
+      keystoneName.includes('hail of blades') || keystoneName.includes('hailofblades')
 
     let currentConquerorStacks = attackerConquerorMap[actorSlot.id] || 0
     let currentLethalTempoStacks = attackerLethalTempoMap[actorSlot.id] || 0
@@ -1305,7 +1308,7 @@ const teamfightSimulationResults = computed(() => {
               // Electrocute base damage: 50 - 190 (based on level) + 0.40 bonus AD OR + 0.25 AP
               const baseEleDmg = 50 + (lvl - 1) * (140 / 17)
               const baseAdValue = actorSlot.champion?.stats?.attackdamage || 0
-              const bonusEleDmg = isApAttacker ? att.ap * 0.25 : (att.ad - baseAdValue) * 0.40
+              const bonusEleDmg = isApAttacker ? att.ap * 0.25 : (att.ad - baseAdValue) * 0.4
               const rawEleDmg = baseEleDmg + Math.max(0, bonusEleDmg)
               const mult = isApAttacker ? spellRes.magicMult : spellRes.physMult
               electrocuteProcDmg = Math.round(rawEleDmg * mult)
@@ -1370,13 +1373,18 @@ const teamfightSimulationResults = computed(() => {
         const dhStacks = actorSlot.darkHarvestStacks ?? 5
 
         const targetHpPct = (defState.currentHp / defState.maxHp) * 100
-        if (hasDarkHarvest && targetHpPct <= 50 && !dhState.procced && ['Q', 'W', 'E', 'R', 'P', 'AA'].includes(action)) {
+        if (
+          hasDarkHarvest &&
+          targetHpPct <= 50 &&
+          !dhState.procced &&
+          ['Q', 'W', 'E', 'R', 'P', 'AA'].includes(action)
+        ) {
           dhState.procced = true
           const lvl = actorSlot.level || 1
           // Dark Harvest base damage: 20 - 60 (level scaling) + (9 * stacks) + 0.10 bonus AD OR + 0.05 AP
           const baseDhDmg = 20 + (lvl - 1) * (40 / 17) + dhStacks * 9
           const baseAdVal = actorSlot.champion?.stats?.attackdamage || 0
-          const bonusDhDmg = isApAttacker ? att.ap * 0.05 : (att.ad - baseAdVal) * 0.10
+          const bonusDhDmg = isApAttacker ? att.ap * 0.05 : (att.ad - baseAdVal) * 0.1
           const rawDhDmg = baseDhDmg + Math.max(0, bonusDhDmg)
           const mult = isApAttacker ? spellRes.magicMult : spellRes.physMult
           darkHarvestProcDmg = Math.round(rawDhDmg * mult)

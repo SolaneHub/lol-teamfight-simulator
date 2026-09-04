@@ -436,9 +436,9 @@ export const useDraftStore = defineStore('draft', () => {
   const setItemStack = (itemIndex: number, stacks: number) => {
     if (!activeCustomizerSlot.value) return
     if (!activeCustomizerSlot.value.itemStacks) {
-      activeCustomizerSlot.value.itemStacks = Array(
-        activeCustomizerSlot.value.items.length,
-      ).fill(undefined)
+      activeCustomizerSlot.value.itemStacks = Array(activeCustomizerSlot.value.items.length).fill(
+        undefined,
+      )
     }
     const item = activeCustomizerSlot.value.items[itemIndex]
     const name = item?.name.toLowerCase() || ''
@@ -451,9 +451,9 @@ export const useDraftStore = defineStore('draft', () => {
     if (activeCustomizerSlot.value) {
       activeCustomizerSlot.value.items[idx] = item
       if (!activeCustomizerSlot.value.itemStacks) {
-        activeCustomizerSlot.value.itemStacks = Array(
-          activeCustomizerSlot.value.items.length,
-        ).fill(undefined)
+        activeCustomizerSlot.value.itemStacks = Array(activeCustomizerSlot.value.items.length).fill(
+          undefined,
+        )
       }
       const name = item.name.toLowerCase()
       if (name.includes('mejai')) {
