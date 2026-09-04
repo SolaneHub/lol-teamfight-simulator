@@ -22,7 +22,9 @@ const outputPatchName = patchVersion;
 
 let DDRAGON_DIR = '';
 let OUTPUT_FILE = '';
-const OUT_DIR = path.join(__dirname, '..', 'out', 'champions');
+const OUT_DIR = fs.existsSync(path.join(__dirname, '..', 'public', 'cdragon', 'champions'))
+  ? path.join(__dirname, '..', 'public', 'cdragon', 'champions')
+  : path.join(__dirname, '..', 'public', 'out', 'champions');
 const DEFAULT_OUTPUT_FILE = path.join(__dirname, '..', 'public', 'data', 'spellFormulas.json');
 
 // Stat coefficient type mapping

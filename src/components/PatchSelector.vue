@@ -30,19 +30,22 @@ import { useDDragonStore } from '@/stores/ddragon'
 const ddragonStore = useDDragonStore()
 const { currentPatch, availablePatches, isLoading, isPatchLoading } = storeToRefs(ddragonStore)
 
+const fullPrecedingPatch = computed(() => {
+  if (availablePatches.value.length <= 1) return ''
+  return availablePatches.value[1] || ''
+})
+
 const isLive = computed(() => currentPatch.value === 'latest')
 const precedingPatch = computed(() => {
-  if (availablePatches.value.length <= 1) return ''
-  const fullVer = availablePatches.value[1]
-  if (!fullVer) return ''
-  return fullVer.split('.').slice(0, 2).join('.')
+  if (!fullPrecedingPatch.value) return ''
+  return fullPrecedingPatch.value.split('.').slice(0, 2).join('.')
 })
 
 const selectPatch = (live: boolean) => {
   if (live) {
     ddragonStore.setPatch('latest')
-  } else if (precedingPatch.value) {
-    ddragonStore.setPatch(precedingPatch.value)
+  } else if (fullPrecedingPatch.value) {
+    ddragonStore.setPatch(fullPrecedingPatch.value)
   }
 }
 </script>

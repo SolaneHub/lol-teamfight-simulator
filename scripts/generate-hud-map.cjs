@@ -10,7 +10,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const OUT_CHAMPS_DIR = path.join(__dirname, '..', 'out', 'champions');
+const OUT_CHAMPS_DIR = fs.existsSync(path.join(__dirname, '..', 'public', 'cdragon', 'champions'))
+  ? path.join(__dirname, '..', 'public', 'cdragon', 'champions')
+  : path.join(__dirname, '..', 'public', 'out', 'champions');
 const DDRAGON_CHAMPS_DIR = path.join(__dirname, '..', 'public', 'ddragon', '16.14.1', 'data', 'en_US', 'champion');
 const OUTPUT_FILE = path.join(__dirname, '..', 'public', 'data', 'championHudMap.json');
 

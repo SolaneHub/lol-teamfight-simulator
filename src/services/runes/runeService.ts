@@ -9,7 +9,7 @@ export const getRuneIconUrl = (iconPath: string): string => {
   const cleanPath = path
     .replace('v1/perk-images/', 'runes/images/')
     .replace('perk-images/', 'runes/images/')
-  return `${import.meta.env.BASE_URL}out/${cleanPath}`
+  return `${import.meta.env.BASE_URL}cdragon/${cleanPath}`
 }
 
 export const mapRune = (raw: Record<string, unknown> | null | undefined): Rune => ({
@@ -61,8 +61,8 @@ export const runeService = {
 
       if (!perksData || !perkstylesData) {
         const [perksRes, stylesRes] = await Promise.all([
-          fetch(`${import.meta.env.BASE_URL}out/runes/perks.json`),
-          fetch(`${import.meta.env.BASE_URL}out/runes/perkstyles.json`),
+          fetch(`${import.meta.env.BASE_URL}cdragon/runes/perks.json`),
+          fetch(`${import.meta.env.BASE_URL}cdragon/runes/perkstyles.json`),
         ])
         perksData = await perksRes.json()
         perkstylesData = await stylesRes.json()

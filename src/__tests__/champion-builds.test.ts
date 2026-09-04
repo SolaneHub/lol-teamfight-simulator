@@ -8,7 +8,7 @@ describe('Champion Build Stat Computations', () => {
   it('should compute builds for standard champions and verify stats', () => {
     // Resolve paths
     const champPath = path.resolve(__dirname, './fixtures/championFull.json')
-    const itemsPath = path.resolve(__dirname, '../../out/items/items.json')
+    const itemsPath = path.resolve(__dirname, '../../public/cdragon/items/items.json')
 
     const championsData = JSON.parse(fs.readFileSync(champPath, 'utf8')).data
     const itemsData: Record<string, unknown>[] = JSON.parse(fs.readFileSync(itemsPath, 'utf8'))

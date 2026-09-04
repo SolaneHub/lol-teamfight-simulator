@@ -15,6 +15,9 @@
     "format": "prettier --write --experimental-cli src/",
     "test": "vitest run",
     "test:watch": "vitest",
+    "sync:ddragon": "node scripts/sync-ddragon.cjs",
+    "sync:cdragon": "pwsh ./scripts/download-cdragon.ps1",
+    "diff:patch": "node scripts/diff-patch.cjs",
     "prepare": "husky"
   },
   "dependencies": {

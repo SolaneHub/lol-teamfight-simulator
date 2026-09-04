@@ -148,10 +148,10 @@ export const getItemIconUrl = (item: Item, patch?: string): string => {
     if (patch) {
       return `https://raw.communitydragon.org/${patch}/plugins/rcp-be-lol-game-data/global/default/assets/items/icons2d/${filename}`
     }
-    return `${import.meta.env.BASE_URL}out/items/icons/${filename}`
+    return `${import.meta.env.BASE_URL}cdragon/items/icons/${filename}`
   }
   if (item.image?.full) {
-    return `${import.meta.env.BASE_URL}out/items/icons/${item.image.full.toLowerCase()}`
+    return `${import.meta.env.BASE_URL}cdragon/items/icons/${item.image.full.toLowerCase()}`
   }
   return ''
 }
@@ -383,20 +383,35 @@ export const itemService = {
       let itemData: unknown = null
       if (patch) {
         try {
-          const cdragonPatch = patch.split('.').slice(0, 2).join('.')
-          const cdragonRes = await fetch(
-            `https://raw.communitydragon.org/${cdragonPatch}/plugins/rcp-be-lol-game-data/global/default/v1/items.json`,
-          )
-          if (cdragonRes.ok) {
-            itemData = await cdragonRes.json()
+          // Try local frozen DDragon items first
+          const localRes = await fetch(`${import.meta.env.BASE_URL}ddragon/${patch}/item.json`)
+          if (localRes.ok) {
+            const json = await localRes.json()
+            if (json && json.data) {
+              itemData = Object.values(json.data)
+            }
           }
         } catch {
-          // Gracefully fallback to local JSON assets if remote CDragon CDN is unreachable
+          // Fallback to cdragon
+        }
+
+        if (!itemData) {
+          try {
+            const cdragonPatch = patch.split('.').slice(0, 2).join('.')
+            const cdragonRes = await fetch(
+              `https://raw.communitydragon.org/${cdragonPatch}/plugins/rcp-be-lol-game-data/global/default/v1/items.json`,
+            )
+            if (cdragonRes.ok) {
+              itemData = await cdragonRes.json()
+            }
+          } catch {
+            // Fallback to local cdragon
+          }
         }
       }
 
       if (!itemData) {
-        const res = await fetch(`${import.meta.env.BASE_URL}out/items/items.json`)
+        const res = await fetch(`${import.meta.env.BASE_URL}cdragon/items/items.json`)
         itemData = await res.json()
       }
 

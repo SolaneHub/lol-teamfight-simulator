@@ -308,14 +308,30 @@ export const championService = {
     const champFullUrl = `${baseUrl}/championFull.json`
 
     try {
-      const response = await fetch(champFullUrl)
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch champions for patch ${targetPatch}: ${response.statusText}`,
-        )
+      let data: Record<string, unknown> | null = null
+
+      // Try local frozen DDragon data first
+      try {
+        const localRes = await fetch(`${import.meta.env.BASE_URL}ddragon/${targetPatch}/championFull.json`)
+        if (localRes.ok) {
+          data = await localRes.json()
+        }
+      } catch {
+        // Fallback to online CDN
       }
-      const data = await response.json()
-      const rawData: Record<string, unknown> = data.data || {}
+
+      // Online CDN fallback
+      if (!data) {
+        const response = await fetch(champFullUrl)
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch champions for patch ${targetPatch}: ${response.statusText}`,
+          )
+        }
+        data = await response.json()
+      }
+
+      const rawData: Record<string, unknown> = (data?.data as Record<string, unknown>) || {}
 
       return Object.values(rawData || {})
         .filter((champObj: unknown) => {

@@ -5,7 +5,7 @@ import { parseStatsFromDescription, parseItemStatsFromDescription } from '../ser
 
 describe('Item Stat Extraction', () => {
   it('should parse stats correctly and detect any unparsed lines inside <stats> tags', () => {
-    const itemsPath = path.resolve(__dirname, '../../out/items/items.json')
+    const itemsPath = path.resolve(__dirname, '../../public/cdragon/items/items.json')
     const itemsData = JSON.parse(fs.readFileSync(itemsPath, 'utf8'))
 
     let unparsedStatsCount = 0

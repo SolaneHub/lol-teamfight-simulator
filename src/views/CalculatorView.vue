@@ -319,9 +319,15 @@
             </div>
             <div>
               <span class="text-slate-500 block text-base">AP</span
-              ><span class="text-cyan-400 font-bold text-lg">{{
-                getCalculatedStatsForSlot(slot)?.ap
-              }}</span>
+              ><span class="text-cyan-400 font-bold text-lg"
+                >{{ getCalculatedStatsForSlot(slot)?.ap }}
+                <span
+                  v-if="getCalculatedStatsForSlot(slot)?.blackfireBonusAp"
+                  class="text-xs text-cyan-300 font-normal block sm:inline"
+                >
+                  (+{{ getCalculatedStatsForSlot(slot)?.blackfireBonusAp }})
+                </span>
+              </span>
             </div>
             <div>
               <span class="text-slate-500 block text-base">Crit</span
@@ -961,10 +967,34 @@ const getCalculatedStatsForSlot = (slot: DraftSlot) => {
   const isAttacker = blueDraft.value.some((b) => b.id === slot.id)
   const mStats = calculateMonsterBuffStats(isAttacker ? attackerBuffs.value : defenderBuffs.value)
 
+  const itemPassives = detectItemPassives(slot.items)
+  let blackfireBonusAp = 0
+  let baseAp = Math.round((base.ap.total + mStats.bonusAP) * mStats.apMultiplier)
+
+  if (itemPassives.hasBlackfireTorch) {
+    // Find max targets hit by an ability action for this slot in current teamfightActions
+    let maxTargetsHit = 0
+    teamfightActions.value.forEach((actStep) => {
+      if (actStep.actorSlotId === slot.id && ['Q', 'W', 'E', 'R', 'P'].includes(actStep.action)) {
+        const count = Math.min(5, Math.max(1, actStep.targetSlotIds.length))
+        if (count > maxTargetsHit) {
+          maxTargetsHit = count
+        }
+      }
+    })
+    if (maxTargetsHit > 0) {
+      const extraApPct = maxTargetsHit * 0.04
+      const effectiveAp = Math.round(baseAp * (1 + extraApPct))
+      blackfireBonusAp = effectiveAp - baseAp
+    }
+  }
+
   return {
     ad: Math.round((base.ad.total + mStats.bonusAD) * mStats.adMultiplier),
     baseAd: Math.round(base.ad.base * mStats.adMultiplier),
-    ap: Math.round((base.ap.total + mStats.bonusAP) * mStats.apMultiplier),
+    ap: baseAp + blackfireBonusAp,
+    baseAp,
+    blackfireBonusAp,
     mana: base.mp.total,
     hp: base.hp.total + mStats.bonusShield,
     armor: Math.round(base.armor.total * mStats.armorMultiplier),

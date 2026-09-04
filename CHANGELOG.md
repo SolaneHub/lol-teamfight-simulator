@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-09-04
+
+### Added
+- **Automated Patch Pipeline & Semantic Diff**: Added `diff-patch.cjs` to categorize patch updates into safe numeric changes vs reworks/mechanic changes.
+- **GitHub Action Automation**: Integrated complete patch update & deploy workflow (`deploy.yml`) with automated test runs, artifact upload, and automated Pull Requests on safe diff reports.
+- **DDragon Offline Sync Utility**: Added `sync-ddragon.cjs` downloading deterministic, frozen JSON files (`championFull`, `item`, `runesReforged`).
+- **Headless CDragon Downloader**: Replaced manual binaries with `scripts/download-cdragon.ps1` that automatically downloads and manages `snip-snip` without committing executables.
+- **Blackfire Torch Stack Calculations**: Integrated dynamic AP escalation based on maximum ability targets hit in `CalculatorView.vue`.
+
+### Changed / Refactored
+- **Public Directory Reorganization**: Centralized static assets cleanly under `public/`:
+  - `public/cdragon/`: Community Dragon game data and 2D assets.
+  - `public/ddragon/`: Frozen Data Dragon JSON assets per patch version.
+  - `public/data/`: Generated spell formulas and HUD mappings.
+- **Vite Configuration Streamlining**: Removed manual stream file-serving and directory copy plugins in `vite.config.ts`, delegating asset serving natively to Vite.
+- **Repository Cleanup**: Removed deprecated `snip-snip-win-x64/` directory and obsolete `update-patches.yml` workflow.
+
+### Fixed
+- **Patch Selector Version Format**: Resolved 404 network failure on patch switching by transmitting valid semantic patch versions (`16.16.1`) while displaying short labels (`16.16`).
+- **Offline Patch Switching**: Enabled instant fallback to local `public/ddragon/{patch}` assets for champions and items.
+
+---
+
 ## [1.1.0] - 2026-08-04
 
 ### Added

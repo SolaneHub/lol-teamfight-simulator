@@ -13,6 +13,8 @@ dist
 dist-ssr
 coverage
 *.local
+scripts/.bin/
+*.exe
 
 # Editor directories and files
 .vscode/*

@@ -9,7 +9,7 @@
  * - Red Buff (Crest of Cinders burn & slow)
  * - Blue Buff (Crest of Insight +10 AH & Mana Regen)
  *
- * Sources: Authentic Riot Game Data in `out/monsters/`
+ * Sources: Authentic Riot Game Data in `public/cdragon/monsters/`
  */
 
 export interface SideBuffs {
