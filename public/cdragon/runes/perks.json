@@ -907,7 +907,7 @@
     "majorChangePatchVersion": "",
     "tooltip": "Attacking and moving builds Energy stacks. At 100 stacks, your next attack is Energized.<br><br>Energized attacks heal you for <healing>@HealAmount@ Health</healing> and grant <speed>@MoveSpeedCalc@ Move Speed</speed> for 1s.<br><rules><br>Healing from minions is 15% effective<br></rules><hr><br>Total Healing: @f1@",
     "shortDesc": "Attacking and moving builds Energy stacks. At 100 stacks, your next attack heals you and grants increased <lol-uikit-tooltipped-keyword key='LinkTooltip_Description_MS'>MS</lol-uikit-tooltipped-keyword>.",
-    "longDesc": "Attacking and moving builds Energy stacks. At 100 stacks, your next attack is Energized<br><br>Energized attacks heal you for 10 - 130 (+0.1 Bonus AD, +0.05 AP) and grant <speed>20% Move Speed</speed> for 1s.<br><br>For Ranged Champions, Healing is 60% effective and Move Speed is 75% effective. All healing is 15% effective against Minions.",
+    "longDesc": "Attacking and moving builds Energy stacks. At 100 stacks, your next attack is Energized<br><br>Energized attacks heal you for 15 - 160 (+0.1 Bonus AD, +0.05 AP) and grant <speed>20% Move Speed</speed> for 1s.<br><br>For Ranged Champions, Healing is 60% effective and Move Speed is 75% effective. All healing is 15% effective against Minions.",
     "recommendationDescriptor": "Movement, Health Recovery",
     "iconPath": "/lol-game-data/assets/v1/perk-images/Styles/Precision/FleetFootwork/FleetFootwork.png",
     "endOfGameStatDescs": [
@@ -1335,7 +1335,7 @@
     "majorChangePatchVersion": "16.9",
     "tooltip": "When you attack an enemy champion, for up to @NumHits@ attacks, gain {{ Item_Melee_Ranged_Split }}% Attack Speed and deal <font color='#48C4B7'>@BonusDamage@</font> <trueDamage>bonus true damage</trueDamage>. <br><br>Cooldown: @Cooldown@s.<br><hr><br>Hail of Blades attacks: @f1@<br>Damage Dealt: @f2@<br>Percentage of Hail attacks landed: @f3@%<br><br><rules>Basic Attack resets increase the attack limit by +1, up to +@MaxBonusHits@.<br>Allows you to temporarily exceed the Attack Speed limit.</rules>",
     "shortDesc": "Gain a large amount of Attack Speed and <trueDamage>bonus true damage</trueDamage> for the first 3 attacks made against enemy champions.",
-    "longDesc": "Gain 120% (60% for ranged champions) Attack Speed and <trueDamage>bonus true damage</trueDamage> when you attack an enemy champion for up to 3 attacks.<br><br>No more than 3s can elapse between attacks or this effect will end.<br><br>Cooldown: 10s.<br>On-Hit Damage: 4 - 20 (+0.08 bonus AD, +0.06 AP) damage.<br><br><rules>Attack resets increase the attack limit by 1.<br>Allows you to temporarily exceed the Attack Speed limit.</rules>",
+    "longDesc": "Gain 90% (60% for ranged champions) Attack Speed and <trueDamage>bonus true damage</trueDamage> when you attack an enemy champion for up to 3 attacks.<br><br>No more than 3s can elapse between attacks or this effect will end.<br><br>Cooldown: 10s.<br>On-Hit Damage: 2 - 20 (+0.12 bonus AD, +0.1 AP) damage.<br><br><rules>Attack resets increase the attack limit by 1.<br>Allows you to temporarily exceed the Attack Speed limit.</rules>",
     "recommendationDescriptor": "Flurry of Attacks",
     "iconPath": "/lol-game-data/assets/v1/perk-images/Styles/Domination/HailOfBlades/HailOfBlades.png",
     "endOfGameStatDescs": [
@@ -1466,9 +1466,9 @@
     "id": 8316,
     "name": "Jack Of All Trades",
     "majorChangePatchVersion": "9.6",
-    "tooltip": "For each different stat gained from items, gain one Jack stack. Each stack grants you <speed>1 Ability Haste</speed>.<br><br>Gain 10 or 25 bonus <lol-uikit-tooltipped-keyword key='LinkTooltip_Description_Adaptive'>Adaptive Force</lol-uikit-tooltipped-keyword> at 5 and 10 stacks, respectively.<br><hr><br>Different Stats: @f1@<br>Bonus Adaptive Force: +@f2@",
+    "tooltip": "For each different stat gained from items, gain one Jack stack. Each stack grants you <speed>1 Ability Haste</speed>.<br><br>Gain 8 or 20 bonus <lol-uikit-tooltipped-keyword key='LinkTooltip_Description_Adaptive'>Adaptive Force</lol-uikit-tooltipped-keyword> at 5 and 10 stacks, respectively.<br><hr><br>Different Stats: @f1@<br>Bonus Adaptive Force: +@f2@",
     "shortDesc": "For each different stat gained from items, gain one Jack stack. Each stack grants you <speed>1 Ability Haste</speed>.<br><br>Gain bonus <lol-uikit-tooltipped-keyword key='LinkTooltip_Description_Adaptive'>Adaptive Force</lol-uikit-tooltipped-keyword> at 5 and 10 stacks.",
-    "longDesc": "For each different stat gained from items, gain one Jack stack. Each stack grants you <speed>1 Ability Haste</speed>.<br><br>Gain 10 or 25 bonus <lol-uikit-tooltipped-keyword key='LinkTooltip_Description_Adaptive'>Adaptive Force</lol-uikit-tooltipped-keyword> at 5 and 10 stacks, respectively.",
+    "longDesc": "For each different stat gained from items, gain one Jack stack. Each stack grants you <speed>1 Ability Haste</speed>.<br><br>Gain 8 or 20 bonus <lol-uikit-tooltipped-keyword key='LinkTooltip_Description_Adaptive'>Adaptive Force</lol-uikit-tooltipped-keyword> at 5 and 10 stacks, respectively.",
     "recommendationDescriptor": "",
     "iconPath": "/lol-game-data/assets/v1/perk-images/Styles/Inspiration/JackOfAllTrades/JackofAllTrades2.png",
     "endOfGameStatDescs": [

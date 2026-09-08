@@ -2109,28 +2109,6 @@
       }
     },
     "AsheQ": {
-      "e1": {
-        "base": [
-          4
-        ],
-        "type": "magic"
-      },
-      "e2": {
-        "base": [
-          4
-        ],
-        "type": "magic"
-      },
-      "e4": {
-        "base": [
-          20,
-          30,
-          40,
-          50,
-          60
-        ],
-        "type": "magic"
-      },
       "empowereddamage": {
         "base": [],
         "scalings": [
@@ -2144,12 +2122,6 @@
             ],
             "stat": "totalAd"
           }
-        ],
-        "type": "magic"
-      },
-      "e3": {
-        "base": [
-          6
         ],
         "type": "magic"
       }
@@ -2818,12 +2790,6 @@
       }
     },
     "AzirW": {
-      "e1": {
-        "base": [
-          10
-        ],
-        "type": "magic"
-      },
       "totaldamage": {
         "base": [
           50,
@@ -2883,12 +2849,6 @@
         ],
         "type": "magic"
       },
-      "e6": {
-        "base": [
-          1.5
-        ],
-        "type": "magic"
-      },
       "totaldamage": {
         "base": [
           70,
@@ -2923,11 +2883,11 @@
         ],
         "type": "magic"
       },
-      "e4": {
+      "wallduration": {
         "base": [
           5
         ],
-        "type": "magic"
+        "type": "status"
       }
     }
   },
@@ -3129,14 +3089,6 @@
           3
         ],
         "type": "status"
-      }
-    },
-    "BardE": {
-      "e1": {
-        "base": [
-          10
-        ],
-        "type": "magic"
       }
     },
     "BardR": {
@@ -3390,18 +3342,6 @@
         ],
         "type": "status"
       },
-      "steroidduration": {
-        "base": [
-          60
-        ],
-        "type": "status"
-      },
-      "voidduration": {
-        "base": [
-          180
-        ],
-        "type": "status"
-      },
       "totalexplosiondamage": {
         "base": [
           150,
@@ -3458,16 +3398,6 @@
         ],
         "type": "magic"
       },
-      "oocms": {
-        "base": [
-          10,
-          45,
-          80,
-          115,
-          150
-        ],
-        "type": "status"
-      },
       "bonusaarange": {
         "base": [
           75
@@ -3481,6 +3411,12 @@
           20,
           25,
           30.000001
+        ],
+        "type": "status"
+      },
+      "steroidduration": {
+        "base": [
+          60
         ],
         "type": "status"
       }
@@ -4619,18 +4555,6 @@
       }
     },
     "CaitlynE": {
-      "e3": {
-        "base": [
-          50
-        ],
-        "type": "magic"
-      },
-      "e2": {
-        "base": [
-          1
-        ],
-        "type": "magic"
-      },
       "netdamage": {
         "base": [
           80,
@@ -6002,40 +5926,6 @@
         "type": "magic"
       }
     },
-    "DravenFury": {
-      "e2": {
-        "base": [
-          50,
-          55,
-          60,
-          65,
-          70
-        ],
-        "type": "magic"
-      },
-      "e3": {
-        "base": [
-          1.5
-        ],
-        "type": "magic"
-      },
-      "e4": {
-        "base": [
-          20,
-          25,
-          30,
-          35,
-          40
-        ],
-        "type": "magic"
-      },
-      "e5": {
-        "base": [
-          3
-        ],
-        "type": "magic"
-      }
-    },
     "DravenDoubleShot": {
       "totaldamage": {
         "base": [
@@ -6050,22 +5940,6 @@
             "ratio": 0.5,
             "stat": "totalAd"
           }
-        ],
-        "type": "magic"
-      },
-      "e2": {
-        "base": [
-          20,
-          25,
-          30,
-          35,
-          40
-        ],
-        "type": "magic"
-      },
-      "e3": {
-        "base": [
-          2
         ],
         "type": "magic"
       }
@@ -6520,16 +6394,6 @@
         ],
         "type": "magic"
       },
-      "e2": {
-        "base": [
-          40,
-          45,
-          50,
-          55,
-          60
-        ],
-        "type": "magic"
-      },
       "recalldamage": {
         "base": [
           40,
@@ -6548,6 +6412,12 @@
       }
     },
     "EkkoW": {
+      "belowhealththreshold*100": {
+        "base": [
+          30.000001
+        ],
+        "type": "status"
+      },
       "missinghealthpercent": {
         "base": [
           0.03,
@@ -6563,12 +6433,6 @@
           }
         ],
         "type": "status"
-      },
-      "e2": {
-        "base": [
-          2.25
-        ],
-        "type": "magic"
       },
       "totalshield": {
         "base": [
@@ -9112,12 +8976,6 @@
       }
     },
     "GravesSmokeGrenade": {
-      "e2": {
-        "base": [
-          50
-        ],
-        "type": "magic"
-      },
       "impactdamage": {
         "base": [
           60,
@@ -11257,12 +11115,6 @@
           }
         ],
         "type": "magic"
-      },
-      "e3": {
-        "base": [
-          3
-        ],
-        "type": "magic"
       }
     }
   },
@@ -13014,38 +12866,8 @@
         "type": "magic"
       }
     },
-    "KarthusWallOfPain": {
-      "e4": {
-        "base": [
-          5
-        ],
-        "type": "magic"
-      },
-      "e1": {
-        "base": [
-          25
-        ],
-        "type": "magic"
-      },
-      "e5": {
-        "base": [
-          5
-        ],
-        "type": "magic"
-      },
-      "e3": {
-        "base": [
-          40,
-          50,
-          60,
-          70,
-          80
-        ],
-        "type": "magic"
-      }
-    },
     "KarthusDefile": {
-      "e2": {
+      "manarestoreonkill": {
         "base": [
           10,
           20,
@@ -13053,7 +12875,7 @@
           40,
           50
         ],
-        "type": "magic"
+        "type": "status"
       },
       "totaldps": {
         "base": [
@@ -13344,24 +13166,6 @@
           2
         ],
         "type": "status"
-      }
-    },
-    "KatarinaW": {
-      "e4": {
-        "base": [
-          50,
-          60,
-          70,
-          80,
-          90
-        ],
-        "type": "magic"
-      },
-      "e2": {
-        "base": [
-          1.25
-        ],
-        "type": "magic"
       }
     },
     "KatarinaEWrapper": {
@@ -14297,13 +14101,13 @@
         ],
         "type": "status"
       },
-      "e8": {
+      "baseasduration": {
         "base": [
           4
         ],
-        "type": "magic"
+        "type": "status"
       },
-      "e4": {
+      "cdnewvalue": {
         "base": [
           4,
           3.5,
@@ -14311,7 +14115,7 @@
           2.5,
           2
         ],
-        "type": "magic"
+        "type": "status"
       }
     },
     "KindredW": {
@@ -14426,19 +14230,21 @@
       }
     },
     "KindredR": {
-      "e2": {
+      "buffduration": {
         "base": [
           4
         ],
-        "type": "magic"
+        "type": "status"
       },
-      "e1": {
+      "healflat": {
         "base": [
           225,
           300,
-          375
+          375,
+          450,
+          525
         ],
-        "type": "magic"
+        "type": "status"
       }
     }
   },
@@ -15802,12 +15608,6 @@
       }
     },
     "LeonaShieldOfDaybreak": {
-      "e1": {
-        "base": [
-          1
-        ],
-        "type": "magic"
-      },
       "totaldamagetooltip": {
         "base": [
           10,
@@ -15868,12 +15668,6 @@
         ],
         "type": "magic"
       },
-      "e3": {
-        "base": [
-          3
-        ],
-        "type": "magic"
-      },
       "totaldamagetooltip": {
         "base": [
           55,
@@ -15905,12 +15699,6 @@
             "ratio": 0.4,
             "stat": "totalAp"
           }
-        ],
-        "type": "magic"
-      },
-      "e2": {
-        "base": [
-          0.5
         ],
         "type": "magic"
       }
@@ -16299,34 +16087,24 @@
         ],
         "type": "magic"
       },
-      "e3": {
+      "slowpercentage*-100": {
         "base": [
           20,
-          24,
+          23.999999,
           28,
-          32,
-          36
+          31.999999,
+          36.000001
         ],
-        "type": "magic"
+        "type": "status"
       },
-      "e2": {
+      "slowduration": {
         "base": [
           1.5
         ],
-        "type": "magic"
+        "type": "status"
       }
     },
     "LissandraW": {
-      "e2": {
-        "base": [
-          1.25,
-          1.35,
-          1.45,
-          1.55,
-          1.65
-        ],
-        "type": "magic"
-      },
       "totaldamage": {
         "base": [
           70,
@@ -16816,16 +16594,6 @@
         ],
         "type": "magic"
       },
-      "executionthreshold*100": {
-        "base": [
-          10,
-          11,
-          12,
-          13,
-          14
-        ],
-        "type": "status"
-      },
       "executethresholdperstack*100": {
         "base": [
           0.5
@@ -17187,45 +16955,9 @@
           }
         ],
         "type": "status"
-      },
-      "e7": {
-        "base": [
-          20,
-          22.5,
-          25,
-          27.5,
-          30
-        ],
-        "type": "magic"
-      },
-      "e5": {
-        "base": [
-          3,
-          3.25,
-          3.5,
-          3.75,
-          4
-        ],
-        "type": "magic"
-      },
-      "e3": {
-        "base": [
-          1.2,
-          1.4,
-          1.6,
-          1.8,
-          2
-        ],
-        "type": "magic"
       }
     },
     "LuluE": {
-      "e1": {
-        "base": [
-          6
-        ],
-        "type": "magic"
-      },
       "totalshield": {
         "base": [
           70,
@@ -17242,11 +16974,11 @@
         ],
         "type": "magic"
       },
-      "e7": {
+      "shieldduration": {
         "base": [
           2.5
         ],
-        "type": "magic"
+        "type": "status"
       },
       "totaldamage": {
         "base": [
@@ -17261,12 +16993,6 @@
             "ratio": 0.5,
             "stat": "totalAp"
           }
-        ],
-        "type": "magic"
-      },
-      "e6": {
-        "base": [
-          4
         ],
         "type": "magic"
       }
@@ -17505,15 +17231,15 @@
         ],
         "type": "magic"
       },
-      "e2": {
+      "speedsteal": {
         "base": [
+          15,
           20,
           25,
           30,
-          35,
-          40
+          35
         ],
-        "type": "magic"
+        "type": "status"
       },
       "slowduration": {
         "base": [
@@ -19555,6 +19281,16 @@
       }
     },
     "MordekaiserE": {
+      "magicpen*100": {
+        "base": [
+          5,
+          7.5,
+          10,
+          12.5,
+          15.000001
+        ],
+        "type": "status"
+      },
       "totaldamage": {
         "base": [
           60,
@@ -20187,12 +19923,6 @@
       }
     },
     "NamiQ": {
-      "e2": {
-        "base": [
-          1.5
-        ],
-        "type": "magic"
-      },
       "totaldamagett": {
         "base": [
           90,
@@ -20319,12 +20049,6 @@
       }
     },
     "NamiR": {
-      "e4": {
-        "base": [
-          70
-        ],
-        "type": "magic"
-      },
       "totaldamage": {
         "base": [
           150,
@@ -20338,12 +20062,6 @@
             "ratio": 0.6,
             "stat": "totalAp"
           }
-        ],
-        "type": "magic"
-      },
-      "e5": {
-        "base": [
-          4
         ],
         "type": "magic"
       }
@@ -20983,12 +20701,6 @@
             "ratio": 0.05,
             "stat": "totalAp"
           }
-        ],
-        "type": "magic"
-      },
-      "e3": {
-        "base": [
-          4
         ],
         "type": "magic"
       },
@@ -22820,16 +22532,6 @@
           }
         ],
         "type": "magic"
-      },
-      "slow_": {
-        "base": [
-          20,
-          25,
-          30,
-          35,
-          40
-        ],
-        "type": "status"
       },
       "delaybetweentwohits": {
         "base": [
@@ -26203,12 +25905,6 @@
           }
         ],
         "type": "magic"
-      },
-      "e4": {
-        "base": [
-          0.5
-        ],
-        "type": "magic"
       }
     },
     "SejuaniW": {
@@ -26269,21 +25965,9 @@
           }
         ],
         "type": "magic"
-      },
-      "e1": {
-        "base": [
-          1
-        ],
-        "type": "magic"
       }
     },
     "SejuaniR": {
-      "e2": {
-        "base": [
-          1
-        ],
-        "type": "magic"
-      },
       "minordamagetooltip": {
         "base": [
           125,
@@ -26295,24 +25979,6 @@
             "ratio": 0.4,
             "stat": "totalAp"
           }
-        ],
-        "type": "magic"
-      },
-      "e6": {
-        "base": [
-          1.5
-        ],
-        "type": "magic"
-      },
-      "e4": {
-        "base": [
-          80
-        ],
-        "type": "magic"
-      },
-      "e3": {
-        "base": [
-          2
         ],
         "type": "magic"
       },
@@ -27284,12 +26950,6 @@
       }
     },
     "JackInTheBox": {
-      "e5": {
-        "base": [
-          2
-        ],
-        "type": "magic"
-      },
       "trapduration": {
         "base": [
           40,
@@ -28373,12 +28033,6 @@
         ],
         "type": "magic"
       },
-      "e7": {
-        "base": [
-          3
-        ],
-        "type": "magic"
-      },
       "totaldamage": {
         "base": [
           40,
@@ -28392,12 +28046,6 @@
             "ratio": 0.4,
             "stat": "totalAp"
           }
-        ],
-        "type": "magic"
-      },
-      "e4": {
-        "base": [
-          14
         ],
         "type": "magic"
       }
@@ -31098,16 +30746,6 @@
       }
     },
     "TaricQ": {
-      "e6": {
-        "base": [
-          1,
-          2,
-          3,
-          4,
-          5
-        ],
-        "type": "magic"
-      },
       "stackcooldown": {
         "base": [
           15,
@@ -31175,31 +30813,9 @@
           }
         ],
         "type": "magic"
-      },
-      "e2": {
-        "base": [
-          7,
-          8,
-          9,
-          10,
-          11
-        ],
-        "type": "magic"
-      },
-      "e3": {
-        "base": [
-          2.5
-        ],
-        "type": "magic"
       }
     },
     "TaricE": {
-      "e3": {
-        "base": [
-          1
-        ],
-        "type": "magic"
-      },
       "totaldamage": {
         "base": [
           90,
@@ -31217,12 +30833,6 @@
             "ratio": 0.5,
             "stat": "bonusAd"
           }
-        ],
-        "type": "magic"
-      },
-      "e2": {
-        "base": [
-          1.5
         ],
         "type": "magic"
       }
@@ -31531,22 +31141,6 @@
         ],
         "type": "magic"
       },
-      "e2": {
-        "base": [
-          20,
-          25,
-          30,
-          35,
-          40
-        ],
-        "type": "magic"
-      },
-      "e4": {
-        "base": [
-          1
-        ],
-        "type": "magic"
-      },
       "totaldamage": {
         "base": [
           75,
@@ -31565,18 +31159,6 @@
       }
     },
     "ThreshRPenta": {
-      "e3": {
-        "base": [
-          99
-        ],
-        "type": "magic"
-      },
-      "e2": {
-        "base": [
-          2
-        ],
-        "type": "magic"
-      },
       "totaldamage": {
         "base": [
           250,
@@ -35060,12 +34642,6 @@
         ],
         "type": "magic"
       },
-      "e8": {
-        "base": [
-          2.5
-        ],
-        "type": "magic"
-      },
       "empowereddamagetooltip": {
         "base": [
           80,
@@ -35233,15 +34809,17 @@
       }
     },
     "VladimirHemoplague": {
-      "e2": {
+      "damageamp": {
         "base": [
-          10
+          150,
+          250,
+          350
         ],
-        "type": "magic"
-      },
-      "e4": {
-        "base": [
-          4
+        "scalings": [
+          {
+            "ratio": 0.7,
+            "stat": "totalAp"
+          }
         ],
         "type": "magic"
       },
@@ -35666,16 +35244,6 @@
           10
         ],
         "type": "status"
-      },
-      "e3": {
-        "base": [
-          25,
-          37.5,
-          50,
-          62.5,
-          75
-        ],
-        "type": "magic"
       }
     },
     "WarwickW": {
@@ -35698,24 +35266,6 @@
           110
         ],
         "type": "status"
-      }
-    },
-    "WarwickE": {
-      "e1": {
-        "base": [
-          35,
-          40,
-          45,
-          50,
-          55
-        ],
-        "type": "magic"
-      },
-      "e3": {
-        "base": [
-          1
-        ],
-        "type": "magic"
       }
     },
     "WarwickR": {
@@ -36510,16 +36060,6 @@
           4
         ],
         "type": "status"
-      },
-      "e2": {
-        "base": [
-          10,
-          9,
-          8,
-          7,
-          6
-        ],
-        "type": "magic"
       }
     },
     "YasuoR": {
@@ -38160,24 +37700,6 @@
         "type": "magic"
       }
     },
-    "ZedW": {
-      "e3": {
-        "base": [
-          30,
-          35,
-          40,
-          45,
-          50
-        ],
-        "type": "magic"
-      },
-      "e5": {
-        "base": [
-          5
-        ],
-        "type": "magic"
-      }
-    },
     "ZedE": {
       "totaldamage": {
         "base": [
@@ -39179,18 +38701,6 @@
       }
     },
     "ZyraW": {
-      "e6": {
-        "base": [
-          60
-        ],
-        "type": "magic"
-      },
-      "e3": {
-        "base": [
-          2
-        ],
-        "type": "magic"
-      },
       "ammorechargetime": {
         "base": [
           18,
@@ -39200,39 +38710,10 @@
           12
         ],
         "type": "status"
-      },
-      "e1": {
-        "base": [
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50
-        ],
-        "type": "magic"
-      },
-      "e2": {
-        "base": [
-          100
-        ],
-        "type": "magic"
       }
     },
     "ZyraE": {
-      "e5": {
+      "rootduration": {
         "base": [
           1,
           1.25,
@@ -39240,7 +38721,7 @@
           1.75,
           2
         ],
-        "type": "magic"
+        "type": "status"
       },
       "totaldamage": {
         "base": [
@@ -39293,18 +38774,6 @@
         ],
         "type": "status"
       },
-      "e2": {
-        "base": [
-          30
-        ],
-        "type": "magic"
-      },
-      "e3": {
-        "base": [
-          2
-        ],
-        "type": "magic"
-      },
       "maxslowstacks": {
         "base": [
           2
@@ -39324,35 +38793,6 @@
             "ratio": 0.7,
             "stat": "totalAp"
           }
-        ],
-        "type": "magic"
-      },
-      "e1": {
-        "base": [
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50,
-          50
-        ],
-        "type": "magic"
-      },
-      "e2": {
-        "base": [
-          50
         ],
         "type": "magic"
       },
