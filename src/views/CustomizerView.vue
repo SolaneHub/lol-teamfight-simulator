@@ -50,6 +50,36 @@
                   {{ activeCustomizerSlot.side === 'blue' ? 'Blue Team' : 'Red Team' }} -
                   {{ activeCustomizerSlot.role }}
                 </span>
+
+                <!-- Mid Lane Quest Toggle -->
+                <button
+                  v-if="activeCustomizerSlot.role === 'Mid'"
+                  @click="toggleQuestCompleted"
+                  :class="[
+                    'text-xs px-2.5 py-1 rounded-md font-mono font-semibold border flex items-center gap-1.5 transition-all cursor-pointer',
+                    activeCustomizerSlot.questCompleted
+                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.25)]'
+                      : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-slate-200 hover:border-slate-500',
+                  ]"
+                  :title="
+                    activeCustomizerSlot.questCompleted
+                      ? 'Mid Quest completata (+8% Bonus AD & +8% AP attivo). Clicca per disattivare.'
+                      : 'Clicca per completare la Mid Quest (+8% Bonus AD & +8% AP).'
+                  "
+                >
+                  <span>⚔️ Mid Quest:</span>
+                  <span
+                    :class="
+                      activeCustomizerSlot.questCompleted
+                        ? 'text-amber-300 font-bold'
+                        : 'text-slate-500'
+                    "
+                  >
+                    {{
+                      activeCustomizerSlot.questCompleted ? 'COMPLETED (+8% AD/AP)' : 'INCOMPLETE'
+                    }}
+                  </span>
+                </button>
               </div>
             </div>
           </div>
@@ -443,6 +473,7 @@
                           activeLevel,
                           activeCustomizerStats,
                           activeChampion!.id,
+                          activeCustomizerSlot?.role,
                         )
                       "
                     ></p>
@@ -617,8 +648,14 @@ import ItemTooltip from '@/components/customizer/ItemTooltip.vue'
 const draftStore = useDraftStore()
 
 const { activeCustomizerSlot } = storeToRefs(draftStore)
-const { removeRunePage, removeItemFromSlot, toggleMasterwork, setItemStack, setSpellRank } =
-  draftStore
+const {
+  removeRunePage,
+  removeItemFromSlot,
+  toggleMasterwork,
+  setItemStack,
+  setSpellRank,
+  toggleQuestCompleted,
+} = draftStore
 
 const ddragonStore = useDDragonStore()
 const { spellFormulasData } = storeToRefs(ddragonStore)
@@ -815,6 +852,8 @@ const getStatValue = (
       return stats.hp?.bonus || 0
     case 'totalHp':
       return stats.hp?.total || 0
+    case 'healShieldPower':
+      return stats.healShieldPower?.total || 0
     default:
       return 0
   }
@@ -836,6 +875,8 @@ const getStatLabel = (statKey: string): string => {
       return 'LS'
     case 'abilityHaste':
       return 'AH'
+    case 'healShieldPower':
+      return 'Heal & Shield Power'
     default:
       return ''
   }
@@ -1187,11 +1228,33 @@ const interpolateSpellTooltip = (
   return tooltip
 }
 
+const getExtrapolatedValueAtLevel = (arr: number[], targetLvl: number): number => {
+  if (!arr || arr.length === 0) return 0
+  if (targetLvl <= arr.length) return arr[targetLvl - 1] ?? arr[arr.length - 1] ?? 0
+  if (arr.length === 1) return arr[0] ?? 0
+
+  // If array covers standard levels 1-18 and champion reaches lvl 19 or 20 (Top Lane Quest)
+  if (arr.length === 18 && targetLvl > 18) {
+    const last = arr[17] ?? 0
+    const prev = arr[16] ?? 0
+    const diff = last - prev
+    // Only continue progressive scaling if there was an active increment at level 18
+    if (Math.abs(diff) > 0.0001) {
+      return last + diff * (targetLvl - 18)
+    }
+    // If it hit a plateau at or before level 18 (like Annie's stun 1.75s from lvl 11+), it stays at max cap
+    return last
+  }
+
+  return arr[arr.length - 1] ?? 0
+}
+
 const interpolatePassiveDescription = (
   passive: ChampionPassive | Record<string, unknown>,
   lvl: number,
   stats: ReturnType<typeof calculateStats> | null,
   champId: string,
+  role?: string,
 ): string => {
   if (!passive) return ''
   let text = (passive as { description?: string })?.description || ''
@@ -1218,7 +1281,7 @@ const interpolatePassiveDescription = (
 
       if (config && typeof config === 'object') {
         const baseArr = ((config as Record<string, unknown>).base as number[]) || []
-        const base = baseArr[lvl - 1] ?? baseArr[baseArr.length - 1] ?? 0
+        const base = getExtrapolatedValueAtLevel(baseArr, lvl)
         const scalings =
           ((config as Record<string, unknown>).scalings as Array<{
             ratio: number | number[]
@@ -1231,7 +1294,7 @@ const interpolatePassiveDescription = (
 
         for (const scale of scalings) {
           const ratioVal = Array.isArray(scale.ratio)
-            ? (scale.ratio[lvl - 1] ?? scale.ratio[scale.ratio.length - 1] ?? 0)
+            ? getExtrapolatedValueAtLevel(scale.ratio, lvl)
             : (scale.ratio ?? 0)
 
           const statValue = getStatValue(stats, scale.stat)
@@ -1253,17 +1316,19 @@ const interpolatePassiveDescription = (
         }
 
         const keyLower = key.toLowerCase()
+        const isCooldown =
+          keyLower.includes('cooldown') ||
+          keyLower.includes('duration') ||
+          keyLower.includes('stunduration')
         const isRatio =
-          keyLower.includes('ratio') ||
-          keyLower.includes('percent') ||
-          keyLower.includes('pct') ||
-          keyLower.includes('chance') ||
-          keyLower.includes('mod') ||
-          keyLower.includes('bonus') ||
-          keyLower.includes('reduction') ||
-          keyLower.includes('pdamage') ||
-          (base > 0 && base < 1)
-        const isCooldown = keyLower.includes('cooldown') || keyLower.includes('duration')
+          !isCooldown &&
+          (keyLower.includes('ratio') ||
+            keyLower.includes('percent') ||
+            keyLower.includes('pct') ||
+            keyLower.includes('chance') ||
+            keyLower.includes('reduction') ||
+            keyLower.includes('pdamage') ||
+            (base > 0 && base < 1))
 
         const rawVal = base + scalingBonus
         let displayVal = rawVal
@@ -1278,8 +1343,17 @@ const interpolatePassiveDescription = (
           unitSuffix = 's'
         }
 
-        displayVal = Math.round(displayVal)
-        const formattedBase = Math.round(isRatio && base <= 1.05 && base > 0 ? base * 100 : base)
+        // Keep up to 2 decimal places for cooldowns/durations and small numbers (e.g. Annie stun 1.25s / 1.5s / 1.75s)
+        const formatNumber = (num: number, isPct: boolean): number => {
+          if (isPct) return Math.round(num * 100) / 100
+          return Math.round(num * 100) / 100
+        }
+
+        displayVal = formatNumber(displayVal, isRatio)
+        const formattedBase = formatNumber(
+          isRatio && base <= 1.05 && base > 0 ? base * 100 : base,
+          isRatio,
+        )
 
         let colorClass = 'text-cyan-400'
         if (dmgType === 'physical') colorClass = 'text-orange-400'
@@ -1296,7 +1370,8 @@ const interpolatePassiveDescription = (
           !skipRangeKeys.includes(keyLower)
         ) {
           const firstVal = baseArr[0] ?? 0
-          const lastVal = baseArr[baseArr.length - 1] ?? 0
+          const maxLevelCap = role === 'Top' ? 20 : 18
+          const lastVal = getExtrapolatedValueAtLevel(baseArr, maxLevelCap)
           if (Math.abs(firstVal - lastVal) > 0.0001) {
             let formFirst = firstVal
             let formLast = lastVal
@@ -1304,8 +1379,8 @@ const interpolatePassiveDescription = (
               formFirst = firstVal <= 1.05 && firstVal > 0 ? firstVal * 100 : firstVal
               formLast = lastVal <= 1.05 && lastVal > 0 ? lastVal * 100 : lastVal
             }
-            formFirst = Math.round(formFirst)
-            formLast = Math.round(formLast)
+            formFirst = formatNumber(formFirst, isRatio)
+            formLast = formatNumber(formLast, isRatio)
             valHtml += ` <span class="text-slate-500 font-normal">(${formFirst}${unitSuffix} - ${formLast}${unitSuffix})</span>`
           }
         }

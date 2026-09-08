@@ -315,6 +315,22 @@
             </td>
           </tr>
 
+          <!-- Heal & Shield Power -->
+          <tr>
+            <td class="px-4 py-2 font-semibold text-slate-300">Heal & Shield Power</td>
+            <td class="px-4 py-2 text-right text-slate-400">0%</td>
+            <td class="px-4 py-2 text-right text-emerald-500">
+              {{
+                activeCustomizerStats.healShieldPower?.bonus > 0
+                  ? '+' + activeCustomizerStats.healShieldPower.bonus + '%'
+                  : '-'
+              }}
+            </td>
+            <td class="px-4 py-2 text-right font-bold text-white">
+              {{ activeCustomizerStats.healShieldPower?.total ?? 0 }}%
+            </td>
+          </tr>
+
           <!-- Range -->
           <tr>
             <td class="px-4 py-2 font-semibold text-slate-300">Attack Range</td>

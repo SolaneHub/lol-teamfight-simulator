@@ -475,6 +475,12 @@ export const useDraftStore = defineStore('draft', () => {
     }
   }
 
+  const toggleQuestCompleted = () => {
+    if (activeCustomizerSlot.value) {
+      activeCustomizerSlot.value.questCompleted = !activeCustomizerSlot.value.questCompleted
+    }
+  }
+
   return {
     blueDraft,
     redDraft,
@@ -504,5 +510,6 @@ export const useDraftStore = defineStore('draft', () => {
     toggleMasterwork,
     setItemStack,
     setSpellRank,
+    toggleQuestCompleted,
   }
 })

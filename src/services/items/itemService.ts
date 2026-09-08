@@ -1,4 +1,5 @@
 import type { Item, ItemStats } from '@/types'
+import itemIconMap from './itemIconMap.json'
 
 export const parseItemStatsFromDescription = (description: string): ItemStats => {
   const stats: ItemStats = {}
@@ -64,6 +65,7 @@ export const parseStatsFromDescription = (description: string) => {
     omnivamp: 0,
     hpRegenPercent: 0,
     manaRegenPercent: 0,
+    healShieldPower: 0,
   }
   if (!description) return result
 
@@ -100,6 +102,8 @@ export const parseStatsFromDescription = (description: string) => {
       result.hpRegenPercent += val
     } else if (name.includes('base mana regen')) {
       result.manaRegenPercent += val
+    } else if (name.includes('heal and shield power') || name.includes('heal & shield power')) {
+      result.healShieldPower += val
     }
   }
   return result
@@ -108,123 +112,256 @@ export const parseStatsFromDescription = (description: string) => {
 export const mapItem = (id: string, raw: Record<string, unknown> | null | undefined): Item => {
   const iconPath = (raw?.iconPath as string) || ''
   const filename = iconPath.split('/').pop()?.toLowerCase() || ''
+  const rawGold = (raw?.gold as Record<string, unknown>) || {}
+  const rawImage = (raw?.image as Record<string, unknown>) || {}
+
+  const priceTotal = (raw?.priceTotal as number) ?? (rawGold.total as number) ?? 0
+  const priceBase = (raw?.price as number) ?? (rawGold.base as number) ?? 0
+  const priceSell = (raw?.price as number) ?? (rawGold.sell as number) ?? 0
+  const inStore =
+    (raw?.inStore as boolean) ??
+    (raw?.inStore !== false && (rawGold.purchasable as boolean) !== false)
+
+  const imageFull = (rawImage.full as string) || filename
 
   return {
     id,
     name: (raw?.name as string) || '',
     description: (raw?.description as string) || '',
-    colloq: '',
+    colloq: (raw?.colloq as string) || '',
     image: {
-      full: filename,
-      sprite: '',
-      group: 'item',
-      x: 0,
-      y: 0,
-      w: 48,
-      h: 48,
+      full: imageFull,
+      sprite: (rawImage.sprite as string) || '',
+      group: (rawImage.group as string) || 'item',
+      x: (rawImage.x as number) || 0,
+      y: (rawImage.y as number) || 0,
+      w: (rawImage.w as number) || 48,
+      h: (rawImage.h as number) || 48,
     },
     gold: {
-      base: (raw?.price as number) || 0,
-      total: (raw?.priceTotal as number) || 0,
-      sell: (raw?.price as number) || 0,
-      purchasable: (raw?.inStore as boolean) ?? false,
+      base: priceBase,
+      total: priceTotal,
+      sell: priceSell,
+      purchasable: (rawGold.purchasable as boolean) ?? (inStore && priceTotal > 0),
     },
-    tags: (raw?.categories as string[]) || [],
-    stats: parseItemStatsFromDescription((raw?.description as string) || ''),
-    maps: {},
-    inStore: raw?.inStore as boolean,
-    requiredChampion: raw?.requiredChampion as string,
-    requiredAlly: raw?.requiredAlly as string,
+    tags: (raw?.categories as string[]) || (raw?.tags as string[]) || [],
+    stats:
+      (raw?.stats as Record<string, number>) ||
+      parseItemStatsFromDescription((raw?.description as string) || ''),
+    maps: (raw?.maps as Record<string, boolean>) || {},
+    inStore,
+    requiredChampion: (raw?.requiredChampion as string) || '',
+    requiredAlly: (raw?.requiredAlly as string) || '',
     from: ((raw?.from as (string | number)[]) || []).map((x) => x.toString()),
-    into: ((raw?.to as (string | number)[]) || []).map((x) => x.toString()),
+    into: ((raw?.to as (string | number)[]) || (raw?.into as (string | number)[]) || []).map((x) =>
+      x.toString(),
+    ),
     iconPath,
   }
 }
 
-export const getItemIconUrl = (item: Item, patch?: string): string => {
+export const getItemIconUrl = (item: Item): string => {
   if (!item) return ''
+  const mappedFilename = itemIconMap[item.id as keyof typeof itemIconMap]
+  if (mappedFilename) {
+    return `${import.meta.env.BASE_URL}cdragon/items/icons/${mappedFilename}`
+  }
   if (item.iconPath) {
     const filename = item.iconPath.split('/').pop()?.toLowerCase() || ''
-    if (patch) {
-      return `https://raw.communitydragon.org/${patch}/plugins/rcp-be-lol-game-data/global/default/assets/items/icons2d/${filename}`
-    }
     return `${import.meta.env.BASE_URL}cdragon/items/icons/${filename}`
   }
   if (item.image?.full) {
-    return `${import.meta.env.BASE_URL}cdragon/items/icons/${item.image.full.toLowerCase()}`
+    const filename = item.image.full.toLowerCase()
+    return `${import.meta.env.BASE_URL}cdragon/items/icons/${filename}`
   }
   return ''
 }
 
 export const itemClassMap: Record<string, string[]> = {
   // Starter items
-  "Doran's Blade": ['Fighter', 'Marksman'],
+  'Dark Seal': ['Mage'],
+  'Tear of the Goddess': ['Fighter', 'Marksman', 'Assassin', 'Mage', 'Tank', 'Support'],
   "Doran's Ring": ['Mage'],
-  "Doran's Shield": ['Tank'],
-  'Tear of the Goddess': ['Mage', 'Marksman'],
+  "Doran's Bow": ['Marksman'],
+  "Doran's Blade": ['Fighter', 'Marksman', 'Assassin'],
+  Cull: ['Fighter', 'Marksman', 'Assassin'],
+  "Doran's Helm": ['Tank'],
+  "Doran's Shield": ['Fighter', 'Marksman', 'Assassin', 'Mage', 'Tank'],
 
-  // Fighter
-  'Black Cleaver': ['Fighter'],
-  'Trinity Force': ['Fighter'],
-  "Sterak's Gage": ['Fighter'],
-  'Ravenous Hydra': ['Fighter'],
-  'Titanic Hydra': ['Fighter'],
-  Stridebreaker: ['Fighter'],
-  "Death's Dance": ['Fighter'],
+  // Basic
+  'Faerie Charm': ['Mage', 'Tank', 'Support'],
+  Dagger: ['Fighter', 'Assassin'],
+  'Glowing Mote': ['Fighter', 'Assassin', 'Support'],
+  'Sapphire Crystal': ['Mage', 'Tank'],
+  'Cloth Armor': ['Fighter', 'Assassin', 'Mage', 'Tank', 'Support'],
+  'Rejuvenation Bead': ['Tank'],
+  'Long Sword': ['Fighter', 'Assassin'],
+  'Amplifying Tome': ['Mage', 'Support'],
+  'Null-Magic Mantle': ['Fighter', 'Assassin', 'Mage', 'Tank', 'Support'],
+  'Ruby Crystal': ['Fighter', 'Assassin', 'Mage', 'Tank', 'Support'],
+  'Cloak of Agility': ['Marksman'],
+  'Blasting Wand': ['Mage'],
+  Pickaxe: ['Fighter', 'Assassin'],
+  'Needlessly Large Rod': ['Mage'],
+  'B. F. Sword': ['Fighter', 'Assassin'],
 
-  // Marksman
-  'Infinity Edge': ['Marksman'],
-  'Kraken Slayer': ['Marksman'],
-  "Lord Dominik's Regards": ['Marksman'],
-  Bloodthirster: ['Marksman'],
-  'Rapid Firecannon': ['Marksman'],
-  "Runaan's Hurricane": ['Marksman'],
-  'Statikk Shiv': ['Marksman'],
+  // Epic
+  'Forbidden Idol': ['Support'],
+  "Scout's Slingshot": ['Marksman'],
+  'Recurve Bow': ['Fighter', 'Marksman'],
+  Rectrix: ['Fighter', 'Marksman', 'Assassin'],
+  'Oblivion Orb': ['Mage', 'Support'],
+  "Executioner's Calling": ['Fighter', 'Marksman', 'Assassin'],
+  Kindlegem: ['Fighter', 'Mage', 'Tank', 'Support'],
+  'Chain Vest': ['Fighter', 'Tank'],
+  'Bramble Vest': ['Tank', 'Support'],
+  'Crystalline Bracer': ['Tank'],
+  'Winged Moonplate': ['Fighter', 'Tank', 'Support'],
+  'Fiendish Codex': ['Mage', 'Support'],
+  'Negatron Cloak': ['Fighter', 'Tank', 'Support'],
+  'Glacial Buckler': ['Tank', 'Support'],
+  'Aether Wisp': ['Mage', 'Support'],
+  'Fated Ashes': ['Mage'],
+  'Bandleglass Mirror': ['Support'],
+  'Vampiric Scepter': ['Fighter', 'Marksman'],
+  Sheen: ['Fighter', 'Marskman', 'Mage', 'Tank'],
+  "Bami's Cinder": ['Tank'],
+  "Giant's Belt": ['Mage', 'Tank', 'Support'],
+  'Serrated Dirk': ['Marksman', 'Assassin'],
+  "Warden's Mail": ['Tank', 'Support'],
+  "Caulfield's Warhammer": ['Fighter', 'Marskman', 'Assassin'],
+  'Hextech Alternator': ['Mage'],
+  'Blightning Jewel': ['Mage'],
+  'Steel Sigil': ['Fighter', 'Marksman', 'Assassin'],
+  Phage: ['Fighter'],
+  Tunneler: ['Fighter', 'Assassin', 'Tank'],
+  'Lost Chapter': ['Mage'],
+  Zeal: ['Marskman'],
+  'Hearthbound Axe': ['Fighter', 'Marskman'],
+  Tiamat: ['Fighter', 'Assassin', 'Tank'],
+  "Spectre's Cowl": ['Tank'],
+  'Catalyst of Aeons': ['Mage', 'Tank'],
+  'Haunting Guise': ['Mage'],
+  Noonquiver: ['Marskman'],
+  Hexdrinker: ['Fighter', 'Marskman', 'Assassin'],
+  'Quicksilver Sash': ['Marksman'],
+  'The Brutalizer': ['Assassin'],
+  'Last Whisper': ['Marksman', 'Assassin'],
+  'Verdant Barrier': ['Mage'],
+  "Seeker's Armguard": ['Mage'],
 
-  // Assassin
-  "Youmuu's Ghostblade": ['Assassin'],
-  Hubris: ['Assassin'],
-  "Serylda's Grudge": ['Assassin'],
-  Opportunity: ['Assassin'],
-  'Edge of Night': ['Assassin'],
-  'Profane Hydra': ['Assassin'],
-
-  // Mage
-  "Rabadon's Deathcap": ['Mage'],
-  "Luden's Companion": ['Mage'],
-  "Zhonya's Hourglass": ['Mage'],
-  "Banshee's Veil": ['Mage'],
-  Shadowflame: ['Mage'],
-  Stormsurge: ['Mage'],
-  "Liandry's Torment": ['Mage', 'Fighter'],
-  Riftmaker: ['Mage', 'Fighter'],
-  "Seraph's Embrace": ['Mage'],
-
-  // Tank
-  Thornmail: ['Tank'],
-  "Warmog's Armor": ['Tank'],
-  'Sunfire Aegis': ['Tank'],
-  "Jak'Sho, The Protean": ['Tank'],
-  'Kaenic Rookern': ['Tank'],
-  Heartsteel: ['Tank'],
-  "Randuin's Omen": ['Tank'],
-
-  // Support
-  'World Atlas': ['Support'],
-  'Celestial Opposition': ['Support'],
-  'Dream Maker': ['Support'],
-  "Zaz'Zak's Realmspike": ['Support'],
-  'Solstice Sleigh': ['Support'],
-  Bloodsong: ['Support'],
-  'Runic Compass': ['Support'],
-  'Bounty of Worlds': ['Support'],
-  Redemption: ['Support'],
-  'Locket of the Iron Solari': ['Support'],
-  'Ardent Censer': ['Support'],
-  'Staff of Flowing Water': ['Support'],
-  'Imperial Mandate': ['Support'],
-  'Moonstone Renewer': ['Support'],
+  //Legendary
+  "Mejai's Soulstealer": ['Mage'],
   "Shurelya's Battlesong": ['Support'],
+  'Ardent Censer': ['Support'],
+  'Echoes of Helia': ['Support'],
+  'Moonstone Renewer': ['Support'],
+  'Locket of the Iron Solari': ['Tank', 'Support'],
+  "Zeke's Convergence": ['Tank'],
+  'Whispering Circlet': ['Support'],
+  'Diadem of Songs': ['Support'],
+  'Staff of Flowing Water': ['Support'],
+  Redemption: ['Support'],
+  "Mikael's Blessing": ['Support'],
+  Bandlepipes: ['Tank', 'Support'],
+  "Knight's Vow": ['Tank', 'Support'],
+  "Winter's Approach": ['Tank'],
+  Fimbulwinter: ['Tank'],
+  'Imperial Mandate': ['Mage', 'Support'],
+  Thornmail: ['Tank', 'Support'],
+  'Frozen Heart': ['Tank', 'Support'],
+  Dawncore: ['Support'],
+  "Serpent's Fang": ['Assassin'],
+  'Rod of Ages': ['Mage'],
+  "Rylai's Crystal Scepter": ['Mage'],
+  'Protoplasm Harness': ['Tank'],
+  'Hextech Rocketbelt': ['Mage'],
+  'Phantom Dancer': ['Marksman'],
+  'Fiendhunter Bolts': ['Marksman'],
+  'Navori Flickerblade': ['Marksman'],
+  "Runaan's Hurricane": ['Marksman'],
+  'Rapid Firecannon': ['Marksman'],
+  'Abyssal Mask': ['Tank', 'Support'],
+  Malignance: ['Mage'],
+  'Horizon Focus': ['Mage'],
+  'Spirit Visage': ['Tank'],
+  "Randuin's Omen": ['Tank'],
+  "Luden's Echo": ['Mage'],
+  'Axiom Arc': ['Assassin'],
+  'Blackfire Torch': [],
+  Actualizer: ['Mage'],
+  Stormsurge: ['Mage'],
+  'Umbral Glaive': ['Assassin'],
+  Hubris: ['Assassin'],
+  "Youmuu's Ghostblade": ['Assassin'],
+  'Hexoptics C44': ['Marksman'],
+  "Wit's End": ['Fighter', 'Marksman'],
+  'Unending Despair': ['Tank'],
+  'Hollow Radiance': ['Tank'],
+  'Sunfire Aegis': ['Tank'],
+  'Force of Nature': ['Tank'],
+  Morellonomicon: ['Mage', 'Support'],
+  'Profane Hydra': ['Assassin'],
+  "Archangel's Staff": ['Mage'],
+  "Seraph's Embrace": ['Mage'],
+  Manamune: ['Fighter', 'Marksman', 'Assassin'],
+  Muramana: ['Fighter', 'Marksman', 'Assassin'],
+  'Lich Bane': ['Mage'],
+  "Nashor's Tooth": ['Marksman', 'Mage'],
+  "Bloodletter's Curse": ['Mage'],
+  Eclipse: ['Fighter'],
+  'Iceborn Gauntlet': ['Fighter', 'Tank'],
+  'Kaenic Rookern': ['Tank'],
+  "Dead Man's Plate": ['Fighter', 'Tank'],
+  "Banshee's Veil": ['Mage'],
+  'Void Staff': ['Mage'],
+  'Hextech Gunblade': ['Assassin', 'Mage'],
+  Cryptbloom: ['Mage'],
+  'Cosmic Drive': ['Mage'],
+  "Liandry's Torment": ['Mage'],
+  'Statikk Shiv': ['Marksman'],
+  "Guinsoo's Rageblade": [],
+  Bastionbreaker: ['Assassin'],
+  'Edge of Night': ['Assassin'],
+  'The Collector': ['Marksman', 'Assassin'],
+  'Voltaic Cyclosword': ['Assassin'],
+  'Immortal Shieldbow': ['Marksman'],
+  'Mortal Reminder': ['Marksman'],
+  'Yun Tal Wildarrows': ['Marksman'],
+  'Kraken Slayer': ['Marksman'],
+  Terminus: ['Fighter', 'Marksman'],
+  'Experimental Hexplate': ['Fighter'],
+  'Black Cleaver': ['Fighter'],
+  'Chempunk Chainsword': ['Fighter', 'Assassin'],
+  "Serylda's Grudge": ['Assassin'],
+  Hullbreaker: ['Fighter'],
+  Heartsteel: ['Tank'],
+  'Essence Reaver': ['Marksman'],
+  Riftmaker: ['Mage'],
+  'Dusk and Dawn': ['Mage'],
+  'Endless Hunger': ['Fighter'],
+  'Maw of Malmortius': ['Fighter', 'Marksman', 'Assassin'],
+  'Spear of Shojin': ['Fighter'],
+  'Sundered Sky': ['Fighter'],
+  "Warmog's Armor": ['Tank'],
+  Shadowflame: ['Mage'],
+  Stormrazor: ['Marksman'],
+  'Blade of The Ruined King': ['Fighter', 'Marksman'],
+  'Guardian Angel': ['Fighter', 'Marksman', 'Assassin'],
+  'Mercurial Scimitar': ['Fighter', 'Marksman'],
+  "Jak'Sho, The Protean": ['Tank'],
+  "Sterak's Gage": ['Fighter'],
+  "Zhonya's Hourglass": ['Mage'],
+  "Lord Dominik's Regards": ['Marksman'],
+  Stridebreaker: ['Fighter'],
+  'Ravenous Hydra': ['Fighter'],
+  "Death's Dance": ['Fighter'],
+  'Titanic Hydra': ['Fighter', 'Tank'],
+  "Overlord's Bloodmail": ['Fighter', 'Tank'],
+  'Trinity Force': ['Fighter'],
+  Bloodthirster: ['Fighter', 'Marksman'],
+  'Infinity Edge': ['Marksman'],
+  "Rabadon's Deathcap": ['Mage'],
 }
 
 export const getItemClass = (item: Item): string[] => {
@@ -388,28 +525,18 @@ export const itemService = {
           if (localRes.ok) {
             const json = await localRes.json()
             if (json && json.data) {
-              itemData = Object.values(json.data)
+              itemData = Object.entries(json.data).map(([id, item]) => ({
+                id,
+                ...(item as Record<string, unknown>),
+              }))
             }
           }
         } catch {
-          // Fallback to cdragon
-        }
-
-        if (!itemData) {
-          try {
-            const cdragonPatch = patch.split('.').slice(0, 2).join('.')
-            const cdragonRes = await fetch(
-              `https://raw.communitydragon.org/${cdragonPatch}/plugins/rcp-be-lol-game-data/global/default/v1/items.json`,
-            )
-            if (cdragonRes.ok) {
-              itemData = await cdragonRes.json()
-            }
-          } catch {
-            // Fallback to local cdragon
-          }
+          // Fallback to local cdragon
         }
       }
 
+      // Strictly fallback to local cdragon item file (no external CDN calls)
       if (!itemData) {
         const res = await fetch(`${import.meta.env.BASE_URL}cdragon/items/items.json`)
         itemData = await res.json()
@@ -424,9 +551,13 @@ export const itemService = {
         const itemId = Number(item.id) || 0
         const isUpgraded = upgradedItemIds.includes(itemId) || (itemId >= 7000 && itemId <= 7050)
 
+        const rawGold = (item.gold as Record<string, unknown>) || {}
+        const priceTotal = (item.priceTotal as number) ?? (rawGold.total as number) ?? 0
+        const inStore =
+          (item.inStore as boolean) ?? (rawGold.purchasable !== false && priceTotal > 0)
+
         if (!isUpgraded) {
-          if (!item.inStore || (item.priceTotal as number) <= 0 || item.displayInItemSets === false)
-            return false
+          if (!inStore || priceTotal <= 0 || item.displayInItemSets === false) return false
           if (itemId >= 10000) return false
         }
 

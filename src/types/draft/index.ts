@@ -29,6 +29,7 @@ export interface DraftSlot {
   shardFlex?: 'adaptive' | 'ms' | 'scaling_hp' | string | null
   shardDefensive?: 'scaling_hp' | 'tenacity' | 'flat_hp' | string | null
   // Stacks / Buffs
+  questCompleted?: boolean
   conquerorStacks?: number
   lethalTempoStacks?: number
   darkHarvestStacks?: number

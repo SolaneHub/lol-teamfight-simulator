@@ -104,6 +104,7 @@ export const calculateStats = (slot: DraftSlot) => {
   let bonusLifeSteal = 0
   let bonusOmnivamp = 0
   let bonusTenacity = 0
+  let bonusHealShieldPower = 0
 
   for (let i = 0; i < (slot.items || []).length; i++) {
     const item = slot.items[i]
@@ -154,6 +155,7 @@ export const calculateStats = (slot: DraftSlot) => {
     bonusHaste += parsed.abilityHaste + (isMasterwork && parsed.abilityHaste > 0 ? 10 : 0)
     bonusLifeSteal += s.PercentLifeStealMod ? s.PercentLifeStealMod * 100 : parsed.lifeSteal
     bonusOmnivamp += parsed.omnivamp
+    bonusHealShieldPower += parsed.healShieldPower
   }
 
   // Sum Shards
@@ -364,7 +366,7 @@ export const calculateStats = (slot: DraftSlot) => {
       bonusAdFromHp += maxHp * 0.015
     }
 
-    // 7. Dawncore: AP from Base Mana Regen (10 AP per 100% Base Mana Regen)
+    // 7. Dawncore: AP & Heal and Shield Power from Base Mana Regen (10 AP and 2% Heal & Shield Power per 100% Base Mana Regen)
     if (name.includes('dawncore')) {
       let totalManaRegenPct = 0
       for (const it of slot.items) {
@@ -374,6 +376,7 @@ export const calculateStats = (slot: DraftSlot) => {
       }
       const stacks = Math.floor(totalManaRegenPct / 100)
       bonusAp += stacks * 10
+      bonusHealShieldPower += stacks * 2
     }
 
     // 8. Jak'Sho, The Protean: +30% bonus Armor & MR
@@ -407,6 +410,12 @@ export const calculateStats = (slot: DraftSlot) => {
   const totalMpRegen = usesMana
     ? Math.round(baseMpRegen * (1 + bonusMpRegenPct / 100) * 10) / 10
     : 0
+
+  // Mid Lane Quest Reward (Pandemonium / Patch 26.11): +8% Bonus AD and +8% AP
+  if (slot.role === 'Mid' && slot.questCompleted) {
+    bonusAd = bonusAd * 1.08
+    bonusAp = bonusAp * 1.08
+  }
 
   // Calculate Totals
   let totalHp = Math.round(baseHp + bonusHp)
@@ -447,6 +456,7 @@ export const calculateStats = (slot: DraftSlot) => {
   const totalLifeSteal = Math.round(bonusLifeSteal)
   const totalOmnivamp = Math.round(bonusOmnivamp)
   const totalTenacity = Math.round(bonusTenacity)
+  const totalHealShieldPower = Math.round(bonusHealShieldPower)
 
   return {
     partype: champ.partype,
@@ -477,5 +487,6 @@ export const calculateStats = (slot: DraftSlot) => {
     lifeSteal: { base: 0, bonus: bonusLifeSteal, total: totalLifeSteal },
     omnivamp: { base: 0, bonus: bonusOmnivamp, total: totalOmnivamp },
     tenacity: { base: 0, bonus: bonusTenacity, total: totalTenacity },
+    healShieldPower: { base: 0, bonus: bonusHealShieldPower, total: totalHealShieldPower },
   }
 }

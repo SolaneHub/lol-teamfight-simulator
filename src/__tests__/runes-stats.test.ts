@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { calculateStats } from '../services/draft/draftService'
+import { mapItem, getItemIconUrl } from '../services/items/itemService'
 import type { DraftSlot, Champion, Rune } from '../types'
 
 const mockChampionAP: Champion = {
@@ -346,5 +347,119 @@ describe('Domination Tree Runes', () => {
     const baseAsRanged = 0.668
     const expectedAsRanged = Math.round((baseAsRanged + baseAsRanged * 0.8) * 1000) / 1000
     expect(statsRanged?.as.total).toBe(expectedAsRanged)
+  })
+
+  it('should apply Mid Lane Quest bonus (+8% Bonus AD and +8% AP) when completed', () => {
+    // AP Champion (Ahri) with items
+    const mockItemAP = {
+      id: '3116',
+      name: "Rylai's Crystal Scepter",
+      description: '<stats><attention>75</attention> Ability Power</stats>',
+      stats: { FlatMagicDamageMod: 100 },
+      gold: { total: 2600, base: 2600, purchasable: true, sell: 1820 },
+      tags: [],
+    }
+
+    const slotMidAP = createSlot(mockChampionAP, [], 1, {
+      role: 'Mid',
+      questCompleted: true,
+      items: [mockItemAP],
+    })
+
+    const statsMidAP = calculateStats(slotMidAP)
+    // 100 AP * 1.08 = 108 AP
+    expect(statsMidAP?.ap.bonus).toBe(108)
+    expect(statsMidAP?.ap.total).toBe(108)
+
+    // AD Champion (Darius) with bonus AD items
+    const mockItemAD = {
+      id: '3071',
+      name: 'Black Cleaver',
+      description: '<stats><attention>55</attention> Attack Damage</stats>',
+      stats: { FlatPhysicalDamageMod: 100 },
+      gold: { total: 3000, base: 3000, purchasable: true, sell: 2100 },
+      tags: [],
+    }
+
+    const slotMidAD = createSlot(mockChampionAD, [], 1, {
+      role: 'Mid',
+      questCompleted: true,
+      items: [mockItemAD],
+    })
+
+    const statsMidAD = calculateStats(slotMidAD)
+    // 100 Bonus AD * 1.08 = 108 Bonus AD
+    expect(statsMidAD?.ad.bonus).toBe(108)
+    expect(statsMidAD?.ad.total).toBe(64 + 108)
+  })
+
+  it('should calculate Heal and Shield Power correctly from items and passives', () => {
+    // Redemption (+10% Heal & Shield Power)
+    const redemption = {
+      id: '3107',
+      name: 'Redemption',
+      description:
+        '<stats><attention>30</attention> Ability Power<br><attention>15</attention> Ability Haste<br><attention>100%</attention> Base Mana Regen<br><attention>10%</attention> Heal and Shield Power</stats>',
+      stats: { FlatMagicDamageMod: 30 },
+      gold: { total: 2300, base: 2300, purchasable: true, sell: 1610 },
+      tags: [],
+    }
+
+    // Dawncore (+20% base H&S Power + 2% per 100% Base Mana Regen)
+    // Redemption gives 100% base mana regen, Dawncore gives 150% = 250% total -> floor(250/100) = 2 stacks = +4% H&S Power
+    const dawncore = {
+      id: '6620',
+      name: 'Dawncore',
+      description:
+        '<stats><attention>50</attention> Ability Power<br><attention>20%</attention> Heal and Shield Power<br><attention>150%</attention> Base Mana Regen</stats>',
+      stats: { FlatMagicDamageMod: 50 },
+      gold: { total: 2700, base: 2700, purchasable: true, sell: 1890 },
+      tags: [],
+    }
+
+    const slot = createSlot(mockChampionAP, [], 1, {
+      items: [redemption, dawncore],
+    })
+
+    const stats = calculateStats(slot)
+    // 10% (Redemption) + 20% (Dawncore base) + 4% (Dawncore passive: 2 stacks * 2%) = 34%
+    expect(stats?.healShieldPower.total).toBe(34)
+    expect(stats?.healShieldPower.bonus).toBe(34)
+  })
+
+  it('correctly maps a DDragon item structure and creates valid item icons', () => {
+    const ddragonRawItem = {
+      name: 'Infinity Edge',
+      description:
+        '<mainText><stats><attention>80</attention> Attack Damage<br><attention>25%</attention> Critical Strike Chance</stats><br><br></mainText>',
+      colloq: ';ie',
+      gold: {
+        base: 625,
+        purchasable: true,
+        total: 3400,
+        sell: 2380,
+      },
+      tags: ['Damage', 'CriticalStrike'],
+      maps: {
+        '11': true,
+        '12': true,
+      },
+      image: {
+        full: '3031.png',
+        sprite: 'item0.png',
+      },
+    }
+
+    const mapped = mapItem('3031', ddragonRawItem)
+
+    expect(mapped.id).toBe('3031')
+    expect(mapped.name).toBe('Infinity Edge')
+    expect(mapped.gold.total).toBe(3400)
+    expect(mapped.gold.purchasable).toBe(true)
+    expect(mapped.inStore).toBe(true)
+    expect(mapped.maps['11']).toBe(true)
+    expect(mapped.stats.FlatPhysicalDamageMod).toBe(80)
+    expect(mapped.stats.FlatCritChanceMod).toBe(0.25)
+    expect(getItemIconUrl(mapped, '16.17.1')).toContain('3031_marksman_t3_infinityedge.png')
   })
 })
