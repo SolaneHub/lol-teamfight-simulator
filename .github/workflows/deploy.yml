@@ -1,139 +1,58 @@
-name: Update Patch & Deploy Simulator
+name: Deploy to GitHub Pages
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      patch:
-        description: 'Target patch version (e.g. 14.21.1 or latest)'
-        required: true
-        default: 'latest'
-      force_deploy:
-        description: 'Force deploy even if reworks/manual review are detected'
-        type: boolean
-        default: false
-  schedule:
-    # Runs every Thursday morning at 06:00 UTC (typical Riot patch day)
-    - cron: '0 6 * * 4'
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
-  issues: write
-  pull-requests: write
 
 concurrency:
   group: 'pages'
   cancel-in-progress: false
 
 jobs:
-  update-and-deploy:
-    runs-on: windows-latest
+  deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
-          fetch-depth: 0
+          version: 10
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: 'pnpm'
 
-      - name: Setup .NET (Required for snip-snip)
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Install NPM Dependencies
-        run: npm ci
+      - name: Run Tests
+        run: pnpm run test
 
-      - name: Backup Current Formulas (for Diff comparison)
-        run: |
-          if (Test-Path "public/data/spellFormulas.json") {
-            Copy-Item "public/data/spellFormulas.json" "public/data/spellFormulas-prev.json" -Force
-          }
-
-      - name: Sync DDragon JSON Data
-        run: |
-          $patchArg = "${{ github.event.inputs.patch || 'latest' }}"
-          node scripts/sync-ddragon.cjs --patch $patchArg
-
-      - name: Download Community Dragon Assets (snip-snip)
-        run: |
-          .\scripts\download-cdragon.ps1 -OutputDir "public/cdragon" -MaxJobs 8
-
-      - name: Generate Spell Formulas & HUD Map
-        run: |
-          node scripts/generate-spell-formulas.cjs
-          node scripts/generate-hud-map.cjs
-
-      - name: Run Patch Semantic Diff
-        id: patch_diff
-        run: |
-          node scripts/diff-patch.cjs --old public/data/spellFormulas-prev.json --new public/data/spellFormulas.json --output patch-diff-report.md
-
-      - name: Publish Diff Report to Action Summary
-        if: always() && hashFiles('patch-diff-report.md') != ''
-        run: |
-          Get-Content patch-diff-report.md | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Append
-
-      - name: Upload Patch Diff Report Artifact
-        if: always() && hashFiles('patch-diff-report.md') != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: patch-diff-report
-          path: patch-diff-report.md
-          retention-days: 30
-
-      - name: Create GitHub Issue on Rework Detection
-        if: steps.patch_diff.outputs.needs_review == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const report = fs.readFileSync('patch-diff-report.md', 'utf8');
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `⚠️ Rework/Mechanic Changes Detected in Patch - Manual Review Required`,
-              body: report,
-              labels: ['patch-update', 'needs-review']
-            });
-
-      - name: Create Pull Request for Safe Patch Update
-        if: steps.patch_diff.outputs.needs_review != 'true' && steps.patch_diff.outputs.has_changes == 'true'
-        uses: peter-evans/create-pull-request@v6
-        with:
-          commit-message: 'chore(patch): update LoL data & formulas [auto-diff safe]'
-          branch: 'auto-patch-update'
-          delete-branch: true
-          title: '🚀 Safe Patch Update: LoL Data & Formulas'
-          body-path: 'patch-diff-report.md'
-          labels: 'automated-pr, patch-update'
-
-      - name: Run Vitest Suite
-        run: npm run test
-
-      - name: Build Web Application
-        run: npm run build
+      - name: Build
+        run: pnpm run build
 
       - name: Setup GitHub Pages
-        if: steps.patch_diff.outputs.needs_review != 'true' || github.event.inputs.force_deploy == 'true'
         uses: actions/configure-pages@v5
 
-      - name: Upload GitHub Pages Artifact
-        if: steps.patch_diff.outputs.needs_review != 'true' || github.event.inputs.force_deploy == 'true'
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: './dist'
 
       - name: Deploy to GitHub Pages
-        if: steps.patch_diff.outputs.needs_review != 'true' || github.event.inputs.force_deploy == 'true'
         id: deployment
         uses: actions/deploy-pages@v4
