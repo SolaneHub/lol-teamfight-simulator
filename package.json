@@ -18,6 +18,7 @@
     "sync:ddragon": "node scripts/sync-ddragon.cjs",
     "sync:cdragon": "pwsh ./scripts/download-cdragon.ps1",
     "diff:patch": "node scripts/diff-patch.cjs",
+    "patch:update": "node scripts/pipeline.cjs",
     "prepare": "husky"
   },
   "dependencies": {

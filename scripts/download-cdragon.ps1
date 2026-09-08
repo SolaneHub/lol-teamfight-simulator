@@ -17,7 +17,7 @@
     .\download-cdragon.ps1 -Champion "ahri"
 #>
 param (
-    [string]$OutputDir = "../public/cdragon",
+    [string]$OutputDir = (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "../public/cdragon"),
     [int]$MaxJobs = 5,
     [string]$Champion = $null
 )
@@ -30,10 +30,6 @@ if (-not (Test-Path $BinDir)) {
     New-Item -ItemType Directory -Path $BinDir -Force | Out-Null
 }
 
-$IsWindows = $true
-if ($PSVersionTable.PSVersion.Major -ge 6) {
-    $IsWindows = $IsWindows -or $IsWindows
-}
 
 $SnipSnipExe = Join-Path $BinDir "snip-snip.exe"
 if (-not (Test-Path $SnipSnipExe)) {
@@ -52,11 +48,11 @@ if (-not (Test-Path $SnipSnipExe)) {
 }
 
 # Resolve full path of snip-snip and OutputDir
-$SnipSnipFullPath = Resolve-Path $SnipSnipExe
+$SnipSnipFullPath = (Resolve-Path $SnipSnipExe).Path
 if (-not (Test-Path $OutputDir)) {
     New-Item -ItemType Directory -Path $OutputDir -Force | Out-Null
 }
-$OutputDirFullPath = Resolve-Path $OutputDir
+$OutputDirFullPath = (Resolve-Path $OutputDir).Path
 
 # ==============================================================================
 # 1. FETCH PLAYABLE CHAMPIONS

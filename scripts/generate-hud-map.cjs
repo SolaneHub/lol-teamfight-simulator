@@ -13,13 +13,41 @@ const path = require('path');
 const OUT_CHAMPS_DIR = fs.existsSync(path.join(__dirname, '..', 'public', 'cdragon', 'champions'))
   ? path.join(__dirname, '..', 'public', 'cdragon', 'champions')
   : path.join(__dirname, '..', 'public', 'out', 'champions');
-const DDRAGON_CHAMPS_DIR = path.join(__dirname, '..', 'public', 'ddragon', '16.14.1', 'data', 'en_US', 'champion');
+const args = process.argv.slice(2);
+let patchVersion = 'latest';
+const patchIdx = args.indexOf('--patch');
+if (patchIdx !== -1 && args[patchIdx + 1]) {
+  patchVersion = args[patchIdx + 1];
+}
+
+const DDRAGON_BASE = path.join(__dirname, '..', 'public', 'ddragon');
+let resolvedPatch = patchVersion;
+if (resolvedPatch === 'latest') {
+  const latestJson = path.join(DDRAGON_BASE, 'latest.json');
+  if (fs.existsSync(latestJson)) {
+    try {
+      resolvedPatch = JSON.parse(fs.readFileSync(latestJson, 'utf8')).patch || 'latest';
+    } catch {}
+  }
+}
+
+const DDRAGON_FULL_FILE = path.join(DDRAGON_BASE, resolvedPatch, 'championFull.json');
+const DDRAGON_CHAMPS_DIR = path.join(DDRAGON_BASE, resolvedPatch, 'data', 'en_US', 'champion');
 const OUTPUT_FILE = path.join(__dirname, '..', 'public', 'data', 'championHudMap.json');
 
 function main() {
   const champs = fs.readdirSync(OUT_CHAMPS_DIR);
   const hudMap = {};
   let mappedCount = 0;
+
+  let fullChampionsData = null;
+  if (fs.existsSync(DDRAGON_FULL_FILE)) {
+    try {
+      fullChampionsData = JSON.parse(fs.readFileSync(DDRAGON_FULL_FILE, 'utf8')).data;
+    } catch (e) {
+      console.warn(`Failed to parse ${DDRAGON_FULL_FILE}:`, e.message);
+    }
+  }
 
   for (const c of champs) {
     const binPath = path.join(OUT_CHAMPS_DIR, c, 'data', `${c}.bin.json`);
@@ -38,12 +66,22 @@ function main() {
     const hudFiles = fs.readdirSync(hudDir);
 
     // Read DDragon spell list for spell IDs (e.g. DariusQ, DariusW...)
-    const ddFiles = fs.readdirSync(DDRAGON_CHAMPS_DIR);
-    const actualDD = ddFiles.find(f => f.toLowerCase() === `${c.toLowerCase()}.json`);
-    if (!actualDD) continue;
-
-    const ddData = JSON.parse(fs.readFileSync(path.join(DDRAGON_CHAMPS_DIR, actualDD), 'utf8'));
-    const champData = ddData.data[Object.keys(ddData.data)[0]];
+    let champData = null;
+    if (fullChampionsData) {
+      const champKey = Object.keys(fullChampionsData).find(k => k.toLowerCase() === c.toLowerCase());
+      if (champKey) {
+        champData = fullChampionsData[champKey];
+      }
+    }
+    if (!champData && fs.existsSync(DDRAGON_CHAMPS_DIR)) {
+      const ddFiles = fs.readdirSync(DDRAGON_CHAMPS_DIR);
+      const actualDD = ddFiles.find(f => f.toLowerCase() === `${c.toLowerCase()}.json`);
+      if (actualDD) {
+        const ddData = JSON.parse(fs.readFileSync(path.join(DDRAGON_CHAMPS_DIR, actualDD), 'utf8'));
+        champData = ddData.data[Object.keys(ddData.data)[0]];
+      }
+    }
+    if (!champData) continue;
 
     const entry = { passive: '', spells: [] };
 

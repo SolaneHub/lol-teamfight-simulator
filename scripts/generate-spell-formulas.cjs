@@ -741,17 +741,30 @@ async function main() {
     }
   }
 
-  DDRAGON_DIR = path.join(__dirname, '..', 'public', 'ddragon', patchVersion, 'data', 'en_US', 'champion');
+  const DDRAGON_BASE = path.join(__dirname, '..', 'public', 'ddragon');
+  const DDRAGON_FULL = path.join(DDRAGON_BASE, patchVersion, 'championFull.json');
+  DDRAGON_DIR = path.join(DDRAGON_BASE, patchVersion, 'data', 'en_US', 'champion');
   OUTPUT_FILE = path.join(__dirname, '..', 'public', 'data', patchIdx !== -1 ? `spellFormulas-${outputPatchName}.json` : 'spellFormulas.json');
 
   let championNames = [];
   let useCDN = false;
+  let localFullData = null;
 
-  if (fs.existsSync(DDRAGON_DIR)) {
+  if (fs.existsSync(DDRAGON_FULL)) {
+    try {
+      console.log(`Loading champions directly from local ${DDRAGON_FULL}...`);
+      localFullData = JSON.parse(fs.readFileSync(DDRAGON_FULL, 'utf8')).data;
+      championNames = Object.keys(localFullData);
+    } catch (e) {
+      console.warn(`Failed to parse local championFull.json:`, e.message);
+    }
+  }
+
+  if (championNames.length === 0 && fs.existsSync(DDRAGON_DIR)) {
     const champFiles = fs.readdirSync(DDRAGON_DIR).filter(f => f.endsWith('.json'));
     championNames = champFiles.map(f => f.replace('.json', ''));
-  } else {
-    console.log(`DDRAGON_DIR not found. Fetching champion list from Riot CDN for patch ${patchVersion}...`);
+  } else if (championNames.length === 0) {
+    console.log(`Local DDragon files not found. Fetching champion list from Riot CDN for patch ${patchVersion}...`);
     useCDN = true;
     try {
       const listData = await downloadJson(`https://ddragon.leagueoflegends.com/cdn/${patchVersion}/data/en_US/champion.json`);
@@ -776,8 +789,8 @@ async function main() {
   
   for (const champId of championNames) {
     try {
-      let champData = null;
-      if (useCDN) {
+      let champData = localFullData ? localFullData[champId] : null;
+      if (!champData && useCDN) {
         const champDDragon = await downloadJson(`https://ddragon.leagueoflegends.com/cdn/${patchVersion}/data/en_US/champion/${champId}.json`);
         champData = champDDragon.data[champId];
       }
