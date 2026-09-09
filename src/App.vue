@@ -29,25 +29,13 @@
               @click="navigate"
               :class="
                 isActive
-                  ? 'bg-cyan-600 text-white shadow-sm'
+                  ? 'bg-cyan-600 text-white shadow-sm font-bold'
                   : 'text-slate-400 hover:text-slate-200'
               "
-              class="px-4 py-1.5 rounded-md text-base font-semibold transition-all cursor-pointer"
+              class="px-5 py-1.5 rounded-md text-base font-semibold transition-all cursor-pointer flex items-center gap-2"
             >
-              🏆 Draft Simulator
-            </button>
-          </router-link>
-          <router-link to="/workbench" v-slot="{ isActive, navigate }">
-            <button
-              @click="navigate"
-              :class="
-                isActive
-                  ? 'bg-cyan-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
-              "
-              class="px-4 py-1.5 rounded-md text-base font-semibold transition-all cursor-pointer"
-            >
-              ⚙️ Build Workbench
+              <span>🛠️</span>
+              <span>Draft & Workshop</span>
             </button>
           </router-link>
           <router-link to="/calculator" v-slot="{ isActive, navigate }">
@@ -55,12 +43,13 @@
               @click="navigate"
               :class="
                 isActive
-                  ? 'bg-cyan-600 text-white shadow-sm'
+                  ? 'bg-cyan-600 text-white shadow-sm font-bold'
                   : 'text-slate-400 hover:text-slate-200'
               "
-              class="px-4 py-1.5 rounded-md text-base font-semibold transition-all cursor-pointer"
+              class="px-5 py-1.5 rounded-md text-base font-semibold transition-all cursor-pointer flex items-center gap-2"
             >
-              ⚔️ Damage Calculator
+              <span>⚔️</span>
+              <span>Damage Calculator</span>
             </button>
           </router-link>
         </div>

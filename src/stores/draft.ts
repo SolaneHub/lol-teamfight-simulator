@@ -217,7 +217,14 @@ export const useDraftStore = defineStore('draft', () => {
   }
 
   const assignChampion = (champ: Champion) => {
-    if (selectedSlotId.value === null) return
+    if (selectedSlotId.value === null) {
+      const firstEmpty = [...blueDraft.value, ...redDraft.value].find((s) => s.champion === null)
+      if (firstEmpty) {
+        selectedSlotId.value = firstEmpty.id
+      } else {
+        return
+      }
+    }
 
     // Prevent duplicates
     const isAlreadySelected =
@@ -229,14 +236,14 @@ export const useDraftStore = defineStore('draft', () => {
     const blueSlot = blueDraft.value.find((s) => s.id === selectedSlotId.value)
     if (blueSlot) {
       blueSlot.champion = champ
-      autoAdvance()
+      activeCustomizerSlot.value = blueSlot
       return
     }
 
     const redSlot = redDraft.value.find((s) => s.id === selectedSlotId.value)
     if (redSlot) {
       redSlot.champion = champ
-      autoAdvance()
+      activeCustomizerSlot.value = redSlot
     }
   }
 
@@ -257,17 +264,17 @@ export const useDraftStore = defineStore('draft', () => {
     slot.shardFlex = null
     slot.shardDefensive = null
 
-    // Sync customized slot
-    if (activeCustomizerSlot.value?.id === slot.id) {
-      activeCustomizerSlot.value = null
-    }
-
+    // Sync customized slot to null and keep this slot selected
     selectedSlotId.value = slot.id
+    activeCustomizerSlot.value = null
   }
 
   const selectCustomizerSlot = (slot: DraftSlot) => {
+    selectedSlotId.value = slot.id
     if (slot.champion) {
       activeCustomizerSlot.value = slot
+    } else {
+      activeCustomizerSlot.value = null
     }
   }
 

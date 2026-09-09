@@ -1,5 +1,4 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import BrowserView from '../views/BrowserView.vue'
 import CustomizerView from '../views/CustomizerView.vue'
 import CalculatorView from '../views/CalculatorView.vue'
 
@@ -8,13 +7,12 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'draft',
-      component: BrowserView,
+      name: 'workshop',
+      component: CustomizerView,
     },
     {
       path: '/workbench',
-      name: 'workbench',
-      component: CustomizerView,
+      redirect: '/',
     },
     {
       path: '/calculator',
