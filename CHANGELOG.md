@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-09-09
+
+### Added
+- **Deathfire Touch Keystone**: Fully simulated Deathfire Touch (ID 8992) with 2s AoE / 4s Single Target magic burn (3–12 + 2.5% AP + 7% bAD/s) and +75% damage amplification after 3 seconds of continuous burn (`🔥 DFT +75%`).
+- **Runes & Keystones Matrix**: Added `docs/status/runes.md` tracking all active and backlog Keystones and combat runes.
+- **Action Creator Quick Snap**: Added `⏱️ Last Damage (X.Xs)` button in the Action Creator toolbar and made combat log event timestamps directly clickable to instantly snap next action timestamps.
+
+### Changed & Improved
+- **Blackfire Torch (Baleful Blaze) Engine Accuracy**:
+  - Implemented 1st tick instant proc upon ability impact + remaining 5 periodic ticks over 2.5s (total 6 ticks = 60 + 6% AP).
+  - Stacks additively with Rabadon's Deathcap and Infernal Might AP multipliers.
+  - Multi-user stacking across different champions.
+  - Simultaneous spells at $t=0.0s$ stay at 6 ticks (no duplicate proc).
+  - Recasting while burning refreshes duration to 3.0s without duplicate proc, extending ticks (e.g. 7 ticks for recast at 0.1s–0.5s) matching live League of Legends behavior verified in Practice Tool.
+- **Seraphine Combat Alignment**:
+  - Unified Surround Sound (W) team shield and missing HP heal into a single log event per ally with silver shield and emerald green heal badges; heal activates only on Echo or pre-existing shield.
+  - Unified Echo Q and E double-cast into a single combat action with `🎶 Echo` badge, computing dynamic execute damage on the 2nd wave.
+- **Cleaned UI Controls**: Removed redundant `Reset 0s` button from the Action Creator toolbar.
+
+---
+
 ## [1.3.0] - 2026-09-09
 
 ### Added

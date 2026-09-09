@@ -179,7 +179,7 @@ It is ordered strictly by **Unique**, **Starter**, **Basic**, **Epic**, and **Le
 - [ ] **Axiom Arc** (`2750g`) — Stats baseline active; passive in backlog
 - [x] **Luden's Echo** (`2750g`) — Echo Shot burst damage active in calculator & sim
 - [ ] **Actualizer** (`2800g`) — Stats baseline active; passive in backlog
-- [x] **Blackfire Torch** (`2800g`) — Baleful Blaze burn + 4% AP per burning enemy active
+- [x] **Blackfire Torch** (`2800g`) — Baleful Blaze burn (1st tick proc + 5 periodic ticks over 2.5s, multi-user stacking, duration refresh on recast) + additive 4% AP per burning enemy active
 - [ ] **Force of Nature** (`2800g`) — Stats baseline active; passive in backlog
 - [ ] **Hexoptics C44** (`2800g`) — Stats baseline active; passive in backlog
 - [x] **Hollow Radiance** (`2800g`) — Immolate burn aura + Desolate explosion active

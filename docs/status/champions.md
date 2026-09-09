@@ -36,10 +36,10 @@ Every champion is broken down by their **Passive (P)** and each individual abili
 ### **Seraphine** (Mid / Support) — 🟢 Fully Implemented
 *Test Suite: seraphine-complete-loadouts.test.ts, seraphine-optimizer.test.ts*
 
-- [x] **Passive: Stage Presence** — Echo double-cast logic & Notes bonus damage
-- [x] **Q: High Note** — Missing HP execution scaling (up to +75% bonus damage)
-- [x] **W: Surround Sound** — Scaling shield & missing HP percentage heal
-- [x] **E: Beat Drop** — Slow / Root / Stun CC progression
+- [x] **Passive: Stage Presence** — Echo double-cast logic (unified combat action & amplified 2nd hit missing HP damage) & Notes on-hit discharge
+- [x] **Q: High Note** — Missing HP execution scaling (up to +75% bonus damage, dynamic 2nd wave calculation on Echo)
+- [x] **W: Surround Sound** — Team scaling shield & missing HP percentage heal (unified event; heal activates only on Echo or pre-existing shield)
+- [x] **E: Beat Drop** — Slow / Root / Stun CC progression & Echo double-cast
 - [x] **R: Encore** — Charm CC & projectile hit extension
 
 ### **Aatrox** (Top) — 🟢 Fully Implemented
