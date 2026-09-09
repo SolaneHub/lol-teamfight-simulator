@@ -66,15 +66,15 @@
                 @click="selectPrimaryPath(tree)"
                 :title="tree.name"
                 :class="[
-                  'group h-14 w-14 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.1] shrink-0',
+                  'group h-14 w-14 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 shrink-0 p-2 border-2',
                   activeCustomizerSlot?.primaryPath?.id === tree.id
-                    ? `border-2 ${getPathTheme(tree.id).activeBorder} bg-slate-950/40 p-2 shadow-lg ${getPathTheme(tree.id).glow}`
-                    : 'opacity-40 hover:opacity-100 p-2',
+                    ? `${getPathTheme(tree.id).activeBorder} bg-slate-950/50 ring-2 ${getPathTheme(tree.id).ring} shadow-lg ${getPathTheme(tree.id).glow} scale-105`
+                    : 'border-transparent opacity-40 hover:opacity-100 hover:scale-105 hover:border-slate-700/60',
                 ]"
               >
                 <img
                   :src="getRuneIconUrl(tree.icon)"
-                  class="h-full w-full object-contain transition-transform group-hover:scale-110 select-none pointer-events-none"
+                  class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 select-none pointer-events-none"
                 />
               </div>
             </div>
@@ -103,18 +103,16 @@
                     @mousemove="onMouseMove"
                     :title="rune.name"
                     :class="[
-                      'group rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.1] shrink-0 relative z-10 h-11 w-11',
-                      (slotIdx === 0 && activeCustomizerSlot.primaryKeystone?.id === rune.id) ||
-                      (slotIdx === 1 && activeCustomizerSlot.primaryRune1?.id === rune.id) ||
-                      (slotIdx === 2 && activeCustomizerSlot.primaryRune2?.id === rune.id) ||
-                      (slotIdx === 3 && activeCustomizerSlot.primaryRune3?.id === rune.id)
-                        ? `border-2 ${getPathTheme(activeCustomizerSlot.primaryPath?.id).activeBorder} bg-slate-950/30 p-0.5 shadow-lg ${getPathTheme(activeCustomizerSlot.primaryPath?.id).glow}`
-                        : 'opacity-25 grayscale hover:opacity-100 hover:grayscale-0',
+                      'group rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 shrink-0 relative z-10 border-2',
+                      slotIdx === 0 ? 'h-13 w-13 p-1.5' : 'h-11 w-11 p-1',
+                      isPrimaryRuneSelected(slotIdx, rune.id)
+                        ? `${getPathTheme(activeCustomizerSlot.primaryPath?.id).activeBorder} bg-slate-950/60 ring-2 ${getPathTheme(activeCustomizerSlot.primaryPath?.id).ring} shadow-xl ${getPathTheme(activeCustomizerSlot.primaryPath?.id).glow} scale-105 opacity-100 grayscale-0`
+                        : 'border-transparent opacity-35 grayscale hover:opacity-100 hover:grayscale-0 hover:scale-105 hover:border-slate-700/60',
                     ]"
                   >
                     <img
                       :src="getRuneIconUrl(rune.icon)"
-                      class="h-full w-full object-contain transition-transform group-hover:scale-110 select-none pointer-events-none"
+                      class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 select-none pointer-events-none"
                     />
                   </div>
                 </div>
@@ -144,15 +142,15 @@
                   @click="selectSecondaryPath(tree)"
                   :title="tree.name"
                   :class="[
-                    'group h-14 w-14 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.1] shrink-0',
+                    'group h-14 w-14 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 shrink-0 p-2 border-2',
                     activeCustomizerSlot?.secondaryPath?.id === tree.id
-                      ? `border-2 ${getPathTheme(tree.id).activeBorder} bg-slate-950/40 p-2 shadow-lg ${getPathTheme(tree.id).glow}`
-                      : 'opacity-40 hover:opacity-100 p-2',
+                      ? `${getPathTheme(tree.id).activeBorder} bg-slate-950/50 ring-2 ${getPathTheme(tree.id).ring} shadow-lg ${getPathTheme(tree.id).glow} scale-105`
+                      : 'border-transparent opacity-40 hover:opacity-100 hover:scale-105 hover:border-slate-700/60',
                   ]"
                 >
                   <img
                     :src="getRuneIconUrl(tree.icon)"
-                    class="h-full w-full object-contain transition-transform group-hover:scale-110 select-none pointer-events-none"
+                    class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 select-none pointer-events-none"
                   />
                 </div>
               </template>
@@ -180,16 +178,15 @@
                     @mousemove="onMouseMove"
                     :title="rune.name"
                     :class="[
-                      'group h-11 w-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.1] shrink-0 relative z-10',
-                      activeCustomizerSlot.secondaryRune1?.id === rune.id ||
-                      activeCustomizerSlot.secondaryRune2?.id === rune.id
-                        ? `border-2 ${getPathTheme(activeCustomizerSlot.secondaryPath?.id).activeBorder} bg-slate-950/30 p-0.5 shadow-lg ${getPathTheme(activeCustomizerSlot.secondaryPath?.id).glow}`
-                        : 'opacity-25 grayscale hover:opacity-100 hover:grayscale-0',
+                      'group h-11 w-11 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 shrink-0 relative z-10 p-1 border-2',
+                      isSecondaryRuneSelected(rune.id)
+                        ? `${getPathTheme(activeCustomizerSlot.secondaryPath?.id).activeBorder} bg-slate-950/60 ring-2 ${getPathTheme(activeCustomizerSlot.secondaryPath?.id).ring} shadow-xl ${getPathTheme(activeCustomizerSlot.secondaryPath?.id).glow} scale-105 opacity-100 grayscale-0`
+                        : 'border-transparent opacity-35 grayscale hover:opacity-100 hover:grayscale-0 hover:scale-105 hover:border-slate-700/60',
                     ]"
                   >
                     <img
                       :src="getRuneIconUrl(rune.icon)"
-                      class="h-full w-full object-contain transition-transform group-hover:scale-110 select-none pointer-events-none"
+                      class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 select-none pointer-events-none"
                     />
                   </div>
                 </div>
@@ -205,15 +202,15 @@
                   @mousemove="onMouseMove"
                   title="Adaptive Force (+9)"
                   :class="[
-                    'group h-9 w-9 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.1] p-1 shadow-sm shrink-0 bg-[#0b0e17] relative z-10',
+                    'group h-9 w-9 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 p-1 shadow-sm shrink-0 relative z-10',
                     activeCustomizerSlot?.shardOffensive === 'adaptive'
-                      ? 'bg-amber-500/20 border-amber-500 shadow-md ring-2 ring-amber-500/20'
-                      : 'bg-[#0b0e17] border-slate-900 opacity-30 grayscale hover:opacity-100 hover:grayscale-0',
+                      ? 'bg-amber-500/20 border-amber-400 shadow-md ring-2 ring-amber-400/40 opacity-100 grayscale-0'
+                      : 'bg-[#0b0e17] border-transparent opacity-35 grayscale hover:opacity-100 hover:grayscale-0 hover:border-slate-700/60',
                   ]"
                 >
                   <img
                     :src="getRuneIconUrl('v1/perk-images/StatMods/StatModsAdaptiveForceIcon.png')"
-                    class="h-full w-full object-contain transition-transform group-hover:scale-110 select-none pointer-events-none"
+                    class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 select-none pointer-events-none"
                   />
                 </button>
                 <!-- Attack Speed -->
@@ -224,15 +221,15 @@
                   @mousemove="onMouseMove"
                   title="Attack Speed (+10%)"
                   :class="[
-                    'group h-9 w-9 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.1] p-1 shadow-sm shrink-0 bg-[#0b0e17] relative z-10',
+                    'group h-9 w-9 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 p-1 shadow-sm shrink-0 relative z-10',
                     activeCustomizerSlot?.shardOffensive === 'as'
-                      ? 'bg-amber-500/20 border-amber-500 shadow-md ring-2 ring-amber-500/20'
-                      : 'bg-[#0b0e17] border-slate-900 opacity-30 grayscale hover:opacity-100 hover:grayscale-0',
+                      ? 'bg-amber-500/20 border-amber-400 shadow-md ring-2 ring-amber-400/40 opacity-100 grayscale-0'
+                      : 'bg-[#0b0e17] border-transparent opacity-35 grayscale hover:opacity-100 hover:grayscale-0 hover:border-slate-700/60',
                   ]"
                 >
                   <img
                     :src="getRuneIconUrl('v1/perk-images/StatMods/StatModsAttackSpeedIcon.png')"
-                    class="h-full w-full object-contain transition-transform group-hover:scale-110 select-none pointer-events-none"
+                    class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 select-none pointer-events-none"
                   />
                 </button>
                 <!-- Ability Haste -->
@@ -243,15 +240,15 @@
                   @mousemove="onMouseMove"
                   title="Ability Haste (+8)"
                   :class="[
-                    'group h-9 w-9 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.1] p-1 shadow-sm shrink-0 bg-[#0b0e17] relative z-10',
+                    'group h-9 w-9 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 p-1 shadow-sm shrink-0 relative z-10',
                     activeCustomizerSlot?.shardOffensive === 'haste'
-                      ? 'bg-amber-500/20 border-amber-500 shadow-md ring-2 ring-amber-500/20'
-                      : 'bg-[#0b0e17] border-slate-900 opacity-30 grayscale hover:opacity-100 hover:grayscale-0',
+                      ? 'bg-amber-500/20 border-amber-400 shadow-md ring-2 ring-amber-400/40 opacity-100 grayscale-0'
+                      : 'bg-[#0b0e17] border-transparent opacity-35 grayscale hover:opacity-100 hover:grayscale-0 hover:border-slate-700/60',
                   ]"
                 >
                   <img
                     :src="getRuneIconUrl('v1/perk-images/StatMods/StatModsCDRScalingIcon.png')"
-                    class="h-full w-full object-contain transition-transform group-hover:scale-110 select-none pointer-events-none"
+                    class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 select-none pointer-events-none"
                   />
                 </button>
               </div>
@@ -266,15 +263,15 @@
                   @mousemove="onMouseMove"
                   title="Adaptive Force (+9)"
                   :class="[
-                    'group h-9 w-9 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.1] p-1 shadow-sm shrink-0 bg-[#0b0e17] relative z-10',
+                    'group h-9 w-9 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 p-1 shadow-sm shrink-0 relative z-10',
                     activeCustomizerSlot?.shardFlex === 'adaptive'
-                      ? 'bg-amber-500/20 border-amber-500 shadow-md ring-2 ring-amber-500/20'
-                      : 'bg-[#0b0e17] border-slate-900 opacity-30 grayscale hover:opacity-100 hover:grayscale-0',
+                      ? 'bg-amber-500/20 border-amber-400 shadow-md ring-2 ring-amber-400/40 opacity-100 grayscale-0'
+                      : 'bg-[#0b0e17] border-transparent opacity-35 grayscale hover:opacity-100 hover:grayscale-0 hover:border-slate-700/60',
                   ]"
                 >
                   <img
                     :src="getRuneIconUrl('v1/perk-images/StatMods/StatModsAdaptiveForceIcon.png')"
-                    class="h-full w-full object-contain transition-transform group-hover:scale-110 select-none pointer-events-none"
+                    class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 select-none pointer-events-none"
                   />
                 </button>
                 <!-- Movement Speed -->
@@ -285,15 +282,15 @@
                   @mousemove="onMouseMove"
                   title="Movement Speed (+2%)"
                   :class="[
-                    'group h-9 w-9 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.1] p-1 shadow-sm shrink-0 bg-[#0b0e17] relative z-10',
+                    'group h-9 w-9 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 p-1 shadow-sm shrink-0 relative z-10',
                     activeCustomizerSlot?.shardFlex === 'ms'
-                      ? 'bg-amber-500/20 border-amber-500 shadow-md ring-2 ring-amber-500/20'
-                      : 'bg-[#0b0e17] border-slate-900 opacity-30 grayscale hover:opacity-100 hover:grayscale-0',
+                      ? 'bg-amber-500/20 border-amber-400 shadow-md ring-2 ring-amber-400/40 opacity-100 grayscale-0'
+                      : 'bg-[#0b0e17] border-transparent opacity-35 grayscale hover:opacity-100 hover:grayscale-0 hover:border-slate-700/60',
                   ]"
                 >
                   <img
                     :src="getRuneIconUrl('v1/perk-images/StatMods/StatModsMovementSpeedIcon.png')"
-                    class="h-full w-full object-contain transition-transform group-hover:scale-110 select-none pointer-events-none"
+                    class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 select-none pointer-events-none"
                   />
                 </button>
                 <!-- Scaling Health -->
@@ -304,15 +301,15 @@
                   @mousemove="onMouseMove"
                   title="Scaling Health (+10-180)"
                   :class="[
-                    'group h-9 w-9 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.1] p-1 shadow-sm shrink-0 bg-[#0b0e17] relative z-10',
+                    'group h-9 w-9 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 p-1 shadow-sm shrink-0 relative z-10',
                     activeCustomizerSlot?.shardFlex === 'scaling_hp'
-                      ? 'bg-amber-500/20 border-amber-500 shadow-md ring-2 ring-amber-500/20'
-                      : 'bg-[#0b0e17] border-slate-900 opacity-30 grayscale hover:opacity-100 hover:grayscale-0',
+                      ? 'bg-amber-500/20 border-amber-400 shadow-md ring-2 ring-amber-400/40 opacity-100 grayscale-0'
+                      : 'bg-[#0b0e17] border-transparent opacity-35 grayscale hover:opacity-100 hover:grayscale-0 hover:border-slate-700/60',
                   ]"
                 >
                   <img
                     :src="getRuneIconUrl('v1/perk-images/StatMods/StatModsHealthScalingIcon.png')"
-                    class="h-full w-full object-contain transition-transform group-hover:scale-110 select-none pointer-events-none"
+                    class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 select-none pointer-events-none"
                   />
                 </button>
               </div>
@@ -327,15 +324,15 @@
                   @mousemove="onMouseMove"
                   title="Scaling Health (+10-180)"
                   :class="[
-                    'group h-9 w-9 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.1] p-1 shadow-sm shrink-0 bg-[#0b0e17] relative z-10',
+                    'group h-9 w-9 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 p-1 shadow-sm shrink-0 relative z-10',
                     activeCustomizerSlot?.shardDefensive === 'scaling_hp'
-                      ? 'bg-amber-500/20 border-amber-500 shadow-md ring-2 ring-amber-500/20'
-                      : 'bg-[#0b0e17] border-slate-900 opacity-30 grayscale hover:opacity-100 hover:grayscale-0',
+                      ? 'bg-amber-500/20 border-amber-400 shadow-md ring-2 ring-amber-400/40 opacity-100 grayscale-0'
+                      : 'bg-[#0b0e17] border-transparent opacity-35 grayscale hover:opacity-100 hover:grayscale-0 hover:border-slate-700/60',
                   ]"
                 >
                   <img
                     :src="getRuneIconUrl('v1/perk-images/StatMods/StatModsHealthScalingIcon.png')"
-                    class="h-full w-full object-contain transition-transform group-hover:scale-110 select-none pointer-events-none"
+                    class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 select-none pointer-events-none"
                   />
                 </button>
                 <!-- Tenacity and Slow Resist -->
@@ -346,15 +343,15 @@
                   @mousemove="onMouseMove"
                   title="Tenacity & Slow Resist (+10%)"
                   :class="[
-                    'group h-9 w-9 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.1] p-1 shadow-sm shrink-0 bg-[#0b0e17] relative z-10',
+                    'group h-9 w-9 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 p-1 shadow-sm shrink-0 relative z-10',
                     activeCustomizerSlot?.shardDefensive === 'tenacity'
-                      ? 'bg-amber-500/20 border-amber-500 shadow-md ring-2 ring-amber-500/20'
-                      : 'bg-[#0b0e17] border-slate-900 opacity-30 grayscale hover:opacity-100 hover:grayscale-0',
+                      ? 'bg-amber-500/20 border-amber-400 shadow-md ring-2 ring-amber-400/40 opacity-100 grayscale-0'
+                      : 'bg-[#0b0e17] border-transparent opacity-35 grayscale hover:opacity-100 hover:grayscale-0 hover:border-slate-700/60',
                   ]"
                 >
                   <img
                     :src="getRuneIconUrl('v1/perk-images/StatMods/StatModsTenacityIcon.png')"
-                    class="h-full w-full object-contain transition-transform group-hover:scale-110 select-none pointer-events-none"
+                    class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 select-none pointer-events-none"
                   />
                 </button>
                 <!-- Flat Health -->
@@ -365,15 +362,15 @@
                   @mousemove="onMouseMove"
                   title="Health (+65 Flat)"
                   :class="[
-                    'group h-9 w-9 rounded-full border flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-[1.1] p-1 shadow-sm shrink-0 bg-[#0b0e17] relative z-10',
+                    'group h-9 w-9 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-105 p-1 shadow-sm shrink-0 relative z-10',
                     activeCustomizerSlot?.shardDefensive === 'flat_hp'
-                      ? 'bg-amber-500/20 border-amber-500 shadow-md ring-2 ring-amber-500/20'
-                      : 'bg-[#0b0e17] border-slate-900 opacity-30 grayscale hover:opacity-100 hover:grayscale-0',
+                      ? 'bg-amber-500/20 border-amber-400 shadow-md ring-2 ring-amber-400/40 opacity-100 grayscale-0'
+                      : 'bg-[#0b0e17] border-transparent opacity-35 grayscale hover:opacity-100 hover:grayscale-0 hover:border-slate-700/60',
                   ]"
                 >
                   <img
                     :src="getRuneIconUrl('v1/perk-images/StatMods/StatModsHealthPlusIcon.png')"
-                    class="h-full w-full object-contain transition-transform group-hover:scale-110 select-none pointer-events-none"
+                    class="h-full w-full object-contain transition-transform duration-200 group-hover:scale-110 select-none pointer-events-none"
                   />
                 </button>
               </div>
@@ -529,12 +526,29 @@ const orderedRunes = computed(() => {
   return [...allRunes.value].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id))
 })
 
+const isPrimaryRuneSelected = (slotIdx: number, runeId: number): boolean => {
+  if (!activeCustomizerSlot.value) return false
+  if (slotIdx === 0) return activeCustomizerSlot.value.primaryKeystone?.id === runeId
+  if (slotIdx === 1) return activeCustomizerSlot.value.primaryRune1?.id === runeId
+  if (slotIdx === 2) return activeCustomizerSlot.value.primaryRune2?.id === runeId
+  if (slotIdx === 3) return activeCustomizerSlot.value.primaryRune3?.id === runeId
+  return false
+}
+
+const isSecondaryRuneSelected = (runeId: number): boolean => {
+  if (!activeCustomizerSlot.value) return false
+  return (
+    activeCustomizerSlot.value.secondaryRune1?.id === runeId ||
+    activeCustomizerSlot.value.secondaryRune2?.id === runeId
+  )
+}
+
 interface PathTheme {
   border: string
   text: string
   activeBg: string
   activeBorder: string
-  hoverBorder: string
+  ring: string
   glow: string
   dotBg: string
   pillsBg: string
@@ -545,21 +559,21 @@ const pathThemes: Record<number, PathTheme> = {
     // Precision
     border: 'border-amber-500/20',
     text: 'text-amber-400',
-    activeBg: 'bg-amber-950/15',
-    activeBorder: 'border-amber-500 shadow-amber-500/25',
-    hoverBorder: 'hover:border-amber-400 hover:shadow-md hover:shadow-amber-500/10',
-    glow: 'shadow-amber-500/20',
-    dotBg: 'bg-amber-500',
+    activeBg: 'bg-amber-950/25',
+    activeBorder: 'border-amber-400',
+    ring: 'ring-amber-400/50',
+    glow: 'shadow-amber-500/30',
+    dotBg: 'bg-amber-400',
     pillsBg: 'bg-amber-500/10 text-amber-300',
   },
   8100: {
     // Domination
     border: 'border-rose-500/20',
     text: 'text-rose-400',
-    activeBg: 'bg-rose-950/15',
-    activeBorder: 'border-rose-500 shadow-rose-500/25',
-    hoverBorder: 'hover:border-rose-400 hover:shadow-md hover:shadow-rose-500/10',
-    glow: 'shadow-rose-500/20',
+    activeBg: 'bg-rose-950/25',
+    activeBorder: 'border-rose-500',
+    ring: 'ring-rose-500/50',
+    glow: 'shadow-rose-500/30',
     dotBg: 'bg-rose-500',
     pillsBg: 'bg-rose-500/10 text-rose-300',
   },
@@ -567,33 +581,33 @@ const pathThemes: Record<number, PathTheme> = {
     // Sorcery
     border: 'border-purple-500/20',
     text: 'text-purple-400',
-    activeBg: 'bg-purple-950/15',
-    activeBorder: 'border-purple-500 shadow-purple-500/25',
-    hoverBorder: 'hover:border-purple-400 hover:shadow-md hover:shadow-purple-500/10',
-    glow: 'shadow-purple-500/20',
-    dotBg: 'bg-purple-500',
+    activeBg: 'bg-purple-950/25',
+    activeBorder: 'border-purple-400',
+    ring: 'ring-purple-400/50',
+    glow: 'shadow-purple-500/30',
+    dotBg: 'bg-purple-400',
     pillsBg: 'bg-purple-500/10 text-purple-300',
   },
   8300: {
     // Inspiration
     border: 'border-sky-500/20',
     text: 'text-sky-400',
-    activeBg: 'bg-sky-950/15',
-    activeBorder: 'border-sky-500 shadow-sky-500/25',
-    hoverBorder: 'hover:border-sky-400 hover:shadow-md hover:shadow-sky-500/10',
-    glow: 'shadow-sky-500/20',
-    dotBg: 'bg-sky-500',
+    activeBg: 'bg-sky-950/25',
+    activeBorder: 'border-sky-400',
+    ring: 'ring-sky-400/50',
+    glow: 'shadow-sky-500/30',
+    dotBg: 'bg-sky-400',
     pillsBg: 'bg-sky-500/10 text-sky-300',
   },
   8400: {
     // Resolve
     border: 'border-emerald-500/20',
     text: 'text-emerald-400',
-    activeBg: 'bg-emerald-950/15',
-    activeBorder: 'border-emerald-500 shadow-emerald-500/25',
-    hoverBorder: 'hover:border-emerald-400 hover:shadow-md hover:shadow-emerald-500/10',
-    glow: 'shadow-emerald-500/20',
-    dotBg: 'bg-emerald-500',
+    activeBg: 'bg-emerald-950/25',
+    activeBorder: 'border-emerald-400',
+    ring: 'ring-emerald-400/50',
+    glow: 'shadow-emerald-500/30',
+    dotBg: 'bg-emerald-400',
     pillsBg: 'bg-emerald-500/10 text-emerald-300',
   },
 }
@@ -604,10 +618,10 @@ const getPathTheme = (pathId?: number): PathTheme => {
       border: 'border-slate-800',
       text: 'text-slate-400',
       activeBg: 'bg-[#131926]/40',
-      activeBorder: 'border-slate-700 shadow-black/30',
-      hoverBorder: 'hover:border-slate-650 hover:shadow-md',
-      glow: 'shadow-black/20',
-      dotBg: 'bg-slate-500',
+      activeBorder: 'border-cyan-400',
+      ring: 'ring-cyan-400/50',
+      glow: 'shadow-cyan-500/30',
+      dotBg: 'bg-cyan-400',
       pillsBg: 'bg-slate-900 text-slate-400',
     }
   }
