@@ -133,7 +133,7 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
   let dmgType: 'physical' | 'magic' | 'true' = isApAttacker ? 'magic' : 'physical'
   let hitMult = isApAttacker ? magicMult : physMult
   let isUtilityOrShield = false
-  const shieldAmount = 0
+  let shieldAmount = 0
 
   // 1. Auto Attack
   if (action === 'AA') {
@@ -213,6 +213,11 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
     if ((tooltip.includes('shield') || tooltip.includes('heal')) && !tooltip.includes('damage')) {
       isUtilityOrShield = true
       rawDmg = 0
+      if (champion?.id === 'Seraphine' && action === 'W') {
+        shieldAmount = Math.round(60 + (wRank - 1) * 20 + attAp * 0.2)
+      } else if (champion?.id === 'JarvanIV' && action === 'W') {
+        shieldAmount = Math.round(60 + (wRank - 1) * 20 + defMaxHp * 0.015)
+      }
     } else {
       let baseDmg = 0
       const currentRank =

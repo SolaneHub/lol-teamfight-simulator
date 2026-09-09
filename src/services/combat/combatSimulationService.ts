@@ -21,6 +21,7 @@ export type DoTType =
   | 'liandrys'
   | 'blackfire'
   | 'malignance'
+  | 'deathfire_touch'
   | 'red_buff'
   | 'elder_buff'
   | 'sunfire'
@@ -46,6 +47,7 @@ export interface ActiveDoT {
   rawDamagePerTick: number
   stacks: number
   maxStacks: number
+  continuousBurnTime?: number
 }
 
 export interface CombatLogEvent {
@@ -58,9 +60,12 @@ export interface CombatLogEvent {
   targetName: string
   targetSide: 'blue' | 'red'
   amount: number
-  dmgType: 'physical' | 'magic' | 'true'
+  dmgType: 'physical' | 'magic' | 'true' | 'shield' | 'heal'
+  shieldAmount?: number
+  healAmount?: number
   isDot: boolean
   remainingHp: number
+  remainingShield?: number
   isKo: boolean
   badges?: string[]
 }
@@ -72,6 +77,7 @@ export interface ChampionCombatResult {
   role: string
   initialHp: number
   currentHp: number
+  currentShield: number
   maxHp: number
   hpPct: number
   isKo: boolean
@@ -154,6 +160,7 @@ interface InternalParticipantState {
   role: string
   maxHp: number
   currentHp: number
+  currentShield: number
   baseArmor: number
   baseMr: number
   blackCleaverStacks: number
@@ -179,6 +186,8 @@ interface InternalParticipantState {
   damageTaken: number
   isKo: boolean
   aatroxQSeq: number
+  aatroxPassiveCooldown: number
+  jarvanPassiveCooldowns: Record<number, number>
   seraphineCastCounter: number
   seraphineNotes: number
   castCounter: number
@@ -245,6 +254,7 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       role: slot.role,
       maxHp: hp,
       currentHp: hp,
+      currentShield: 0,
       baseArmor: armor,
       baseMr: mr,
       blackCleaverStacks: 0,
@@ -270,6 +280,8 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       damageTaken: 0,
       isKo: false,
       aatroxQSeq: 1,
+      aatroxPassiveCooldown: 0.0,
+      jarvanPassiveCooldowns: {},
       seraphineCastCounter: 0,
       seraphineNotes: 0,
       castCounter: 0,
@@ -308,8 +320,9 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
 
     const baseAd = Math.round((dynamicStats?.ad?.base || 70) * mStats.adMultiplier)
     const extraNoxianAd = part.noxianMight ? 30 + (part.level - 1) * (200 / 17) : 0
-    const totalAd =
-      Math.round(((dynamicStats?.ad?.total || 70) + mStats.bonusAD + extraNoxianAd) * mStats.adMultiplier)
+    const totalAd = Math.round(
+      ((dynamicStats?.ad?.total || 70) + mStats.bonusAD + extraNoxianAd) * mStats.adMultiplier,
+    )
 
     // Check Blackfire Torch active bonus AP (4% AP per burning enemy)
     const activeItems = detectItemPassives(part.slot.items)
@@ -322,8 +335,14 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       extraApPct = Math.min(0.2, burningCount * 0.04)
     }
 
-    const baseAp = Math.round(((dynamicStats?.ap?.total || 0) + mStats.bonusAP) * mStats.apMultiplier)
-    const totalAp = Math.round(baseAp * (1 + extraApPct))
+    const rawAp = (dynamicStats?.ap?.bonus || 0) + mStats.bonusAP
+    const existingApMultiplier =
+      (dynamicStats?.ap?.total || 0) > 0 && (dynamicStats?.ap?.bonus || 0) > 0
+        ? dynamicStats!.ap.total / dynamicStats!.ap.bonus
+        : 1.0
+    // Blackfire multiplier stacks additively with other sources of % AP (Rabadon, Infernal Might)
+    const totalApMultiplier = existingApMultiplier + (mStats.apMultiplier - 1) + extraApPct
+    const totalAp = Math.round(rawAp * totalApMultiplier)
 
     const attackSpeed = Math.max(0.2, Math.min(3.5, dynamicStats?.as?.total || 0.65))
 
@@ -342,11 +361,12 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       mana: dynamicStats?.mp?.total || 600,
       bonusHp: Math.max(0, part.maxHp - (part.slot.champion?.stats?.hp || 600)),
       abilityHaste: Math.round((dynamicStats?.abilityHaste?.total || 0) + mStats.bonusAH),
+      healShieldPower: dynamicStats?.healShieldPower?.total || 0,
       itemPassives: activeItems,
     }
   }
 
-  // Helper: Apply direct damage and register to state
+  // Helper: Apply direct damage and register to state (Shield absorbs damage first)
   const applyDamageToTarget = (
     actor: InternalParticipantState,
     target: InternalParticipantState,
@@ -359,7 +379,21 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
   ) => {
     if (target.isKo || amount <= 0) return
 
-    target.currentHp = Math.max(0, target.currentHp - amount)
+    let effectiveDamage = amount
+    if (target.currentShield > 0) {
+      if (effectiveDamage <= target.currentShield) {
+        target.currentShield -= effectiveDamage
+        badges.push(`🛡️ Absorbed (${effectiveDamage})`)
+        effectiveDamage = 0
+      } else {
+        const absorbed = target.currentShield
+        effectiveDamage -= target.currentShield
+        target.currentShield = 0
+        badges.push(`🛡️ Shield Broken (-${absorbed})`)
+      }
+    }
+
+    target.currentHp = Math.max(0, target.currentHp - effectiveDamage)
     target.damageTaken += amount
 
     actor.totalDamageDealt += amount
@@ -387,15 +421,22 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       dmgType,
       isDot,
       remainingHp: target.currentHp,
+      remainingShield: target.currentShield,
       isKo: target.isKo,
       badges: badges.length > 0 ? badges : undefined,
     })
 
     // Elder Dragon execute threshold check: target below 20% max HP
     const buffs = actor.side === 'blue' ? attackerBuffs : defenderBuffs
-    if (buffs.elder && !target.isKo && target.currentHp > 0 && target.currentHp / target.maxHp < 0.2) {
+    if (
+      buffs.elder &&
+      !target.isKo &&
+      target.currentHp > 0 &&
+      target.currentHp / target.maxHp < 0.2
+    ) {
       const executeDmg = target.currentHp
       target.currentHp = 0
+      target.currentShield = 0
       target.isKo = true
       actor.totalDamageDealt += executeDmg
       actor.damageDealtByType.true += executeDmg
@@ -414,6 +455,7 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         dmgType: 'true',
         isDot: false,
         remainingHp: 0,
+        remainingShield: 0,
         isKo: true,
         badges: ['20% HP Execute'],
       })
@@ -440,7 +482,7 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
     )
 
     if (existing) {
-      existing.remainingDuration = duration
+      existing.remainingDuration = Math.max(existing.remainingDuration, duration)
       existing.rawDamagePerTick = rawDamagePerTick
       if (existing.stacks < maxStacks) {
         existing.stacks++
@@ -460,6 +502,7 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         rawDamagePerTick,
         stacks: 1,
         maxStacks,
+        continuousBurnTime: 0,
       })
     }
   }
@@ -494,6 +537,22 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
     const hasElectrocute = keystoneName.includes('electrocute')
     const hasDarkHarvest =
       keystoneName.includes('dark harvest') || keystoneName.includes('darkharvest')
+    const hasDeathfireTouch =
+      actor.slot.primaryKeystone?.id === 8992 ||
+      keystoneName.includes('deathfire touch') ||
+      keystoneName.includes('deathfiretouch') ||
+      [
+        actor.slot.primaryKeystone,
+        actor.slot.primaryRune1,
+        actor.slot.primaryRune2,
+        actor.slot.primaryRune3,
+        actor.slot.secondaryRune1,
+        actor.slot.secondaryRune2,
+        ...(actor.slot.runes || []),
+      ].some((r) => {
+        const str = `${r?.name || ''} ${r?.key || ''}`.toLowerCase()
+        return r?.id === 8992 || str.includes('deathfire touch') || str.includes('deathfiretouch')
+      })
 
     if (hasConqueror) {
       actor.conquerorStacks = Math.min(12, actor.conquerorStacks + (isMelee ? 2 : 1))
@@ -505,11 +564,16 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       actor.hobAttacksLeft--
     }
 
-    // Aatrox sequence tracking
+    // Aatrox sequence tracking & passive cooldown reduction on abilities
     let aatroxQSeq = 1
-    if (actor.slot.champion?.id === 'Aatrox' && action === 'Q') {
-      aatroxQSeq = actor.aatroxQSeq || 1
-      actor.aatroxQSeq = (aatroxQSeq % 3) + 1
+    if (actor.slot.champion?.id === 'Aatrox') {
+      if (action === 'Q') {
+        aatroxQSeq = actor.aatroxQSeq || 1
+        actor.aatroxQSeq = (aatroxQSeq % 3) + 1
+      }
+      if (['Q', 'W', 'E', 'R'].includes(action)) {
+        actor.aatroxPassiveCooldown = Math.max(0, (actor.aatroxPassiveCooldown || 0) - 2.0)
+      }
     }
 
     // Seraphine Stage Presence (Every 3rd basic ability Q/W/E echoes and casts twice)
@@ -528,7 +592,72 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         (p) => p.side === actor.side && !p.isKo,
       )
       const alliesCount = Math.max(1, sameSideAlive.length)
-      actor.seraphineNotes = Math.min(20, (actor.seraphineNotes || 0) + alliesCount * (isEchoCast ? 2 : 1))
+      actor.seraphineNotes = Math.min(
+        20,
+        (actor.seraphineNotes || 0) + alliesCount * (isEchoCast ? 2 : 1),
+      )
+    }
+
+    // Seraphine W (Surround Sound): Team Shield + Missing HP Team Heal (single unified cast event)
+    if (isSeraphine && action === 'W') {
+      const allyTargets = Object.values(participants).filter(
+        (p) => p.side === actor.side && !p.isKo,
+      )
+      const wRank =
+        actor.slot.spellRanks?.w ||
+        (actor.level >= 13 ? 5 : Math.max(1, Math.min(5, Math.ceil(actor.level / 3))))
+      const healShieldMult = 1 + (actorStats.healShieldPower || 0) / 100
+      const echoMult = isEchoCast ? 1.5 : 1.0
+
+      // Shield: 60/80/100/120/140 + 20% AP
+      const baseShield = (60 + (wRank - 1) * 20 + 0.2 * actorStats.ap) * healShieldMult
+      const finalShield = Math.round(baseShield * echoMult)
+
+      // Heal: 3%-5% (+0.4% per 100 AP) missing HP per ally + base 40-100 (+25% AP)
+      const missingHpRate = 0.03 + (wRank - 1) * 0.005 + (actorStats.ap / 100) * 0.004
+
+      // In LoL, Surround Sound heals if Seraphine already has a shield (e.g. pre-shielded by ally/item) or casts with Echo
+      const hasPreExistingShield = (actor.currentShield || 0) > 0
+      const shouldHeal = isEchoCast || hasPreExistingShield
+
+      allyTargets.forEach((ally) => {
+        // 1. Grant Shield
+        ally.currentShield += finalShield
+
+        // 2. Grant Heal if cast with Echo or if Seraphine already had a shield
+        let finalHeal = 0
+        if (shouldHeal) {
+          const missingHp = Math.max(0, ally.maxHp - ally.currentHp)
+          const allyCount = Math.min(5, allyTargets.length)
+          const missingHeal = missingHp * missingHpRate * allyCount
+          const baseHeal = 40 + (wRank - 1) * 15 + 0.25 * actorStats.ap
+          finalHeal = Math.round(Math.max(baseHeal, missingHeal) * healShieldMult * echoMult)
+          const actualHeal = Math.min(ally.maxHp - ally.currentHp, finalHeal)
+          ally.currentHp += actualHeal
+        }
+
+        // Single combat log event for this cast
+        events.push({
+          timestamp: Math.round(currentTime * 10) / 10,
+          actorSlotId: actor.slotId,
+          actorName: actor.championName,
+          actorSide: actor.side,
+          action: 'W',
+          targetSlotId: ally.slotId,
+          targetName: ally.championName,
+          targetSide: ally.side,
+          amount: finalShield + finalHeal,
+          dmgType: 'shield',
+          shieldAmount: finalShield,
+          healAmount: finalHeal > 0 ? finalHeal : undefined,
+          isDot: false,
+          remainingHp: ally.currentHp,
+          remainingShield: ally.currentShield,
+          isKo: false,
+          badges: isEchoCast ? ['🎶 Echo'] : undefined,
+        })
+      })
+      return
     }
 
     // Determine target participants
@@ -570,7 +699,10 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         })
 
         // Shred stacks (Black Cleaver & Vile Decay)
-        if (!actor.slot.champion?.tags?.includes('Mage') && actorStats.itemPassives.hasBlackCleaver) {
+        if (
+          !actor.slot.champion?.tags?.includes('Mage') &&
+          actorStats.itemPassives.hasBlackCleaver
+        ) {
           if (target.blackCleaverStacks < 6) {
             target.blackCleaverStacks++
             badges.push(`🪓 BC ${target.blackCleaverStacks}x`)
@@ -745,14 +877,51 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         if (actor.slot.champion?.id === 'Aatrox' && action === 'Q') {
           actionLabel = `Q${aatroxQSeq} (Sweetspot)`
         }
-        if (isEcho) {
-          actionLabel = `${actionLabel} + 🎶 Echo`
+
+        let totalHitDmg = finalHitDmg
+
+        // Seraphine Stage Presence (Echo): second cast is combined into this single action
+        if (isSeraphine && isEcho && ['Q', 'E'].includes(action)) {
+          if (action === 'Q') {
+            const remainingHpAfterHit1 = Math.max(1, target.currentHp - finalHitDmg)
+            const echoSpellRes = calculateSpellDamage({
+              champion: actor.slot.champion,
+              action: 'Q',
+              spellRanks: actor.slot.spellRanks,
+              attacker: {
+                ad: actorStats.ad,
+                baseAd: actorStats.baseAd,
+                ap: actorStats.ap,
+                crit: actorStats.crit,
+                level: actor.level,
+                hp: actor.currentHp,
+                maxHp: actor.maxHp,
+                mana: actorStats.mana,
+                armorPen: actorStats.armorPen,
+                lethality: actorStats.lethality,
+                magicPenPercent: actorStats.magicPenPercent,
+                magicPenFlat: actorStats.magicPenFlat,
+                adaptiveType: 'AP',
+              },
+              defender: {
+                currentHp: remainingHpAfterHit1,
+                maxHp: target.maxHp,
+                armor: target.baseArmor,
+                mr: Math.max(0, target.baseMr - (target.malignanceShredDuration > 0 ? 10 : 0)),
+                blackCleaverStacks: target.blackCleaverStacks,
+                vileDecayStacks: target.vileDecayStacks,
+              },
+            })
+            totalHitDmg += Math.round(echoSpellRes.rawDmg * echoSpellRes.hitMult)
+          } else if (action === 'E') {
+            totalHitDmg += finalHitDmg
+          }
         }
 
         applyDamageToTarget(
           actor,
           target,
-          finalHitDmg,
+          totalHitDmg,
           spellRes.dmgType,
           actionLabel,
           currentTime,
@@ -778,20 +947,62 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
           )
         }
 
-        // 2. Blackfire Torch Burn (3s, 60 + 6% AP total over 3s = 10 + 1% AP per 0.5s tick)
+        // 2. Blackfire Torch Burn (Baleful Blaze: 60 + 6% AP total over 3s = 10 + 1% AP per 0.5s tick)
+        // Multi-user: can stack on target when applied by different users.
+        // Same user:
+        // - Simultaneous casts (at the same time t) do not duplicate the burn or proc (stays 6 ticks).
+        // - Recasting while already burning refreshes duration to 2.6s from recast time without duplicate proc,
+        //   extending periodic ticks (e.g. 7 ticks if recast at 0.5s).
         if (isAbility && actorStats.itemPassives.hasBlackfireTorch) {
           const tickDmg = (60 + actorStats.ap * 0.06) / 6
-          applyOrRefreshDoT(
-            actor,
-            target,
-            'blackfire',
-            'Blackfire Torch Burn',
-            'magic',
-            3.0,
-            0.5,
-            tickDmg,
-            currentTime,
+          const existingDot = target.activeDoTs.find(
+            (d) =>
+              d.type === 'blackfire' && d.sourceSlotId === actor.slotId && d.remainingDuration > 0,
           )
+
+          if (!existingDot) {
+            const effMr = Math.max(
+              0,
+              (target.baseMr - (target.malignanceShredDuration > 0 ? 10 : 0)) *
+                (1 - target.vileDecayStacks * 0.075) *
+                (1 - actorStats.magicPenPercent / 100) -
+                actorStats.magicPenFlat,
+            )
+            const magicMult = 100 / (100 + effMr)
+            const firstTickMitigated = Math.max(1, Math.round(tickDmg * magicMult))
+
+            // 1st tick applied immediately on initial application
+            applyDamageToTarget(
+              actor,
+              target,
+              firstTickMitigated,
+              'magic',
+              'Blackfire Torch Burn (Proc)',
+              currentTime,
+              true,
+            )
+
+            // Remaining 5 ticks over next 2.5s
+            applyOrRefreshDoT(
+              actor,
+              target,
+              'blackfire',
+              'Blackfire Torch Burn',
+              'magic',
+              2.6,
+              0.5,
+              tickDmg,
+              currentTime,
+            )
+          } else {
+            // Recast while already burning:
+            // If recast occurs after initial cast (currentTime > 0.05, e.g. 0.1s, 0.2s, 0.4s),
+            // refresh duration to 3.0s from currentTime to extend the burn and ensure subsequent ticks fire
+            if (currentTime > 0.05) {
+              existingDot.remainingDuration = Math.max(existingDot.remainingDuration, 3.0)
+            }
+            existingDot.rawDamagePerTick = tickDmg
+          }
         }
 
         // 3. Malignance Hatefog Pool (on Ultimate R, 3s, 60 + 5% AP per sec, ticks every 0.5s)
@@ -809,6 +1020,33 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
             currentTime,
           )
           target.malignanceShredDuration = 3.0
+        }
+
+        // 4. Deathfire Touch Keystone Burn
+        // Damaging a champion with an ability burns them for 3 - 12 based on level (+2.5% AP) (+7% bonus AD) magic damage per second.
+        // After burning for 3 seconds, the damage of the burn increases by 75% while they remain on fire.
+        // Duration: Single Target: 4s | Area of Effect: 2s | Damage over Time: 1s
+        if (isAbility && hasDeathfireTouch && !spellRes.isUtilityOrShield) {
+          const bonusAd = Math.max(0, actorStats.ad - actorStats.baseAd)
+          const dftBase = 3 + (actor.level - 1) * (9 / 17)
+          const dftPerSec = dftBase + actorStats.ap * 0.025 + bonusAd * 0.07
+          const isAoE =
+            finalTargets.length > 1 ||
+            (actor.slot.champion?.id === 'Seraphine' && ['Q', 'E', 'R'].includes(action))
+          const dftDuration = isAoE ? 2.0 : 4.0
+          const tickInterval = 0.5
+          const tickDmg = dftPerSec * tickInterval
+          applyOrRefreshDoT(
+            actor,
+            target,
+            'deathfire_touch',
+            'Deathfire Touch Burn',
+            'magic',
+            dftDuration,
+            tickInterval,
+            tickDmg,
+            currentTime,
+          )
         }
 
         // 4. Red Buff Burn (on AA, 3s true damage)
@@ -986,13 +1224,8 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       })
     }
 
-    // First cast (Normal)
-    executeCastOnTargets(false)
-
-    // Second cast (Echo) for Seraphine Stage Presence
-    if (isEchoCast) {
-      executeCastOnTargets(true)
-    }
+    // Execute cast on targets (single unified action, handles Seraphine Echo amplification if isEchoCast)
+    executeCastOnTargets(isEchoCast)
 
     // Seraphine Harmony Notes Discharge on AA
     if (isSeraphine && action === 'AA' && actor.seraphineNotes > 0) {
@@ -1002,7 +1235,8 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       if (primaryTarget && !primaryTarget.isKo) {
         const effMr = Math.max(
           0,
-          primaryTarget.baseMr * (1 - primaryTarget.vileDecayStacks * 0.075) - actorStats.magicPenFlat,
+          primaryTarget.baseMr * (1 - primaryTarget.vileDecayStacks * 0.075) -
+            actorStats.magicPenFlat,
         )
         const noteMagicMult = 100 / (100 + effMr)
         const noteBase = 4 + (actor.level - 1) * (21 / 17) + 0.04 * actorStats.ap
@@ -1018,6 +1252,76 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
             false,
             [`🎶 ${notesToUse} Notes`],
           )
+        }
+      }
+    }
+
+    // Jarvan IV Martial Cadence On-Hit on AA (8% current HP physical damage, 6s cooldown per target)
+    if (actor.slot.champion?.id === 'JarvanIV' && action === 'AA') {
+      const primaryTarget = finalTargets[0]
+      if (primaryTarget && !primaryTarget.isKo) {
+        actor.jarvanPassiveCooldowns = actor.jarvanPassiveCooldowns || {}
+        const nextReady = actor.jarvanPassiveCooldowns[primaryTarget.slotId] || 0
+        if (currentTime >= nextReady) {
+          actor.jarvanPassiveCooldowns[primaryTarget.slotId] = currentTime + 6.0
+          const effArmor = Math.max(
+            0,
+            primaryTarget.baseArmor *
+              (1 - primaryTarget.blackCleaverStacks * 0.05) *
+              (1 - actorStats.armorPen / 100) -
+              actorStats.lethality,
+          )
+          const physMult = 100 / (100 + effArmor)
+          const bonusRaw = Math.max(20, primaryTarget.currentHp * 0.08)
+          const bonusDmg = Math.round(bonusRaw * physMult)
+          if (bonusDmg > 0) {
+            applyDamageToTarget(
+              actor,
+              primaryTarget,
+              bonusDmg,
+              'physical',
+              '⚔️ Martial Cadence',
+              currentTime,
+              false,
+              ['⚔️ 8% Current HP'],
+            )
+          }
+        }
+      }
+    }
+
+    // Aatrox Deathbringer Stance On-Hit on AA (4%-12% max HP physical damage + heal, 15s cooldown)
+    if (actor.slot.champion?.id === 'Aatrox' && action === 'AA') {
+      const primaryTarget = finalTargets[0]
+      if (primaryTarget && !primaryTarget.isKo) {
+        const nextReady = actor.aatroxPassiveCooldown || 0
+        if (currentTime >= nextReady) {
+          actor.aatroxPassiveCooldown = currentTime + 15.0
+          const hpPct = 0.04 + (actor.level - 1) * 0.0047
+          const bonusRaw = primaryTarget.maxHp * hpPct
+          const effArmor = Math.max(
+            0,
+            primaryTarget.baseArmor *
+              (1 - primaryTarget.blackCleaverStacks * 0.05) *
+              (1 - actorStats.armorPen / 100) -
+              actorStats.lethality,
+          )
+          const physMult = 100 / (100 + effArmor)
+          const bonusDmg = Math.round(bonusRaw * physMult)
+          if (bonusDmg > 0) {
+            applyDamageToTarget(
+              actor,
+              primaryTarget,
+              bonusDmg,
+              'physical',
+              '🗡️ Deathbringer Stance',
+              currentTime,
+              false,
+              [`🗡️ ${Math.round(hpPct * 100)}% Max HP`],
+            )
+            const healAmt = Math.round(bonusDmg * 0.8)
+            actor.currentHp = Math.min(actor.maxHp, actor.currentHp + healAmt)
+          }
         }
       }
     }
@@ -1094,7 +1398,12 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
             if (hasPendingAction) break
 
             lastActionTime = Math.max(lastActionTime, t)
-            executeChampionAction(actor, sp, oppAlive.map((o) => o.slotId), t)
+            executeChampionAction(
+              actor,
+              sp,
+              oppAlive.map((o) => o.slotId),
+              t,
+            )
             break
           }
         }
@@ -1186,6 +1495,10 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
 
       // Process each active DoT on target
       target.activeDoTs.forEach((dot) => {
+        if (dot.type === 'deathfire_touch') {
+          dot.continuousBurnTime = (dot.continuousBurnTime || 0) + timeStep
+        }
+
         if (t >= dot.nextTickTime - 0.01 && dot.remainingDuration > 0) {
           const actor = participants[dot.sourceSlotId]
           if (actor) {
@@ -1212,18 +1525,30 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
                   ? 100 / (100 + effMr)
                   : 1.0
 
-            const totalRaw = dot.rawDamagePerTick * (dot.stacks || 1)
+            let ampMultiplier = 1.0
+            let isEmpowered = false
+            if (dot.type === 'deathfire_touch' && (dot.continuousBurnTime || 0) >= 3.0 - 0.01) {
+              ampMultiplier = 1.75
+              isEmpowered = true
+            }
+
+            const totalRaw = dot.rawDamagePerTick * (dot.stacks || 1) * ampMultiplier
             const tickDmg = Math.max(1, Math.round(totalRaw * mult))
 
             const stackSuffix = dot.stacks > 1 ? ` (${dot.stacks}x)` : ''
+            const actionName = isEmpowered
+              ? `🔥 Deathfire Touch Burn (+75%)`
+              : `${dot.name}${stackSuffix}`
+
             applyDamageToTarget(
               actor,
               target,
               tickDmg,
               dot.dmgType,
-              `${dot.name}${stackSuffix}`,
+              actionName,
               t,
               true,
+              isEmpowered ? ['🔥 DFT +75%'] : undefined,
             )
           }
           dot.nextTickTime = t + dot.tickInterval
@@ -1259,7 +1584,10 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       })
       if (!remainingActions && !hasActiveDots && !hasOngoingAura && t >= lastActionTime) {
         terminationReason = 'combo_complete'
-        combatEndTime = Math.max(0.1, Math.round(Math.max(lastDamageTime, lastActionTime) * 10) / 10)
+        combatEndTime = Math.max(
+          0.1,
+          Math.round(Math.max(lastDamageTime, lastActionTime) * 10) / 10,
+        )
         break
       }
     }
@@ -1296,8 +1624,9 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       role: part.role,
       initialHp: part.maxHp,
       currentHp: part.currentHp,
+      currentShield: part.currentShield,
       maxHp: part.maxHp,
-      hpPct: Math.max(0, Math.round((part.currentHp / part.maxHp) * 100)),
+      hpPct: Math.max(0, Math.round(((part.currentHp + part.currentShield) / part.maxHp) * 100)),
       isKo: part.isKo,
       totalDamageDealt: part.totalDamageDealt,
       dps,

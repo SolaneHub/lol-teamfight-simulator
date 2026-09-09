@@ -150,11 +150,23 @@ describe('Combat Simulation Engine (DPS, DoT, Two-way Trading)', () => {
     champion: dariusChamp,
     level: 11,
     items: [
-      { id: '3071', name: 'Black Cleaver', description: '<attention>+400</attention> Health <attention>+55</attention> Attack Damage' },
-      null, null, null, null, null,
+      {
+        id: '3071',
+        name: 'Black Cleaver',
+        description: '<attention>+400</attention> Health <attention>+55</attention> Attack Damage',
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
     ],
     primaryPath: null,
-    primaryKeystone: { id: 8010, key: 'Conqueror', name: 'Conqueror' } as unknown as DraftSlot['primaryKeystone'],
+    primaryKeystone: {
+      id: 8010,
+      key: 'Conqueror',
+      name: 'Conqueror',
+    } as unknown as DraftSlot['primaryKeystone'],
     primaryRune1: null,
     primaryRune2: null,
     primaryRune3: null,
@@ -173,11 +185,23 @@ describe('Combat Simulation Engine (DPS, DoT, Two-way Trading)', () => {
     champion: garenChamp,
     level: 11,
     items: [
-      { id: '3068', name: 'Sunfire Aegis', description: '<attention>+500</attention> Health <attention>+50</attention> Armor' },
-      null, null, null, null, null,
+      {
+        id: '3068',
+        name: 'Sunfire Aegis',
+        description: '<attention>+500</attention> Health <attention>+50</attention> Armor',
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
     ],
     primaryPath: null,
-    primaryKeystone: { id: 8010, key: 'Conqueror', name: 'Conqueror' } as unknown as DraftSlot['primaryKeystone'],
+    primaryKeystone: {
+      id: 8010,
+      key: 'Conqueror',
+      name: 'Conqueror',
+    } as unknown as DraftSlot['primaryKeystone'],
     primaryRune1: null,
     primaryRune2: null,
     primaryRune3: null,
@@ -267,9 +291,21 @@ describe('Combat Simulation Engine (DPS, DoT, Two-way Trading)', () => {
       champion: dariusChamp, // using dummy champ stats
       level: 11,
       items: [
-        { id: '3151', name: "Liandry's Torment", description: '<attention>+90</attention> Ability Power <attention>+300</attention> Health' },
-        { id: '2503', name: 'Blackfire Torch', description: '<attention>+90</attention> Ability Power <attention>+600</attention> Mana' },
-        null, null, null, null,
+        {
+          id: '3151',
+          name: "Liandry's Torment",
+          description:
+            '<attention>+90</attention> Ability Power <attention>+300</attention> Health',
+        },
+        {
+          id: '2503',
+          name: 'Blackfire Torch',
+          description: '<attention>+90</attention> Ability Power <attention>+600</attention> Mana',
+        },
+        null,
+        null,
+        null,
+        null,
       ],
       primaryPath: null,
       primaryKeystone: null,
@@ -308,9 +344,7 @@ describe('Combat Simulation Engine (DPS, DoT, Two-way Trading)', () => {
       allSlots: [mageSlot, targetDummy],
       activeBlueSlotIds: [2],
       activeRedSlotIds: [7],
-      actions: [
-        { id: 'm1', actorSlotId: 2, action: 'Q', targetSlotIds: [7], timestamp: 0.0 },
-      ],
+      actions: [{ id: 'm1', actorSlotId: 2, action: 'Q', targetSlotIds: [7], timestamp: 0.0 }],
       duration: 3.0,
       enableAutoAttacks: false,
       attackerBuffs: defaultBuffs,
@@ -393,8 +427,16 @@ describe('Combat Simulation Engine (DPS, DoT, Two-way Trading)', () => {
       champion: seraChamp,
       level: 11,
       items: [
-        { id: '3089', name: "Rabadon's Deathcap", description: '<attention>+140</attention> Ability Power' },
-        null, null, null, null, null,
+        {
+          id: '3089',
+          name: "Rabadon's Deathcap",
+          description: '<attention>+140</attention> Ability Power',
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
       ],
       primaryPath: null,
       primaryKeystone: null,
@@ -456,16 +498,18 @@ describe('Combat Simulation Engine (DPS, DoT, Two-way Trading)', () => {
     const eEvents = result.events.filter((e) => e.action === 'E' && e.timestamp === 0.5)
     expect(eEvents.length).toBe(1)
 
-    // 3rd cast: Q (Echo => 2 hits, normal + echo)
-    const thirdQEvents = result.events.filter((e) => e.timestamp === 1.0)
-    expect(thirdQEvents.length).toBe(2)
+    // 3rd cast: Q (Echo => single unified action with Echo badge and amplified double damage)
+    const thirdQEvents = result.events.filter((e) => e.timestamp === 1.0 && e.action === 'Q')
+    expect(thirdQEvents.length).toBe(1)
     expect(thirdQEvents[0].action).toBe('Q')
-    expect(thirdQEvents[1].action).toContain('Echo')
-    // The second Q hit must deal MORE damage than the first Q hit because the target's HP is lower (missing HP execute scaling!)
-    expect(thirdQEvents[1].amount).toBeGreaterThan(thirdQEvents[0].amount)
+    expect(thirdQEvents[0].badges).toContain('🎶 Echo')
+    // The Echo Q must deal MORE than 2x the first Q hit because the second soundwave scales with missing HP execute!
+    expect(thirdQEvents[0].amount).toBeGreaterThan(firstQEvents[0].amount * 2)
 
     // 4th action: AA fires Notes Volley
-    const noteEvents = result.events.filter((e) => e.action.includes('Notes') && e.timestamp === 1.5)
+    const noteEvents = result.events.filter(
+      (e) => e.action.includes('Notes') && e.timestamp === 1.5,
+    )
     expect(noteEvents.length).toBe(1)
     expect(noteEvents[0].amount).toBeGreaterThan(0)
   })
@@ -479,7 +523,11 @@ describe('Combat Simulation Engine (DPS, DoT, Two-way Trading)', () => {
       level: 11,
       items: [
         { id: '3071', name: 'Black Cleaver', description: '+20 Ability Haste' },
-        null, null, null, null, null,
+        null,
+        null,
+        null,
+        null,
+        null,
       ],
       primaryPath: null,
       primaryKeystone: null,
@@ -494,7 +542,8 @@ describe('Combat Simulation Engine (DPS, DoT, Two-way Trading)', () => {
       shardDefensive: null,
     }
 
-    const { getSpellBaseCooldown, getSpellEffectiveCooldown } = await import('../services/combat/combatSimulationService')
+    const { getSpellBaseCooldown, getSpellEffectiveCooldown } =
+      await import('../services/combat/combatSimulationService')
     // Decimate base cooldown at max rank is 5s
     const baseCd = getSpellBaseCooldown(slotWithHaste, 'Q')
     expect(baseCd).toBeGreaterThan(0)
@@ -603,9 +652,7 @@ describe('Combat Simulation Engine (DPS, DoT, Two-way Trading)', () => {
       allSlots: [blueDariusSlot, fragileTarget],
       activeBlueSlotIds: [1],
       activeRedSlotIds: [6],
-      actions: [
-        { id: 'act1', actorSlotId: 1, action: 'Q', targetSlotIds: [6], timestamp: 0.0 },
-      ],
+      actions: [{ id: 'act1', actorSlotId: 1, action: 'Q', targetSlotIds: [6], timestamp: 0.0 }],
       duration: 15.0, // Long safety ceiling
       enableAutoAttacks: false,
       autoCastSpells: false,
@@ -672,8 +719,505 @@ describe('Combat Simulation Engine (DPS, DoT, Two-way Trading)', () => {
     expect(result.timeToKill).toBeNull()
     expect(result.duration).toBeLessThanOrEqual(6.0)
     expect(result.duration).toBeGreaterThanOrEqual(5.0)
-    expect(result.blueTeamDps).toBe(Math.round((result.blueTeamTotalDamage / result.duration) * 10) / 10)
+    expect(result.blueTeamDps).toBe(
+      Math.round((result.blueTeamTotalDamage / result.duration) * 10) / 10,
+    )
+  })
+
+  it('automatically triggers champion on-hit passives (Jarvan Martial Cadence & Aatrox Deathbringer) on basic attacks', () => {
+    const jarvanChamp: Champion = {
+      id: 'JarvanIV',
+      key: '59',
+      name: 'Jarvan IV',
+      stats: { ...dariusChamp.stats, attackdamage: 100 },
+      spells: [],
+      passive: { name: 'Martial Cadence', description: 'bonus % current hp physical damage' },
+      tags: ['Fighter', 'Tank'],
+    }
+
+    const jarvanSlot: DraftSlot = {
+      id: 1,
+      side: 'blue',
+      role: 'Jungle',
+      champion: jarvanChamp,
+      level: 10,
+      items: Array(6).fill(null),
+      primaryPath: null,
+      primaryKeystone: null,
+      primaryRune1: null,
+      primaryRune2: null,
+      primaryRune3: null,
+      secondaryPath: null,
+      secondaryRune1: null,
+      secondaryRune2: null,
+      shardOffensive: null,
+      shardFlex: null,
+      shardDefensive: null,
+    }
+
+    const targetSlot: DraftSlot = {
+      id: 6,
+      side: 'red',
+      role: 'Top',
+      champion: garenChamp,
+      level: 10,
+      items: Array(6).fill(null),
+      primaryPath: null,
+      primaryKeystone: null,
+      primaryRune1: null,
+      primaryRune2: null,
+      primaryRune3: null,
+      secondaryPath: null,
+      secondaryRune1: null,
+      secondaryRune2: null,
+      shardOffensive: null,
+      shardFlex: null,
+      shardDefensive: null,
+    }
+
+    const res = runCombatSimulation({
+      allSlots: [jarvanSlot, targetSlot],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [6],
+      actions: [{ id: 'aa1', actorSlotId: 1, action: 'AA', targetSlotIds: [6], timestamp: 0.0 }],
+      duration: 3.0,
+      enableAutoAttacks: false,
+      autoCastSpells: false,
+      attackerBuffs: defaultBuffs,
+      defenderBuffs: defaultBuffs,
+    })
+
+    const martialCadenceEvent = res.events.find(
+      (e) =>
+        e.action.includes('Martial Cadence') ||
+        (e.badges && e.badges.some((b) => b.includes('8% Current HP'))),
+    )
+    expect(martialCadenceEvent).toBeDefined()
+    expect(martialCadenceEvent?.amount).toBeGreaterThan(0)
+  })
+
+  it('implements Seraphine W (Surround Sound) to heal and grant shield, with hpPct exceeding 100%', () => {
+    const seraphineChamp: Champion = {
+      id: 'Seraphine',
+      key: '147',
+      name: 'Seraphine',
+      stats: { ...dariusChamp.stats, hp: 1000 },
+      spells: [
+        { id: 'SeraphineQ', name: 'High Note', description: 'execute', tooltip: '' },
+        {
+          id: 'SeraphineW',
+          name: 'Surround Sound',
+          description: 'shield and heal',
+          tooltip: '<shield>60</shield><heal>5%</heal>',
+        },
+        { id: 'SeraphineE', name: 'Beat Drop', description: 'slow', tooltip: '' },
+        { id: 'SeraphineR', name: 'Encore', description: 'charm', tooltip: '' },
+      ],
+      passive: { name: 'Stage Presence', description: 'echo' },
+      tags: ['Mage', 'Support'],
+    }
+
+    const seraSlot: DraftSlot = {
+      id: 1,
+      side: 'blue',
+      role: 'Support',
+      champion: seraphineChamp,
+      level: 10,
+      items: Array(6).fill(null),
+      primaryPath: null,
+      primaryKeystone: null,
+      primaryRune1: null,
+      primaryRune2: null,
+      primaryRune3: null,
+      secondaryPath: null,
+      secondaryRune1: null,
+      secondaryRune2: null,
+      shardOffensive: null,
+      shardFlex: null,
+      shardDefensive: null,
+    }
+
+    const dummyEnemy: DraftSlot = {
+      id: 6,
+      side: 'red',
+      role: 'Top',
+      champion: garenChamp,
+      level: 10,
+      items: Array(6).fill(null),
+      primaryPath: null,
+      primaryKeystone: null,
+      primaryRune1: null,
+      primaryRune2: null,
+      primaryRune3: null,
+      secondaryPath: null,
+      secondaryRune1: null,
+      secondaryRune2: null,
+      shardOffensive: null,
+      shardFlex: null,
+      shardDefensive: null,
+    }
+
+    const res = runCombatSimulation({
+      allSlots: [seraSlot, dummyEnemy],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [6],
+      actions: [{ id: 'w1', actorSlotId: 1, action: 'W', targetSlotIds: [1], timestamp: 0.0 }],
+      duration: 3.0,
+      enableAutoAttacks: false,
+      autoCastSpells: false,
+      attackerBuffs: defaultBuffs,
+      defenderBuffs: defaultBuffs,
+    })
+
+    const wEventNormal = res.events.find((e) => e.action === 'W')
+
+    expect(wEventNormal).toBeDefined()
+    expect(wEventNormal?.shieldAmount).toBeGreaterThan(50)
+    // Without echo, W does NOT heal
+    expect(wEventNormal?.healAmount).toBeUndefined()
+    expect(wEventNormal?.badges).toBeUndefined()
+
+    const seraResult = res.championResults[1]
+    expect(seraResult.currentShield).toBeGreaterThan(50)
+    // When at full HP and gaining shield, total effective health percentage exceeds 100%!
+    expect(seraResult.hpPct).toBeGreaterThan(100)
+
+    // Now verify that 3rd ability cast as W (Echo W) both shields AND heals!
+    const resEcho = runCombatSimulation({
+      allSlots: [seraSlot, dummyEnemy],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [6],
+      actions: [
+        { id: 'q1', actorSlotId: 1, action: 'Q', targetSlotIds: [6], timestamp: 0.0 },
+        { id: 'e1', actorSlotId: 1, action: 'E', targetSlotIds: [6], timestamp: 0.5 },
+        { id: 'w1', actorSlotId: 1, action: 'W', targetSlotIds: [1], timestamp: 1.0 },
+      ],
+      duration: 3.0,
+      enableAutoAttacks: false,
+      autoCastSpells: false,
+      attackerBuffs: defaultBuffs,
+      defenderBuffs: defaultBuffs,
+    })
+
+    const wEventEcho = resEcho.events.find((e) => e.action === 'W')
+    expect(wEventEcho).toBeDefined()
+    expect(wEventEcho?.shieldAmount).toBeGreaterThan(50)
+    expect(wEventEcho?.healAmount).toBeGreaterThan(0)
+    expect(wEventEcho?.badges).toEqual(['🎶 Echo'])
+  })
+
+  it('correctly applies and amplifies Deathfire Touch keystone burn on ability damage', () => {
+    const dftMage: DraftSlot = {
+      id: 2,
+      side: 'blue',
+      role: 'MID',
+      champion: {
+        id: 'Lux',
+        key: '99',
+        name: 'Lux',
+        stats: {
+          hp: 580,
+          hpperlevel: 99,
+          mp: 480,
+          mpperlevel: 23.5,
+          movespeed: 330,
+          armor: 21,
+          armorperlevel: 5.2,
+          spellblock: 30,
+          spellblockperlevel: 1.3,
+          attackrange: 550,
+          hpregen: 5.5,
+          hpregenperlevel: 0.55,
+          mpregen: 8,
+          mpregenperlevel: 0.8,
+          crit: 0,
+          critperlevel: 0,
+          attackdamage: 54,
+          attackdamageperlevel: 3.3,
+          attackspeedperlevel: 2,
+          attackspeed: 0.669,
+        },
+        tags: ['Mage'],
+      } as Champion,
+      level: 13,
+      items: [
+        {
+          id: '3089',
+          name: "Rabadon's Deathcap",
+          description: '<attention>+140</attention> Ability Power',
+        },
+      ],
+      primaryKeystone: {
+        id: 8992,
+        name: 'Deathfire Touch',
+        icon: 'perk-images/Styles/Sorcery/DeathfireTouch/DEATHFIRE_TOUCH_KEYSTONE.png',
+      },
+      primaryRune1: null,
+      primaryRune2: null,
+      primaryRune3: null,
+      secondaryRune1: null,
+      secondaryRune2: null,
+      shardOffensive: null,
+      shardFlex: null,
+      shardDefensive: null,
+    }
+
+    const dummyEnemy: DraftSlot = {
+      id: 7,
+      side: 'red',
+      role: 'MID',
+      champion: {
+        id: 'TargetDummy',
+        key: '999',
+        name: 'Target Dummy',
+        stats: {
+          hp: 5000,
+          hpperlevel: 0,
+          mp: 0,
+          mpperlevel: 0,
+          movespeed: 0,
+          armor: 50,
+          armorperlevel: 0,
+          spellblock: 50,
+          spellblockperlevel: 0,
+          attackrange: 100,
+          hpregen: 0,
+          hpregenperlevel: 0,
+          mpregen: 0,
+          mpregenperlevel: 0,
+          crit: 0,
+          critperlevel: 0,
+          attackdamage: 0,
+          attackdamageperlevel: 0,
+          attackspeedperlevel: 0,
+          attackspeed: 0.625,
+        },
+        tags: ['Tank'],
+      } as Champion,
+      level: 13,
+      items: [],
+      primaryKeystone: null,
+      primaryRune1: null,
+      primaryRune2: null,
+      primaryRune3: null,
+      secondaryRune1: null,
+      secondaryRune2: null,
+      shardOffensive: null,
+      shardFlex: null,
+      shardDefensive: null,
+    }
+
+    // Lux casts single target spell at t=0.0 (duration 4s). After 3s of burn, it should amplify by 75%!
+    const res = runCombatSimulation({
+      allSlots: [dftMage, dummyEnemy],
+      activeBlueSlotIds: [2],
+      activeRedSlotIds: [7],
+      actions: [{ id: 'q1', actorSlotId: 2, action: 'Q', targetSlotIds: [7], timestamp: 0.0 }],
+      duration: 5.0,
+      enableAutoAttacks: false,
+      attackerBuffs: defaultBuffs,
+      defenderBuffs: defaultBuffs,
+    })
+
+    const dftEvents = res.events.filter((e) => e.action.includes('Deathfire Touch'))
+    expect(dftEvents.length).toBeGreaterThanOrEqual(6)
+
+    // Check normal burn ticks (< 3s)
+    const normalTicks = dftEvents.filter((e) => e.timestamp < 3.0)
+    expect(normalTicks.length).toBeGreaterThan(0)
+
+    // Check empowered burn ticks (>= 3s)
+    const empoweredTicks = dftEvents.filter((e) => e.badges?.includes('🔥 DFT +75%'))
+    expect(empoweredTicks.length).toBeGreaterThan(0)
+
+    // Empowered tick damage should be significantly higher (~1.75x)
+    const normalDmg = normalTicks[0]!.amount
+    const empDmg = empoweredTicks[0]!.amount
+    expect(empDmg).toBeGreaterThan(normalDmg * 1.5)
+  })
+
+  it('ensures Blackfire Torch does not re-proc or stack on same user rapid casts (e.g. Q at 0s, E at 0.3s)', () => {
+    const mageSlot: DraftSlot = {
+      id: 1,
+      side: 'blue',
+      role: 'MID',
+      champion: {
+        id: 'Lux',
+        key: '99',
+        name: 'Lux',
+        stats: {
+          hp: 580,
+          hpperlevel: 99,
+          mp: 480,
+          mpperlevel: 23.5,
+          movespeed: 330,
+          armor: 21,
+          armorperlevel: 5.2,
+          spellblock: 30,
+          spellblockperlevel: 1.3,
+          attackrange: 550,
+          hpregen: 5.5,
+          hpregenperlevel: 0.55,
+          mpregen: 8,
+          mpregenperlevel: 0.8,
+          crit: 0,
+          critperlevel: 0,
+          attackdamage: 54,
+          attackdamageperlevel: 3.3,
+          attackspeedperlevel: 2,
+          attackspeed: 0.669,
+        },
+        tags: ['Mage'],
+      } as Champion,
+      level: 11,
+      items: [
+        {
+          id: '2503',
+          name: 'Blackfire Torch',
+          description: '<attention>+90</attention> Ability Power <attention>+600</attention> Mana',
+        },
+      ],
+      primaryKeystone: null,
+      primaryRune1: null,
+      primaryRune2: null,
+      primaryRune3: null,
+      secondaryRune1: null,
+      secondaryRune2: null,
+      shardOffensive: null,
+      shardFlex: null,
+      shardDefensive: null,
+    }
+
+    const dummyEnemy: DraftSlot = {
+      id: 6,
+      side: 'red',
+      role: 'MID',
+      champion: {
+        id: 'TargetDummy',
+        key: '999',
+        name: 'Target Dummy',
+        stats: {
+          hp: 5000,
+          hpperlevel: 0,
+          mp: 0,
+          mpperlevel: 0,
+          movespeed: 0,
+          armor: 50,
+          armorperlevel: 0,
+          spellblock: 50,
+          spellblockperlevel: 0,
+          attackrange: 100,
+          hpregen: 0,
+          hpregenperlevel: 0,
+          mpregen: 0,
+          mpregenperlevel: 0,
+          crit: 0,
+          critperlevel: 0,
+          attackdamage: 0,
+          attackdamageperlevel: 0,
+          attackspeedperlevel: 0,
+          attackspeed: 0.625,
+        },
+        tags: ['Tank'],
+      } as Champion,
+      level: 11,
+      items: [],
+      primaryKeystone: null,
+      primaryRune1: null,
+      primaryRune2: null,
+      primaryRune3: null,
+      secondaryRune1: null,
+      secondaryRune2: null,
+      shardOffensive: null,
+      shardFlex: null,
+      shardDefensive: null,
+    }
+
+    // Test Case 1: Lux casts Q at 0.0s and E at 0.0s simultaneously -> exactly 6 ticks (no double proc)
+    const resSimultaneous = runCombatSimulation({
+      allSlots: [mageSlot, dummyEnemy],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [6],
+      actions: [
+        { id: 'q0', actorSlotId: 1, action: 'Q', targetSlotIds: [6], timestamp: 0.0 },
+        { id: 'e0', actorSlotId: 1, action: 'E', targetSlotIds: [6], timestamp: 0.0 },
+      ],
+      duration: 4.0,
+      enableAutoAttacks: false,
+      attackerBuffs: defaultBuffs,
+      defenderBuffs: defaultBuffs,
+    })
+
+    const simBlackfireEvents = resSimultaneous.events.filter((ev) =>
+      ev.action.includes('Blackfire Torch Burn'),
+    )
+    const simProcEvents = resSimultaneous.events.filter((ev) =>
+      ev.action.includes('Blackfire Torch Burn (Proc)'),
+    )
+    expect(simProcEvents.length).toBe(1)
+    expect(simBlackfireEvents.length).toBe(6)
+
+    // Test Case 2: Lux casts Q at 0.0s and E at 0.5s -> duration is refreshed, extending ticks to 7!
+    const resExtended = runCombatSimulation({
+      allSlots: [mageSlot, dummyEnemy],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [6],
+      actions: [
+        { id: 'q1', actorSlotId: 1, action: 'Q', targetSlotIds: [6], timestamp: 0.0 },
+        { id: 'e1', actorSlotId: 1, action: 'E', targetSlotIds: [6], timestamp: 0.5 },
+      ],
+      duration: 4.0,
+      enableAutoAttacks: false,
+      attackerBuffs: defaultBuffs,
+      defenderBuffs: defaultBuffs,
+    })
+
+    const extBlackfireEvents = resExtended.events.filter((ev) =>
+      ev.action.includes('Blackfire Torch Burn'),
+    )
+    const extProcEvents = resExtended.events.filter((ev) =>
+      ev.action.includes('Blackfire Torch Burn (Proc)'),
+    )
+    // Only 1 initial proc at 0.0s (no double proc at 0.5s)
+    expect(extProcEvents.length).toBe(1)
+    // Ticks at: 0.0s (proc), 0.5s, 1.0s, 1.5s, 2.0s, 2.5s, 3.0s = 7 ticks!
+    expect(extBlackfireEvents.length).toBe(7)
+
+    // Test Case 3: Lux casts Q at 0.0s and E at 0.1s (or 0.4s) -> also refreshes and yields 7 ticks!
+    const resRapid01 = runCombatSimulation({
+      allSlots: [mageSlot, dummyEnemy],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [6],
+      actions: [
+        { id: 'q01', actorSlotId: 1, action: 'Q', targetSlotIds: [6], timestamp: 0.0 },
+        { id: 'e01', actorSlotId: 1, action: 'E', targetSlotIds: [6], timestamp: 0.1 },
+      ],
+      duration: 4.0,
+      enableAutoAttacks: false,
+      attackerBuffs: defaultBuffs,
+      defenderBuffs: defaultBuffs,
+    })
+    const rapid01Events = resRapid01.events.filter((ev) =>
+      ev.action.includes('Blackfire Torch Burn'),
+    )
+    expect(rapid01Events.length).toBe(7)
+
+    const resRapid04 = runCombatSimulation({
+      allSlots: [mageSlot, dummyEnemy],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [6],
+      actions: [
+        { id: 'q04', actorSlotId: 1, action: 'Q', targetSlotIds: [6], timestamp: 0.0 },
+        { id: 'e04', actorSlotId: 1, action: 'E', targetSlotIds: [6], timestamp: 0.4 },
+      ],
+      duration: 4.0,
+      enableAutoAttacks: false,
+      attackerBuffs: defaultBuffs,
+      defenderBuffs: defaultBuffs,
+    })
+    const rapid04Events = resRapid04.events.filter((ev) =>
+      ev.action.includes('Blackfire Torch Burn'),
+    )
+    expect(rapid04Events.length).toBe(7)
   })
 })
-
-
