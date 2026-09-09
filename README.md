@@ -58,35 +58,33 @@ pnpm lint
 ## 📁 Project Structure
 
 ```
+docs/              # Project tracking & status matrices
+└── status/        # Champions (173) & Items (203) implementation matrices
 src/
 ├── assets/        # Static assets
 ├── components/    # Vue components
 ├── router/        # Vue Router config
-├── services/      # Modular business logic & API services
+├── services/      # Modular business logic, damage & simulation services
 ├── stores/        # Pinia stores
 ├── types/         # TypeScript types
 └── views/         # Page views
-scripts/           # Utility scripts (e.g. data fetching)
-public/            # Static public assets
-out/               # Pre-fetched champion data
+scripts/           # Utility scripts
+public/            # Static public assets (DDragon & CDragon data)
 ```
 
 ---
 
-## 📋 Champion Progress Tracker
+## 📊 Implementation & Tracking Dashboard
 
-Use this checklist to track champion data validation, custom spell formulas, and simulation support status.
+We maintain exhaustive implementation registries for champions, abilities, items, and runes:
 
-### Completed Champions
-- [x] **Aatrox** — Spells parsed, dynamic E omnivamp healing scaling on bonus HP resolved, passive formatted.
+| Category | Coverage | Detailed Tracking Registry |
+| :--- | :---: | :--- |
+| 🏆 **Champions & Abilities** | **18 / 173** (865 abilities tracked) | [docs/status/champions.md](docs/status/champions.md) |
+| 📦 **Items Implementation** | **69 / 203** (Unique, Starter, Basic, Epic, Legendary) | [docs/status/items.md](docs/status/items.md) |
 
-### Pending Champions (Work in Progress / To Be Validated)
-- [ ] Ahri
-- [ ] Akali
-- [ ] Amumu
-- [ ] Annie
-- [ ] Ashe
-- [ ] *The remaining 160+ champions from Data Dragon*
+> 🎨 **UI Rule**: Implemented champions appear in **full vibrant color** in the draft and builder grids; untested champions in the backlog are rendered in **grayscale** (`grayscale opacity-60`).
+
 
 ---
 
