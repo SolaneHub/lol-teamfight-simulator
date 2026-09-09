@@ -13,7 +13,8 @@
             Damage Calculator & DPS Simulator
           </h1>
           <p class="text-base text-slate-400">
-            Real-time combat exchange between Blue and Red squads with continuous spell cooldowns, Attack Speed pacing, and DoTs
+            Real-time combat exchange between Blue and Red squads with continuous spell cooldowns,
+            Attack Speed pacing, and DoTs
           </p>
         </div>
       </div>
@@ -136,26 +137,83 @@
                 :class="
                   getChampionEndState(slot.id).isKo
                     ? 'text-rose-500 font-extrabold'
-                    : 'text-emerald-400'
+                    : getChampionEndState(slot.id).currentShield > 0
+                      ? 'text-white font-extrabold'
+                      : 'text-emerald-400'
                 "
               >
-                {{ getChampionEndState(slot.id).currentHp }} /
-                {{ getChampionEndState(slot.id).maxHp }} ({{ getChampionEndState(slot.id).hpPct }}%)
+                {{ getChampionEndState(slot.id).currentHp }}
+                <span
+                  v-if="getChampionEndState(slot.id).currentShield > 0"
+                  class="text-white font-bold"
+                >
+                  (+{{ getChampionEndState(slot.id).currentShield }})
+                </span>
+                / {{ getChampionEndState(slot.id).maxHp }}
+                <span
+                  class="font-black"
+                  :class="
+                    getChampionEndState(slot.id).hpPct > 100
+                      ? 'text-white font-extrabold'
+                      : getChampionEndState(slot.id).currentShield > 0
+                        ? 'text-slate-200'
+                        : ''
+                  "
+                >
+                  ({{ getChampionEndState(slot.id).hpPct }}%)
+                </span>
               </span>
             </div>
             <div
-              class="h-3.5 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative"
+              class="h-3.5 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative flex"
             >
+              <!-- Base Health Bar (Green / Yellow / Red) -->
               <div
                 class="h-full transition-all duration-300"
                 :class="
-                  getChampionEndState(slot.id).hpPct > 50
+                  getChampionEndState(slot.id).currentHp / getChampionEndState(slot.id).maxHp > 0.5
                     ? 'bg-linear-to-r from-emerald-500 to-green-400'
-                    : getChampionEndState(slot.id).hpPct > 20
+                    : getChampionEndState(slot.id).currentHp / getChampionEndState(slot.id).maxHp >
+                        0.2
                       ? 'bg-linear-to-r from-amber-500 to-yellow-400'
                       : 'bg-linear-to-r from-rose-600 to-red-500'
                 "
-                :style="{ width: getChampionEndState(slot.id).hpPct + '%' }"
+                :style="{
+                  width:
+                    Math.min(
+                      100,
+                      Math.round(
+                        (getChampionEndState(slot.id).currentHp /
+                          Math.max(
+                            getChampionEndState(slot.id).maxHp,
+                            getChampionEndState(slot.id).currentHp +
+                              getChampionEndState(slot.id).currentShield,
+                          )) *
+                          100,
+                      ),
+                    ) + '%',
+                }"
+              ></div>
+              <!-- Shield Bar (Silver / White / Platinum - NOT GREEN!) -->
+              <div
+                v-if="getChampionEndState(slot.id).currentShield > 0"
+                class="h-full bg-linear-to-r from-slate-200 via-white to-slate-300 border-l border-white shadow-md transition-all duration-300"
+                :title="getChampionEndState(slot.id).currentShield + ' Shield'"
+                :style="{
+                  width:
+                    Math.min(
+                      100,
+                      Math.round(
+                        (getChampionEndState(slot.id).currentShield /
+                          Math.max(
+                            getChampionEndState(slot.id).maxHp,
+                            getChampionEndState(slot.id).currentHp +
+                              getChampionEndState(slot.id).currentShield,
+                          )) *
+                          100,
+                      ),
+                    ) + '%',
+                }"
               ></div>
             </div>
           </div>
@@ -295,42 +353,65 @@
               <div>
                 <div class="flex items-center gap-2">
                   <span class="text-cyan-400 font-bold text-lg uppercase">Blue Squad</span>
-                  <span class="text-base bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-md border border-cyan-800/60 font-bold">
+                  <span
+                    class="text-base bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-md border border-cyan-800/60 font-bold"
+                  >
                     {{ selectedAttackerSlots.length }} Champs
                   </span>
                 </div>
                 <div class="text-base mt-1">
-                  <span class="text-slate-300 font-bold">Dmg: <strong class="text-cyan-300 text-lg">{{ combatResults.blueTeamTotalDamage.toLocaleString() }}</strong></span>
+                  <span class="text-slate-300 font-bold"
+                    >Dmg:
+                    <strong class="text-cyan-300 text-lg">{{
+                      combatResults.blueTeamTotalDamage.toLocaleString()
+                    }}</strong></span
+                  >
                   <span class="mx-2 text-slate-600">•</span>
-                  <span class="text-slate-300 font-bold">DPS: <strong class="text-amber-400 text-lg">🔥 {{ combatResults.blueTeamDps.toFixed(1) }}</strong></span>
+                  <span class="text-slate-300 font-bold"
+                    >DPS:
+                    <strong class="text-amber-400 text-lg"
+                      >🔥 {{ combatResults.blueTeamDps.toFixed(1) }}</strong
+                    ></span
+                  >
                 </div>
               </div>
             </div>
 
             <!-- VS Badge & Dynamic Outcome -->
             <div class="flex flex-col items-center justify-center">
-              <span class="text-base text-slate-400 uppercase tracking-widest font-extrabold">VS</span>
+              <span class="text-base text-slate-400 uppercase tracking-widest font-extrabold"
+                >VS</span
+              >
               <div
                 v-if="combatResults.timeToKill !== null && combatResults.timeToKill !== undefined"
                 class="flex items-center gap-1.5 text-base font-extrabold text-rose-300 bg-rose-950/90 px-3 py-1 rounded-xl border border-rose-800 shadow-lg shadow-rose-950/40 mt-1"
               >
                 <span>💀 TTK:</span>
-                <span class="text-white text-lg font-black">{{ combatResults.timeToKill.toFixed(1) }}s</span>
-                <span class="text-xs uppercase bg-rose-600 text-white font-black px-1.5 py-0.5 rounded">K.O.</span>
+                <span class="text-white text-lg font-black"
+                  >{{ combatResults.timeToKill.toFixed(1) }}s</span
+                >
+                <span
+                  class="text-xs uppercase bg-rose-600 text-white font-black px-1.5 py-0.5 rounded"
+                  >K.O.</span
+                >
               </div>
               <div
                 v-else-if="combatResults.terminationReason === 'combo_complete'"
                 class="flex items-center gap-1.5 text-base font-extrabold text-cyan-300 bg-cyan-950/90 px-3 py-1 rounded-xl border border-cyan-800 shadow mt-1"
               >
                 <span>⏱️ Combo:</span>
-                <span class="text-white text-lg font-black">{{ combatResults.duration.toFixed(1) }}s</span>
+                <span class="text-white text-lg font-black"
+                  >{{ combatResults.duration.toFixed(1) }}s</span
+                >
               </div>
               <div
                 v-else
                 class="flex items-center gap-1.5 text-base font-extrabold text-amber-300 bg-amber-950/90 px-3 py-1 rounded-xl border border-amber-800 shadow mt-1"
               >
                 <span>⏱️ Combat:</span>
-                <span class="text-white text-lg font-black">{{ combatResults.duration.toFixed(1) }}s</span>
+                <span class="text-white text-lg font-black"
+                  >{{ combatResults.duration.toFixed(1) }}s</span
+                >
               </div>
             </div>
 
@@ -338,15 +419,27 @@
             <div class="flex items-center gap-3 text-right">
               <div>
                 <div class="flex items-center justify-end gap-2">
-                  <span class="text-base bg-rose-950 text-rose-300 px-2 py-0.5 rounded-md border border-rose-800/60 font-bold">
+                  <span
+                    class="text-base bg-rose-950 text-rose-300 px-2 py-0.5 rounded-md border border-rose-800/60 font-bold"
+                  >
                     {{ selectedDefenderSlots.length }} Champs
                   </span>
                   <span class="text-rose-400 font-bold text-lg uppercase">Red Squad</span>
                 </div>
                 <div class="text-base mt-1">
-                  <span class="text-slate-300 font-bold">DPS: <strong class="text-amber-400 text-lg">🔥 {{ combatResults.redTeamDps.toFixed(1) }}</strong></span>
+                  <span class="text-slate-300 font-bold"
+                    >DPS:
+                    <strong class="text-amber-400 text-lg"
+                      >🔥 {{ combatResults.redTeamDps.toFixed(1) }}</strong
+                    ></span
+                  >
                   <span class="mx-2 text-slate-600">•</span>
-                  <span class="text-slate-300 font-bold">Dmg: <strong class="text-rose-300 text-lg">{{ combatResults.redTeamTotalDamage.toLocaleString() }}</strong></span>
+                  <span class="text-slate-300 font-bold"
+                    >Dmg:
+                    <strong class="text-rose-300 text-lg">{{
+                      combatResults.redTeamTotalDamage.toLocaleString()
+                    }}</strong></span
+                  >
                 </div>
               </div>
               <div class="h-4 w-4 rounded-full bg-rose-400 animate-pulse"></div>
@@ -354,14 +447,16 @@
           </div>
 
           <!-- Damage Share Progress Bar -->
-          <div class="h-3 w-full bg-slate-950 rounded-full overflow-hidden flex border border-slate-800">
+          <div
+            class="h-3 w-full bg-slate-950 rounded-full overflow-hidden flex border border-slate-800"
+          >
             <div
               class="h-full bg-cyan-500 transition-all duration-300"
               :style="{ width: blueDamageSharePct + '%' }"
             ></div>
             <div
               class="h-full bg-rose-500 transition-all duration-300"
-              :style="{ width: (100 - blueDamageSharePct) + '%' }"
+              :style="{ width: 100 - blueDamageSharePct + '%' }"
             ></div>
           </div>
         </div>
@@ -370,7 +465,9 @@
         <div
           class="bg-[#131926] border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-5 font-mono text-base"
         >
-          <div class="flex items-center justify-between border-b border-slate-800 pb-3 flex-wrap gap-2">
+          <div
+            class="flex items-center justify-between border-b border-slate-800 pb-3 flex-wrap gap-2"
+          >
             <div class="flex items-center gap-2.5">
               <span class="text-lg font-bold text-amber-400 uppercase tracking-wider">
                 ⚡ Action & Combo Scheduler
@@ -423,7 +520,9 @@
                       v-if="s.champion"
                       :src="getChampionIconUrl(s.champion)"
                       class="w-11 h-11 rounded-lg object-cover border-2 shrink-0"
-                      :class="actionCreatorActorId === s.id ? 'border-cyan-400' : 'border-slate-800'"
+                      :class="
+                        actionCreatorActorId === s.id ? 'border-cyan-400' : 'border-slate-800'
+                      "
                     />
                     <div class="min-w-0 flex-1">
                       <div class="text-base font-extrabold text-white truncate">
@@ -449,10 +548,39 @@
                 </span>
               </div>
 
-              <!-- Vertical Abilities: P ➔ Q ➔ W ➔ E ➔ R ➔ AA -->
+              <!-- Innate Passive Card (Always active / innate, not manually castable) -->
+              <div
+                v-if="selectedActorSlot?.champion?.passive"
+                class="flex items-center gap-2.5 p-2 px-3 rounded-xl bg-slate-900/90 border border-slate-800 text-base"
+                :title="
+                  selectedActorSlot.champion.passive.description ||
+                  selectedActorSlot.champion.passive.name
+                "
+              >
+                <span
+                  class="w-8 h-8 rounded-lg flex items-center justify-center font-black text-xs shrink-0 bg-purple-950 text-purple-300 border border-purple-800/60"
+                >
+                  P
+                </span>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center justify-between gap-1">
+                    <span class="text-base font-extrabold text-white truncate">
+                      {{ selectedActorSlot.champion.passive.name }}
+                    </span>
+                    <span class="text-xs font-bold text-purple-400 font-mono shrink-0">
+                      Innate
+                    </span>
+                  </div>
+                  <p class="text-xs text-slate-400 truncate">
+                    Triggers automatically on spells & attacks
+                  </p>
+                </div>
+              </div>
+
+              <!-- Vertical Abilities: Q ➔ W ➔ E ➔ R ➔ AA -->
               <div class="flex flex-col gap-2 flex-1">
                 <button
-                  v-for="act in (['P', 'Q', 'W', 'E', 'R', 'AA'] as const)"
+                  v-for="act in ['Q', 'W', 'E', 'R', 'AA'] as const"
                   :key="act"
                   @click="selectSpellAction(act)"
                   :title="getAbilityFullTooltip(act)"
@@ -525,7 +653,9 @@
                       v-if="s.champion"
                       :src="getChampionIconUrl(s.champion)"
                       class="w-11 h-11 rounded-lg object-cover border-2 shrink-0"
-                      :class="actionCreatorActorId === s.id ? 'border-rose-400' : 'border-slate-800'"
+                      :class="
+                        actionCreatorActorId === s.id ? 'border-rose-400' : 'border-slate-800'
+                      "
                     />
                     <div class="min-w-0 flex-1">
                       <div class="text-base font-extrabold text-white truncate">
@@ -589,7 +719,10 @@
             <div class="flex items-center gap-2">
               <span>⚠️</span>
               <span>
-                <strong>{{ actionCreatorSpell }} is on Cooldown at {{ actionCreatorTime.toFixed(1) }}s!</strong>
+                <strong
+                  >{{ actionCreatorSpell }} is on Cooldown at
+                  {{ actionCreatorTime.toFixed(1) }}s!</strong
+                >
                 Ready at {{ nextReadyTimeForSelectedSpell.toFixed(1) }}s
               </span>
             </div>
@@ -602,7 +735,9 @@
           </div>
 
           <!-- Step 4: Timestamp & Submit -->
-          <div class="flex items-center justify-between gap-4 pt-2 border-t border-slate-800/80 flex-wrap text-base">
+          <div
+            class="flex items-center justify-between gap-4 pt-2 border-t border-slate-800/80 flex-wrap text-base"
+          >
             <div class="flex items-center gap-2.5 flex-wrap">
               <span class="text-base font-bold text-slate-400 uppercase">Timestamp:</span>
               <input
@@ -620,10 +755,16 @@
                 +0.5s
               </button>
               <button
-                @click="actionCreatorTime = 0"
-                class="text-base text-slate-500 hover:text-slate-400 underline cursor-pointer"
+                v-if="lastCombatEventTime > 0"
+                @click="snapToLastEventTime"
+                :title="
+                  lastCombatEventAction
+                    ? `Set to last damage/event (${lastCombatEventAction} at ${lastCombatEventTime.toFixed(1)}s)`
+                    : `Set to last event (${lastCombatEventTime.toFixed(1)}s)`
+                "
+                class="px-3 py-2 rounded-xl bg-cyan-950/80 border border-cyan-800/60 text-base text-cyan-300 hover:text-cyan-200 hover:bg-cyan-900/60 font-bold cursor-pointer transition-all flex items-center gap-1.5 shadow-sm"
               >
-                Reset 0s
+                <span>⏱️ Last Damage ({{ lastCombatEventTime.toFixed(1) }}s)</span>
               </button>
             </div>
 
@@ -637,7 +778,9 @@
         </div>
 
         <!-- 3. TABS SELECTOR FOR CENTER BODY: ACTIONS SEQUENCE VS LOG -->
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2 font-mono text-base">
+        <div
+          class="flex items-center justify-between border-b border-slate-800 pb-2 font-mono text-base"
+        >
           <div class="flex items-center gap-2.5 flex-wrap">
             <button
               @click="centerViewTab = 'all'"
@@ -685,7 +828,9 @@
               <span class="text-base font-bold text-amber-400 uppercase tracking-wider">
                 ⚡ Champion Action Sequence
               </span>
-              <span class="text-base text-slate-400 bg-slate-950 px-2.5 py-0.5 rounded-lg border border-slate-800">
+              <span
+                class="text-base text-slate-400 bg-slate-950 px-2.5 py-0.5 rounded-lg border border-slate-800"
+              >
                 {{ teamfightActions.length }} Scheduled
               </span>
             </div>
@@ -744,10 +889,18 @@
                   :class="
                     act.action === 'AA'
                       ? 'bg-emerald-950/80 text-emerald-300 border-emerald-700/60'
-                      : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                      : act.action === 'P'
+                        ? 'bg-purple-950/80 text-purple-300 border-purple-700/60'
+                        : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                   "
                 >
-                  {{ act.action === 'AA' ? 'Basic Attack (AA)' : 'Ability ' + act.action }}
+                  {{
+                    act.action === 'AA'
+                      ? 'Basic Attack (AA)'
+                      : act.action === 'P'
+                        ? 'Passive'
+                        : 'Ability ' + act.action
+                  }}
                 </div>
 
                 <span class="text-slate-500 text-base font-bold">➔</span>
@@ -816,7 +969,8 @@
           >
             <span class="text-lg font-bold text-slate-300">⚡ No actions scheduled.</span>
             <span class="text-slate-400 max-w-lg text-base">
-              Select a champion and ability above, then click <strong>Add Action to Sequence</strong> to start simulating combat!
+              Select a champion and ability above, then click
+              <strong>Add Action to Sequence</strong> to start simulating combat!
             </span>
           </div>
         </div>
@@ -826,12 +980,16 @@
           v-if="centerViewTab === 'all' || centerViewTab === 'log'"
           class="bg-[#131926] border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 font-mono text-base"
         >
-          <div class="flex items-center justify-between border-b border-slate-800 pb-3 flex-wrap gap-2">
+          <div
+            class="flex items-center justify-between border-b border-slate-800 pb-3 flex-wrap gap-2"
+          >
             <div class="flex items-center gap-2.5">
               <span class="text-base font-bold text-amber-400 uppercase tracking-wider">
                 📜 Combat Damage & Event Log
               </span>
-              <span class="text-base text-slate-400 bg-slate-950 px-2.5 py-0.5 rounded-lg border border-slate-800">
+              <span
+                class="text-base text-slate-400 bg-slate-950 px-2.5 py-0.5 rounded-lg border border-slate-800"
+              >
                 {{ filteredEvents.length }} Events
               </span>
             </div>
@@ -904,11 +1062,13 @@
             >
               <!-- Left: Timestamp, Actor, Action, Target -->
               <div class="flex items-center gap-2.5 flex-wrap">
-                <span
-                  class="px-2 py-0.5 rounded-lg bg-slate-900 text-amber-400 font-bold text-base border border-slate-800"
+                <button
+                  @click="actionCreatorTime = Math.round(evt.timestamp * 10) / 10"
+                  title="Click to set this timestamp in the Action Creator"
+                  class="px-2 py-0.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-400 hover:text-amber-300 font-bold text-base border border-slate-800 hover:border-amber-500/50 cursor-pointer transition-all"
                 >
                   {{ evt.timestamp.toFixed(1) }}s
-                </span>
+                </button>
                 <span
                   class="font-bold text-base"
                   :class="evt.actorSide === 'blue' ? 'text-cyan-400' : 'text-rose-400'"
@@ -925,6 +1085,12 @@
                 >
                   {{ evt.action }}
                 </span>
+                <span
+                  v-if="evt.badges?.includes('🎶 Echo') && !evt.action.includes('Echo')"
+                  class="px-2 py-0.5 rounded-lg text-base font-bold border bg-pink-950/80 text-pink-300 border-pink-700/60 shadow-sm"
+                >
+                  🎶 Echo
+                </span>
                 <span class="text-slate-500 text-base font-bold">➔</span>
                 <span
                   class="font-bold text-base"
@@ -938,27 +1104,60 @@
               <div class="flex items-center gap-2.5 flex-wrap justify-end">
                 <div class="flex items-center gap-1.5 flex-wrap">
                   <span
-                    v-for="(badge, bIdx) in evt.badges || []"
+                    v-for="(badge, bIdx) in (evt.badges || []).filter((b) => b !== '🎶 Echo')"
                     :key="bIdx"
                     class="text-base bg-slate-900 text-amber-300 px-2 py-0.5 rounded-lg border border-slate-800"
                   >
                     {{ badge }}
                   </span>
                 </div>
+                <!-- Combined Shield & Heal for W cast -->
+                <template v-if="evt.shieldAmount !== undefined || evt.healAmount !== undefined">
+                  <span
+                    v-if="evt.shieldAmount && evt.shieldAmount > 0"
+                    class="text-base font-extrabold px-2.5 py-0.5 rounded-lg border bg-slate-800 text-white border-slate-400 shadow-sm"
+                  >
+                    +{{ evt.shieldAmount }} SHIELD
+                  </span>
+                  <span
+                    v-if="evt.healAmount && evt.healAmount > 0"
+                    class="text-base font-extrabold px-2.5 py-0.5 rounded-lg border bg-emerald-950/80 text-emerald-400 border-emerald-800/60 shadow-sm"
+                  >
+                    +{{ evt.healAmount }} HP
+                  </span>
+                </template>
+
+                <!-- Standard badge for damage or standalone events -->
                 <span
-                  class="text-base font-extrabold px-2.5 py-0.5 rounded-lg"
+                  v-else
+                  class="text-base font-extrabold px-2.5 py-0.5 rounded-lg border"
                   :class="
                     evt.dmgType === 'physical'
-                      ? 'bg-orange-950/80 text-orange-400'
+                      ? 'bg-orange-950/80 text-orange-400 border-orange-800/60'
                       : evt.dmgType === 'magic'
-                        ? 'bg-cyan-950/80 text-cyan-400'
-                        : 'bg-slate-900 text-white'
+                        ? 'bg-cyan-950/80 text-cyan-400 border-cyan-800/60'
+                        : evt.dmgType === 'shield'
+                          ? 'bg-slate-800 text-white border-slate-400 shadow-sm'
+                          : evt.dmgType === 'heal'
+                            ? 'bg-emerald-950/80 text-emerald-400 border-emerald-800/60 shadow-sm'
+                            : 'bg-slate-900 text-slate-100 border-slate-700'
                   "
                 >
-                  {{ evt.amount }} {{ evt.dmgType.toUpperCase() }}
+                  <template v-if="evt.dmgType === 'shield'"> +{{ evt.amount }} SHIELD </template>
+                  <template v-else-if="evt.dmgType === 'heal'"> +{{ evt.amount }} HP </template>
+                  <template v-else> {{ evt.amount }} {{ evt.dmgType.toUpperCase() }} </template>
                 </span>
                 <span class="text-base text-slate-400">
-                  HP: <strong :class="evt.remainingHp === 0 ? 'text-rose-500' : 'text-slate-200'">{{ evt.remainingHp }}</strong>
+                  HP:
+                  <strong :class="evt.remainingHp === 0 ? 'text-rose-500' : 'text-slate-200'">{{
+                    evt.remainingHp
+                  }}</strong>
+                  <span
+                    v-if="evt.remainingShield && evt.remainingShield > 0"
+                    class="text-white font-bold ml-1"
+                  >
+                    (+{{ evt.remainingShield }})
+                  </span>
                 </span>
                 <span
                   v-if="evt.isKo"
@@ -1079,26 +1278,83 @@
                 :class="
                   getChampionEndState(slot.id).isKo
                     ? 'text-rose-500 font-extrabold'
-                    : 'text-emerald-400'
+                    : getChampionEndState(slot.id).currentShield > 0
+                      ? 'text-white font-extrabold'
+                      : 'text-emerald-400'
                 "
               >
-                {{ getChampionEndState(slot.id).currentHp }} /
-                {{ getChampionEndState(slot.id).maxHp }} ({{ getChampionEndState(slot.id).hpPct }}%)
+                {{ getChampionEndState(slot.id).currentHp }}
+                <span
+                  v-if="getChampionEndState(slot.id).currentShield > 0"
+                  class="text-white font-bold"
+                >
+                  (+{{ getChampionEndState(slot.id).currentShield }})
+                </span>
+                / {{ getChampionEndState(slot.id).maxHp }}
+                <span
+                  class="font-black"
+                  :class="
+                    getChampionEndState(slot.id).hpPct > 100
+                      ? 'text-white font-extrabold'
+                      : getChampionEndState(slot.id).currentShield > 0
+                        ? 'text-slate-200'
+                        : ''
+                  "
+                >
+                  ({{ getChampionEndState(slot.id).hpPct }}%)
+                </span>
               </span>
             </div>
             <div
-              class="h-3.5 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative"
+              class="h-3.5 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative flex"
             >
+              <!-- Base Health Bar (Green / Yellow / Red) -->
               <div
                 class="h-full transition-all duration-300"
                 :class="
-                  getChampionEndState(slot.id).hpPct > 50
+                  getChampionEndState(slot.id).currentHp / getChampionEndState(slot.id).maxHp > 0.5
                     ? 'bg-linear-to-r from-emerald-500 to-green-400'
-                    : getChampionEndState(slot.id).hpPct > 20
+                    : getChampionEndState(slot.id).currentHp / getChampionEndState(slot.id).maxHp >
+                        0.2
                       ? 'bg-linear-to-r from-amber-500 to-yellow-400'
                       : 'bg-linear-to-r from-rose-600 to-red-500'
                 "
-                :style="{ width: getChampionEndState(slot.id).hpPct + '%' }"
+                :style="{
+                  width:
+                    Math.min(
+                      100,
+                      Math.round(
+                        (getChampionEndState(slot.id).currentHp /
+                          Math.max(
+                            getChampionEndState(slot.id).maxHp,
+                            getChampionEndState(slot.id).currentHp +
+                              getChampionEndState(slot.id).currentShield,
+                          )) *
+                          100,
+                      ),
+                    ) + '%',
+                }"
+              ></div>
+              <!-- Shield Bar (Silver / White / Platinum - NOT GREEN!) -->
+              <div
+                v-if="getChampionEndState(slot.id).currentShield > 0"
+                class="h-full bg-linear-to-r from-slate-200 via-white to-slate-300 border-l border-white shadow-md transition-all duration-300"
+                :title="getChampionEndState(slot.id).currentShield + ' Shield'"
+                :style="{
+                  width:
+                    Math.min(
+                      100,
+                      Math.round(
+                        (getChampionEndState(slot.id).currentShield /
+                          Math.max(
+                            getChampionEndState(slot.id).maxHp,
+                            getChampionEndState(slot.id).currentHp +
+                              getChampionEndState(slot.id).currentShield,
+                          )) *
+                          100,
+                      ),
+                    ) + '%',
+                }"
               ></div>
             </div>
           </div>
@@ -1438,6 +1694,9 @@ watch(
     const oppSlots = isBlue ? selectedDefenderSlots.value : selectedAttackerSlots.value
     const firstId = oppSlots[0]?.id
     actionCreatorTargetIds.value = firstId !== undefined ? [firstId] : []
+    if (actionCreatorSpell.value === 'P') {
+      actionCreatorSpell.value = 'Q'
+    }
   },
   { immediate: true },
 )
@@ -1466,10 +1725,7 @@ const submitTeamfightAction = () => {
     actionCreatorTime.value,
   )
   // Auto-advance timestamp by cast animation time (0.3s) for seamless combo queuing
-  actionCreatorTime.value = Math.min(
-    30,
-    Math.round((actionCreatorTime.value + 0.3) * 10) / 10,
-  )
+  actionCreatorTime.value = Math.min(30, Math.round((actionCreatorTime.value + 0.3) * 10) / 10)
 }
 
 const clearActionsAndResetTime = () => {
@@ -1482,7 +1738,11 @@ const moveActionUp = (index: number) => {
   const current = teamfightActions.value[index]
   const prev = teamfightActions.value[index - 1]
   if (!current || !prev) return
-  if (current.timestamp !== undefined && prev.timestamp !== undefined && current.timestamp !== prev.timestamp) {
+  if (
+    current.timestamp !== undefined &&
+    prev.timestamp !== undefined &&
+    current.timestamp !== prev.timestamp
+  ) {
     const tempTime = current.timestamp
     current.timestamp = prev.timestamp
     prev.timestamp = tempTime
@@ -1495,7 +1755,11 @@ const moveActionDown = (index: number) => {
   const current = teamfightActions.value[index]
   const next = teamfightActions.value[index + 1]
   if (!current || !next) return
-  if (current.timestamp !== undefined && next.timestamp !== undefined && current.timestamp !== next.timestamp) {
+  if (
+    current.timestamp !== undefined &&
+    next.timestamp !== undefined &&
+    current.timestamp !== next.timestamp
+  ) {
     const tempTime = current.timestamp
     current.timestamp = next.timestamp
     next.timestamp = tempTime
@@ -1520,6 +1784,7 @@ const getCalculatedStatsForSlot = (slot: DraftSlot) => {
   const itemPassives = detectItemPassives(slot.items)
   let blackfireBonusAp = 0
   const baseAp = Math.round((base.ap.total + mStats.bonusAP) * mStats.apMultiplier)
+  const rawAp = (base.ap.bonus || 0) + mStats.bonusAP
 
   if (itemPassives.hasBlackfireTorch) {
     let maxTargetsHit = 0
@@ -1533,8 +1798,8 @@ const getCalculatedStatsForSlot = (slot: DraftSlot) => {
     })
     if (maxTargetsHit > 0) {
       const extraApPct = maxTargetsHit * 0.04
-      const effectiveAp = Math.round(baseAp * (1 + extraApPct))
-      blackfireBonusAp = effectiveAp - baseAp
+      // Stacks additively with other sources of % AP (Rabadon, Infernal Might)
+      blackfireBonusAp = Math.round(rawAp * extraApPct)
     }
   }
 
@@ -1582,6 +1847,28 @@ const blueDamageSharePct = computed(() => {
   return Math.round((combatResults.value.blueTeamTotalDamage / total) * 100)
 })
 
+// Last Combat Event Time & Action for smart combo queuing
+const lastCombatEventTime = computed(() => {
+  const evts = combatResults.value?.events || []
+  if (evts.length === 0) return 0
+  const maxTime = Math.max(...evts.map((e) => e.timestamp))
+  return Math.round(maxTime * 10) / 10
+})
+
+const lastCombatEventAction = computed(() => {
+  const evts = combatResults.value?.events || []
+  if (evts.length === 0) return ''
+  const maxTime = lastCombatEventTime.value
+  const lastEvt = [...evts].reverse().find((e) => Math.abs(e.timestamp - maxTime) < 0.05)
+  return lastEvt?.action || ''
+})
+
+const snapToLastEventTime = () => {
+  if (lastCombatEventTime.value > 0) {
+    actionCreatorTime.value = Math.min(30, lastCombatEventTime.value)
+  }
+}
+
 // Event Filter State
 const eventFilter = ref<'all' | 'blue' | 'red' | 'dot'>('all')
 
@@ -1604,6 +1891,7 @@ const getChampionEndState = (slotId: number) => {
       role: '',
       initialHp: 1000,
       currentHp: 1000,
+      currentShield: 0,
       maxHp: 1000,
       hpPct: 100,
       isKo: false,
@@ -1623,4 +1911,3 @@ const getChampionEndState = (slotId: number) => {
   return res
 }
 </script>
-
