@@ -1,368 +1,276 @@
 <template>
   <div
-    class="flex-1 flex flex-col gap-6 p-6 w-full max-w-none bg-[#0b0f17] text-slate-200 font-sans min-h-screen text-base"
+    class="flex-1 flex flex-col gap-6 p-4 sm:p-6 w-full max-w-none bg-[#0b0f17] text-slate-200 font-sans min-h-screen text-base"
   >
-    <!-- TOP TOOLBAR: SCENARIO PRESETS & VIEW MODE SWITCHER -->
+    <!-- TOP SLIM BAR: TITLE & PRESETS -->
     <div
-      class="flex flex-wrap items-center justify-between gap-4 bg-[#131926] border border-slate-800 rounded-2xl p-5 shadow-xl"
+      class="flex flex-wrap items-center justify-between gap-4 bg-[#131926] border border-slate-800 rounded-2xl p-5 shadow-xl font-mono text-base"
     >
-      <!-- Scenario Presets -->
-      <div class="flex items-center gap-3 flex-wrap">
-        <span class="text-base font-mono uppercase font-bold text-slate-400 mr-2">Presets:</span>
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">⚔️</span>
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold text-white uppercase tracking-wider">
+            Damage Calculator & DPS Simulator
+          </h1>
+          <p class="text-base text-slate-400">
+            Real-time combat exchange between Blue and Red squads with continuous spell cooldowns, Attack Speed pacing, and DoTs
+          </p>
+        </div>
+      </div>
+
+      <!-- Presets for fast setup -->
+      <div class="flex items-center gap-2.5 flex-wrap text-base">
+        <span class="text-base uppercase font-bold text-slate-400 mr-1">Presets:</span>
         <button
           v-for="p in presetOptions"
           :key="p.id"
           @click="setPresetScenario(p.id)"
-          class="px-4 py-2.5 rounded-lg font-mono text-base font-bold transition-all border cursor-pointer"
+          class="px-3.5 py-2 rounded-xl text-base font-bold transition-all border cursor-pointer"
           :class="
             isPresetActive(p.id)
               ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500 shadow-sm'
-              : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-white'
+              : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-white'
           "
         >
           {{ p.label }}
         </button>
       </div>
-
-      <!-- View Mode Switcher -->
-      <div class="flex items-center bg-slate-950 p-1.5 rounded-xl border border-slate-800">
-        <button
-          @click="teamfightViewMode = 'split'"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-base font-mono font-bold transition-all cursor-pointer"
-          :class="
-            teamfightViewMode === 'split'
-              ? 'bg-cyan-500 text-slate-950 shadow-md'
-              : 'text-slate-400 hover:text-white'
-          "
-        >
-          <span>📊</span>
-          <span>3-Column Squad View</span>
-        </button>
-        <button
-          @click="teamfightViewMode = 'feed'"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-base font-mono font-bold transition-all cursor-pointer"
-          :class="
-            teamfightViewMode === 'feed'
-              ? 'bg-cyan-500 text-slate-950 shadow-md'
-              : 'text-slate-400 hover:text-white'
-          "
-        >
-          <span>⏱️</span>
-          <span>Chronological Feed View</span>
-        </button>
-      </div>
     </div>
 
-    <!-- ROSTER SELECTORS (BLUE TEAM ATTACKERS & RED TEAM DEFENDERS) -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-      <!-- Blue Team Attacker Selection -->
-      <div
-        class="bg-[#131926] border border-slate-800 rounded-xl p-5 flex flex-col gap-3 shadow-md"
-      >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="h-3.5 w-3.5 rounded-full bg-cyan-400 animate-pulse"></span>
-            <span class="text-base font-mono font-bold uppercase tracking-wider text-cyan-400"
-              >Attacker Squad (Blue Team)</span
-            >
-          </div>
-          <span class="text-base font-mono text-slate-400 font-semibold"
-            >{{ selectedAttackerSlots.length }} Champions Participating</span
-          >
-        </div>
-        <div class="flex items-center gap-2.5 flex-wrap">
-          <button
-            v-for="s in blueDraft"
-            :key="s.id"
-            @click="toggleAttackerSlot(s.id)"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg border font-mono text-base cursor-pointer transition-all"
-            :class="
-              selectedAttackerSlotIds.includes(s.id)
-                ? 'bg-cyan-950/80 text-cyan-300 border-cyan-500/80 font-bold shadow'
-                : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
-            "
-          >
-            <span
-              class="h-2.5 w-2.5 rounded-full"
-              :class="selectedAttackerSlotIds.includes(s.id) ? 'bg-cyan-400' : 'bg-slate-600'"
-            ></span>
-            <span>{{ s.role }}</span>
-            <span v-if="s.champion" class="text-white font-semibold">{{ s.champion.name }}</span>
-            <span v-else class="text-slate-500">Empty</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Red Team Defender Selection -->
-      <div
-        class="bg-[#131926] border border-slate-800 rounded-xl p-5 flex flex-col gap-3 shadow-md"
-      >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="h-3.5 w-3.5 rounded-full bg-rose-400 animate-pulse"></span>
-            <span class="text-base font-mono font-bold uppercase tracking-wider text-rose-400"
-              >Defender Squad (Red Team)</span
-            >
-          </div>
-          <span class="text-base font-mono text-slate-400 font-semibold"
-            >{{ selectedDefenderSlots.length }} Champions Targetable</span
-          >
-        </div>
-        <div class="flex items-center gap-2.5 flex-wrap">
-          <button
-            v-for="s in redDraft"
-            :key="s.id"
-            @click="toggleDefenderSlot(s.id)"
-            class="flex items-center gap-2 px-4 py-2 rounded-lg border font-mono text-base cursor-pointer transition-all"
-            :class="
-              selectedDefenderSlotIds.includes(s.id)
-                ? 'bg-rose-950/80 text-rose-300 border-rose-500/80 font-bold shadow'
-                : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
-            "
-          >
-            <span
-              class="h-2.5 w-2.5 rounded-full"
-              :class="selectedDefenderSlotIds.includes(s.id) ? 'bg-rose-400' : 'bg-slate-600'"
-            ></span>
-            <span>{{ s.role }}</span>
-            <span v-if="s.champion" class="text-white font-semibold">{{ s.champion.name }}</span>
-            <span v-else class="text-slate-500">Empty</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ACTION CREATOR PANEL (SELECT ACTOR, ABILITY & TARGETS) -->
-    <div
-      class="bg-[#131926] border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-5"
-    >
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div class="flex items-center gap-3">
-          <span class="text-lg font-bold font-mono text-amber-400 uppercase tracking-wider"
-            >⚡ Teamfight Action Creator</span
-          >
-          <span
-            class="text-base font-mono text-slate-300 bg-slate-900 px-3 py-1 rounded border border-slate-800"
-            >AOE & Multi-Target Ready</span
-          >
-        </div>
-        <button
-          @click="clearComboSequence"
-          class="px-4 py-2 bg-rose-950/50 text-rose-300 hover:bg-rose-900 border border-rose-900/60 rounded-lg font-mono text-base font-bold transition-all cursor-pointer"
+    <!-- MAIN 3-COLUMN VERTICAL ARENA -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full items-start text-base">
+      <!-- ================================================================= -->
+      <!-- LEFT COLUMN: BLUE SQUAD (Attackers / Allies)                      -->
+      <!-- ================================================================= -->
+      <div class="lg:col-span-3 flex flex-col gap-5 order-2 lg:order-1 text-base">
+        <!-- Blue Squad Header & Roster Picker -->
+        <div
+          class="bg-[#131926] border border-cyan-900/40 rounded-2xl p-5 flex flex-col gap-3.5 shadow-xl"
         >
-          🗑️ Clear Teamfight Timeline
-        </button>
-      </div>
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="h-4 w-4 rounded-full bg-cyan-400 animate-pulse"></span>
+              <span class="text-lg font-mono font-bold uppercase tracking-wider text-cyan-400">
+                Blue Squad
+              </span>
+            </div>
+            <span
+              class="text-base font-mono text-cyan-300 font-bold bg-cyan-950 px-2.5 py-1 rounded-lg border border-cyan-800/60"
+            >
+              {{ selectedAttackerSlots.length }} Active
+            </span>
+          </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end font-mono">
-        <!-- 1. Actor Selector -->
-        <div class="md:col-span-3 flex flex-col gap-2">
-          <label class="text-base font-bold text-slate-400 uppercase tracking-wide"
-            >1. Attacking Champion</label
-          >
-          <div
-            class="min-h-14 bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-1.5"
-          >
+          <!-- Roster Slot Buttons -->
+          <div class="flex items-center gap-2 flex-wrap">
             <button
-              v-for="s in selectedAttackerSlots"
+              v-for="s in blueDraft"
               :key="s.id"
-              @click="actionCreatorActorId = s.id"
-              class="h-10 flex items-center gap-1.5 px-2.5 rounded-lg text-base font-bold font-mono border cursor-pointer transition-all"
+              @click="toggleAttackerSlot(s.id)"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl border font-mono text-base cursor-pointer transition-all"
               :class="
-                actionCreatorActorId === s.id
-                  ? 'bg-cyan-600 text-white border-cyan-400 font-extrabold shadow-md shadow-cyan-600/30'
-                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'
+                selectedAttackerSlotIds.includes(s.id)
+                  ? 'bg-cyan-950 text-cyan-300 border-cyan-500 font-bold shadow'
+                  : 'bg-slate-950 text-slate-500 border-slate-800 hover:text-slate-300'
               "
+              :title="s.champion ? s.champion.name : s.role"
             >
               <img
                 v-if="s.champion"
                 :src="getChampionIconUrl(s.champion)"
-                class="w-6 h-6 rounded-md object-cover border border-cyan-500/30"
+                class="w-6 h-6 rounded-md object-cover"
               />
-              <span>{{ s.champion ? s.champion.name : s.role }}</span>
+              <span>{{ s.role }}</span>
+              <span v-if="s.champion" class="text-white font-semibold truncate max-w-[100px]">
+                {{ s.champion.name }}
+              </span>
             </button>
           </div>
         </div>
 
-        <!-- 2. Spell / AA Selector -->
-        <div class="md:col-span-3 flex flex-col gap-2">
-          <label class="text-base font-bold text-slate-400 uppercase tracking-wide"
-            >2. Action / Spell</label
-          >
-          <div
-            class="h-14 bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex items-center gap-1.5"
-          >
-            <button
-              v-for="act in ['Q', 'W', 'E', 'R', 'P', 'AA']"
-              :key="act"
-              @click="actionCreatorSpell = act as any"
-              class="flex-1 h-full flex items-center justify-center rounded-lg font-mono text-base font-extrabold transition-all border cursor-pointer"
-              :class="
-                actionCreatorSpell === act
-                  ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/20'
-                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-white'
-              "
-            >
-              {{ act }}
-            </button>
-          </div>
-        </div>
-
-        <!-- 3. Target Picker (AOE Checkboxes) -->
-        <div class="md:col-span-4 flex flex-col gap-2">
-          <div class="flex items-center justify-between">
-            <label class="text-base font-bold text-slate-400 uppercase tracking-wide"
-              >3. Hit Targets (AOE Multi-Select)</label
-            >
-            <button
-              @click="toggleSelectAllTargets"
-              class="text-base text-cyan-400 hover:text-cyan-300 hover:underline cursor-pointer font-bold"
-            >
-              {{ isAllTargetsSelected ? 'Deselect All' : 'Select All Enemies (AOE)' }}
-            </button>
-          </div>
-          <div
-            class="min-h-14 bg-slate-950 p-1.5 rounded-xl border border-slate-800 flex flex-wrap items-center gap-1.5"
-          >
-            <label
-              v-for="s in selectedDefenderSlots"
-              :key="s.id"
-              class="h-10 flex items-center gap-1.5 px-2.5 rounded-lg text-base font-bold border cursor-pointer transition-all"
-              :class="
-                actionCreatorTargetIds.includes(s.id)
-                  ? 'bg-rose-950 text-rose-300 border-rose-600 font-bold shadow-md shadow-rose-900/30'
-                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'
-              "
-            >
-              <input
-                type="checkbox"
-                :value="s.id"
-                v-model="actionCreatorTargetIds"
-                class="hidden"
-              />
-              <img
-                v-if="s.champion"
-                :src="getChampionIconUrl(s.champion)"
-                class="w-6 h-6 rounded-md object-cover border border-rose-500/30"
-              />
-              <span>{{ s.champion ? s.champion.name : s.role }}</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Add Button -->
-        <div class="md:col-span-2 flex flex-col gap-2">
-          <label class="text-base font-bold text-transparent uppercase select-none">&nbsp;</label>
-          <button
-            @click="submitTeamfightAction"
-            class="h-14 w-full px-4 bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold rounded-xl font-mono text-base transition-all shadow-lg shadow-orange-500/20 cursor-pointer flex items-center justify-center gap-2"
-          >
-            <span>➕ Add Action</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- VIEW MODE 1: 3-COLUMN SQUAD VIEW -->
-    <div v-if="teamfightViewMode === 'split'" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <!-- LEFT COLUMN: ATTACKER SQUAD ROSTER -->
-      <div class="lg:col-span-3 flex flex-col gap-5">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-          <span class="text-base font-mono uppercase font-bold text-cyan-400"
-            >Attacker Squad Roster</span
-          >
-          <span class="text-base font-mono text-slate-500 font-semibold">Live Stats</span>
-        </div>
-
+        <!-- Blue Participating Champions Cards (Stacked Vertically) -->
         <div
           v-for="slot in selectedAttackerSlots"
           :key="slot.id"
-          class="bg-[#131926] border border-slate-800 rounded-xl p-5 flex flex-col gap-4 shadow-lg"
+          class="bg-[#131926] border border-slate-800 hover:border-cyan-800/60 rounded-2xl p-5 flex flex-col gap-4 shadow-lg transition-all text-base"
         >
-          <!-- Card Header -->
+          <!-- Champion Header -->
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <img
                 v-if="slot.champion"
                 :src="getChampionIconUrl(slot.champion)"
-                class="h-12 w-12 rounded-lg border border-cyan-500/50 object-cover"
+                class="h-14 w-14 rounded-xl border border-cyan-500/50 object-cover shadow"
               />
+              <div
+                v-else
+                class="h-14 w-14 rounded-xl border border-slate-800 bg-slate-950 flex items-center justify-center text-slate-600 font-mono text-base"
+              >
+                Empty
+              </div>
               <div>
-                <h4 class="text-base font-bold text-white leading-tight">
+                <h4 class="text-lg font-bold text-white leading-tight">
                   {{ slot.champion?.name || 'Unassigned' }}
                 </h4>
-                <span class="text-base font-mono text-cyan-400 font-semibold"
-                  >{{ slot.side.toUpperCase() }} {{ slot.role }} • Lvl {{ slot.level }}</span
-                >
+                <span class="text-base font-mono text-cyan-400 font-semibold">
+                  BLUE {{ slot.role }} • Lvl {{ slot.level }}
+                </span>
               </div>
             </div>
             <button
               @click="openWorkbenchForSlot(slot.id)"
-              class="text-base text-cyan-400 hover:text-white font-mono px-2.5 py-1 rounded bg-slate-950 border border-slate-800 hover:border-cyan-500 transition-all cursor-pointer"
+              class="text-base text-cyan-400 hover:text-white font-mono px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:border-cyan-500 transition-all cursor-pointer font-semibold"
+              title="Edit build in Workbench"
             >
-              ⚙️
+              ⚙️ Build
             </button>
+          </div>
+
+          <!-- Live HP Bar & Status -->
+          <div
+            class="flex flex-col gap-1.5 font-mono text-base bg-slate-950 p-3 rounded-xl border border-slate-800"
+          >
+            <div class="flex items-center justify-between font-bold">
+              <span class="text-slate-400">Health</span>
+              <span
+                :class="
+                  getChampionEndState(slot.id).isKo
+                    ? 'text-rose-500 font-extrabold'
+                    : 'text-emerald-400'
+                "
+              >
+                {{ getChampionEndState(slot.id).currentHp }} /
+                {{ getChampionEndState(slot.id).maxHp }} ({{ getChampionEndState(slot.id).hpPct }}%)
+              </span>
+            </div>
+            <div
+              class="h-3.5 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative"
+            >
+              <div
+                class="h-full transition-all duration-300"
+                :class="
+                  getChampionEndState(slot.id).hpPct > 50
+                    ? 'bg-linear-to-r from-emerald-500 to-green-400'
+                    : getChampionEndState(slot.id).hpPct > 20
+                      ? 'bg-linear-to-r from-amber-500 to-yellow-400'
+                      : 'bg-linear-to-r from-rose-600 to-red-500'
+                "
+                :style="{ width: getChampionEndState(slot.id).hpPct + '%' }"
+              ></div>
+            </div>
+          </div>
+
+          <!-- DPS & Total Damage Card -->
+          <div
+            class="flex flex-col gap-2 font-mono bg-slate-950 p-3 rounded-xl border border-slate-800 text-base"
+          >
+            <div class="flex items-center justify-between">
+              <span class="text-slate-400 text-base uppercase">Damage Dealt</span>
+              <span class="text-amber-400 font-extrabold text-lg">
+                🔥 {{ getChampionEndState(slot.id).dps }} DPS
+              </span>
+            </div>
+            <div class="flex items-center justify-between text-base">
+              <span class="text-white font-bold">
+                {{ getChampionEndState(slot.id).totalDamageDealt.toLocaleString() }} Total
+              </span>
+              <span class="text-slate-400">
+                Taken: {{ getChampionEndState(slot.id).damageTaken.toLocaleString() }}
+              </span>
+            </div>
+
+            <!-- Damage Breakdown Badges -->
+            <div class="flex items-center gap-1.5 flex-wrap text-base font-bold pt-1">
+              <span
+                v-if="getChampionEndState(slot.id).damageDealtByType.physical > 0"
+                class="bg-orange-950/80 text-orange-400 border border-orange-800/60 px-2 py-0.5 rounded-md"
+              >
+                {{ getChampionEndState(slot.id).damageDealtByType.physical }} Phys
+              </span>
+              <span
+                v-if="getChampionEndState(slot.id).damageDealtByType.magic > 0"
+                class="bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 px-2 py-0.5 rounded-md"
+              >
+                {{ getChampionEndState(slot.id).damageDealtByType.magic }} Mag
+              </span>
+              <span
+                v-if="getChampionEndState(slot.id).damageDealtByType.true > 0"
+                class="bg-slate-900 text-slate-200 border border-slate-700 px-2 py-0.5 rounded-md"
+              >
+                {{ getChampionEndState(slot.id).damageDealtByType.true }} True
+              </span>
+              <span
+                v-if="getChampionEndState(slot.id).damageDealtByType.dot > 0"
+                class="bg-purple-950/80 text-purple-300 border border-purple-800/60 px-2 py-0.5 rounded-md"
+              >
+                🔥 {{ getChampionEndState(slot.id).damageDealtByType.dot }} DoT
+              </span>
+            </div>
+          </div>
+
+          <!-- Active DoTs on this champion -->
+          <div
+            v-if="getChampionEndState(slot.id).activeDoTs.length > 0"
+            class="flex items-center gap-2 flex-wrap font-mono text-base"
+          >
+            <span
+              v-for="dot in getChampionEndState(slot.id).activeDoTs"
+              :key="dot.id"
+              class="bg-rose-950/90 text-rose-300 border border-rose-800/60 px-2.5 py-1 rounded-lg font-semibold animate-pulse"
+            >
+              🩸 {{ dot.name }} ({{ dot.remainingDuration.toFixed(1) }}s)
+            </span>
           </div>
 
           <!-- Stats Grid -->
           <div
             v-if="getCalculatedStatsForSlot(slot)"
-            class="grid grid-cols-3 gap-2 text-base font-mono bg-slate-950 p-3 rounded-lg border border-slate-800"
+            class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-base font-mono bg-slate-950 p-3 rounded-xl border border-slate-800"
           >
             <div>
-              <span class="text-slate-500 block text-base">AD</span
-              ><span class="text-orange-400 font-bold text-lg">{{
-                getCalculatedStatsForSlot(slot)?.ad
-              }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 block text-base">AP</span
-              ><span class="text-cyan-400 font-bold text-lg"
-                >{{ getCalculatedStatsForSlot(slot)?.ap }}
-                <span
-                  v-if="getCalculatedStatsForSlot(slot)?.blackfireBonusAp"
-                  class="text-xs text-cyan-300 font-normal block sm:inline"
-                >
-                  (+{{ getCalculatedStatsForSlot(slot)?.blackfireBonusAp }})
-                </span>
+              <span class="text-slate-400 block text-base font-semibold">AD</span>
+              <span class="text-orange-400 font-bold text-lg">
+                {{ getCalculatedStatsForSlot(slot)?.ad }}
               </span>
             </div>
             <div>
-              <span class="text-slate-500 block text-base">Crit</span
-              ><span class="text-amber-300 font-bold text-lg"
-                >{{ getCalculatedStatsForSlot(slot)?.crit }}%</span
-              >
+              <span class="text-slate-400 block text-base font-semibold">AP</span>
+              <span class="text-cyan-400 font-bold text-lg">
+                {{ getCalculatedStatsForSlot(slot)?.ap }}
+              </span>
             </div>
             <div>
-              <span class="text-slate-500 block text-base">Pen</span
-              ><span class="text-rose-400 font-bold text-base"
-                >{{ getCalculatedStatsForSlot(slot)?.lethality }}|{{
-                  getCalculatedStatsForSlot(slot)?.armorPen
-                }}%</span
-              >
+              <span class="text-slate-400 block text-base font-semibold">AS</span>
+              <span class="text-emerald-400 font-bold text-lg">
+                {{ getCalculatedStatsForSlot(slot)?.as }}
+              </span>
             </div>
             <div>
-              <span class="text-slate-500 block text-base">MPen</span
-              ><span class="text-purple-400 font-bold text-base"
-                >{{ getCalculatedStatsForSlot(slot)?.magicPenFlat }}|{{
-                  getCalculatedStatsForSlot(slot)?.magicPenPercent
-                }}%</span
-              >
+              <span class="text-slate-400 block text-base font-semibold">Armor</span>
+              <span class="text-amber-400 font-bold text-lg">
+                {{ getChampionEndState(slot.id).effectiveArmor }}
+              </span>
             </div>
             <div>
-              <span class="text-slate-500 block text-base">AH</span
-              ><span class="text-teal-400 font-bold text-lg">{{
-                getCalculatedStatsForSlot(slot)?.abilityHaste
-              }}</span>
+              <span class="text-slate-400 block text-base font-semibold">MR</span>
+              <span class="text-purple-400 font-bold text-lg">
+                {{ getChampionEndState(slot.id).effectiveMr }}
+              </span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-base font-semibold">Crit</span>
+              <span class="text-amber-300 font-bold text-lg">
+                {{ getCalculatedStatsForSlot(slot)?.crit }}%
+              </span>
             </div>
           </div>
 
           <!-- Items Row -->
-          <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-2 flex-wrap">
             <div
               v-for="(item, idx) in slot.items"
               :key="idx"
-              class="h-9 w-9 rounded bg-slate-950 border border-slate-800 flex items-center justify-center overflow-hidden"
+              class="h-10 w-10 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center overflow-hidden"
             >
               <img v-if="item" :src="getItemIconUrl(item)" class="h-full w-full object-cover" />
               <span v-else class="text-base text-slate-700">-</span>
@@ -371,468 +279,946 @@
         </div>
       </div>
 
-      <!-- CENTER COLUMN: COMBAT TIMELINE & LOGS -->
-      <div class="lg:col-span-6 flex flex-col gap-5">
+      <!-- ================================================================= -->
+      <!-- CENTER COLUMN: ALL COMMON ELEMENTS BETWEEN BLUE & RED             -->
+      <!-- ================================================================= -->
+      <div class="lg:col-span-6 flex flex-col gap-6 order-1 lg:order-2 text-base">
+        <!-- 1. MATCHUP & SIMULATION CONTROLS (COMMON IN CENTER) -->
         <div
-          class="bg-[#131926] border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-4"
+          class="bg-[#131926] border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-5 font-mono text-base"
         >
-          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-            <span class="text-lg font-mono uppercase font-bold text-amber-400"
-              >Teamfight Combat Log</span
-            >
-            <span class="text-base font-mono text-slate-400"
-              >{{ teamfightSimulationResults.logSteps.length }} Steps Executed</span
-            >
+          <!-- Header: Blue vs Red Scores -->
+          <div class="flex items-center justify-between flex-wrap gap-4">
+            <!-- Blue Summary -->
+            <div class="flex items-center gap-3">
+              <div class="h-4 w-4 rounded-full bg-cyan-400 animate-pulse"></div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-cyan-400 font-bold text-lg uppercase">Blue Squad</span>
+                  <span class="text-base bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-md border border-cyan-800/60 font-bold">
+                    {{ selectedAttackerSlots.length }} Champs
+                  </span>
+                </div>
+                <div class="text-base mt-1">
+                  <span class="text-slate-300 font-bold">Dmg: <strong class="text-cyan-300 text-lg">{{ combatResults.blueTeamTotalDamage.toLocaleString() }}</strong></span>
+                  <span class="mx-2 text-slate-600">•</span>
+                  <span class="text-slate-300 font-bold">DPS: <strong class="text-amber-400 text-lg">🔥 {{ combatResults.blueTeamDps.toFixed(1) }}</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- VS Badge & Dynamic Outcome -->
+            <div class="flex flex-col items-center justify-center">
+              <span class="text-base text-slate-400 uppercase tracking-widest font-extrabold">VS</span>
+              <div
+                v-if="combatResults.timeToKill !== null && combatResults.timeToKill !== undefined"
+                class="flex items-center gap-1.5 text-base font-extrabold text-rose-300 bg-rose-950/90 px-3 py-1 rounded-xl border border-rose-800 shadow-lg shadow-rose-950/40 mt-1"
+              >
+                <span>💀 TTK:</span>
+                <span class="text-white text-lg font-black">{{ combatResults.timeToKill.toFixed(1) }}s</span>
+                <span class="text-xs uppercase bg-rose-600 text-white font-black px-1.5 py-0.5 rounded">K.O.</span>
+              </div>
+              <div
+                v-else-if="combatResults.terminationReason === 'combo_complete'"
+                class="flex items-center gap-1.5 text-base font-extrabold text-cyan-300 bg-cyan-950/90 px-3 py-1 rounded-xl border border-cyan-800 shadow mt-1"
+              >
+                <span>⏱️ Combo:</span>
+                <span class="text-white text-lg font-black">{{ combatResults.duration.toFixed(1) }}s</span>
+              </div>
+              <div
+                v-else
+                class="flex items-center gap-1.5 text-base font-extrabold text-amber-300 bg-amber-950/90 px-3 py-1 rounded-xl border border-amber-800 shadow mt-1"
+              >
+                <span>⏱️ Combat:</span>
+                <span class="text-white text-lg font-black">{{ combatResults.duration.toFixed(1) }}s</span>
+              </div>
+            </div>
+
+            <!-- Red Summary -->
+            <div class="flex items-center gap-3 text-right">
+              <div>
+                <div class="flex items-center justify-end gap-2">
+                  <span class="text-base bg-rose-950 text-rose-300 px-2 py-0.5 rounded-md border border-rose-800/60 font-bold">
+                    {{ selectedDefenderSlots.length }} Champs
+                  </span>
+                  <span class="text-rose-400 font-bold text-lg uppercase">Red Squad</span>
+                </div>
+                <div class="text-base mt-1">
+                  <span class="text-slate-300 font-bold">DPS: <strong class="text-amber-400 text-lg">🔥 {{ combatResults.redTeamDps.toFixed(1) }}</strong></span>
+                  <span class="mx-2 text-slate-600">•</span>
+                  <span class="text-slate-300 font-bold">Dmg: <strong class="text-rose-300 text-lg">{{ combatResults.redTeamTotalDamage.toLocaleString() }}</strong></span>
+                </div>
+              </div>
+              <div class="h-4 w-4 rounded-full bg-rose-400 animate-pulse"></div>
+            </div>
           </div>
 
-          <!-- Action Steps Timeline -->
-          <div
-            v-if="teamfightSimulationResults.logSteps.length > 0"
-            class="flex flex-col gap-4 font-mono text-base"
-          >
+          <!-- Damage Share Progress Bar -->
+          <div class="h-3 w-full bg-slate-950 rounded-full overflow-hidden flex border border-slate-800">
             <div
-              v-for="(step, idx) in teamfightSimulationResults.logSteps"
-              :key="idx"
-              class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 flex flex-col gap-3 transition-all hover:border-slate-700"
-            >
-              <!-- Step Header -->
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <span
-                    class="px-2.5 py-1 rounded bg-slate-900 text-slate-400 border border-slate-800 font-bold text-base"
-                    >#{{ idx + 1 }}</span
-                  >
-                  <span class="text-cyan-300 font-bold text-lg">{{ step.actorName }}</span>
-                  <span
-                    class="px-3 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 text-base"
-                    >{{ step.action }}</span
-                  >
+              class="h-full bg-cyan-500 transition-all duration-300"
+              :style="{ width: blueDamageSharePct + '%' }"
+            ></div>
+            <div
+              class="h-full bg-rose-500 transition-all duration-300"
+              :style="{ width: (100 - blueDamageSharePct) + '%' }"
+            ></div>
+          </div>
+        </div>
+
+        <!-- 2. ACTION & COMBO CREATOR (COOLDOWN-AWARE SCHEDULER) -->
+        <div
+          class="bg-[#131926] border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-5 font-mono text-base"
+        >
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3 flex-wrap gap-2">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg font-bold text-amber-400 uppercase tracking-wider">
+                ⚡ Action & Combo Scheduler
+              </span>
+            </div>
+
+            <!-- Clear Actions Button -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <button
+                v-if="teamfightActions.length > 0"
+                @click="clearActionsAndResetTime"
+                class="px-3 py-1.5 bg-rose-950/40 text-rose-300 hover:bg-rose-900 border border-rose-900/60 rounded-xl text-base font-bold transition-all cursor-pointer"
+              >
+                🗑️ Clear ({{ teamfightActions.length }})
+              </button>
+            </div>
+          </div>
+
+          <!-- 1. 3-COLUMN ARENA: BLUE TEAM (LEFT) | ABILITIES VERTICAL (CENTER) | RED TEAM (RIGHT) -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
+            <!-- LEFT: BLUE TEAM -->
+            <div class="flex flex-col gap-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-cyan-400"></span>
+                  <span class="text-base font-extrabold text-cyan-400 uppercase tracking-wide">
+                    Blue Team
+                  </span>
                 </div>
-                <div class="flex items-center gap-4">
-                  <span class="text-amber-400 font-extrabold text-lg"
-                    >{{ step.totalStepDamage }} Total Dmg</span
+                <span class="text-base text-slate-400 font-bold">
+                  {{ selectedAttackerSlots.length }} Active
+                </span>
+              </div>
+
+              <!-- Blue Champions List -->
+              <div class="flex flex-col gap-2">
+                <button
+                  v-for="s in selectedAttackerSlots"
+                  :key="s.id"
+                  @click="actionCreatorActorId = s.id"
+                  class="flex items-center p-3 rounded-xl text-base font-bold border cursor-pointer transition-all text-left min-w-0"
+                  :class="
+                    actionCreatorActorId === s.id
+                      ? 'bg-cyan-950/90 text-white border-cyan-400 shadow-lg shadow-cyan-950/50 ring-2 ring-cyan-400/80'
+                      : 'bg-slate-900/90 text-slate-300 border-slate-800 hover:border-cyan-700 hover:text-white'
+                  "
+                >
+                  <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <img
+                      v-if="s.champion"
+                      :src="getChampionIconUrl(s.champion)"
+                      class="w-11 h-11 rounded-lg object-cover border-2 shrink-0"
+                      :class="actionCreatorActorId === s.id ? 'border-cyan-400' : 'border-slate-800'"
+                    />
+                    <div class="min-w-0 flex-1">
+                      <div class="text-base font-extrabold text-white truncate">
+                        {{ s.champion ? s.champion.name : s.role }}
+                      </div>
+                      <div class="text-base text-cyan-400 font-semibold truncate">
+                        {{ s.role }} • Lvl {{ s.level }}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- CENTER: ABILITY / ACTION (VERTICAL ORDER FROM PASSIVE TO R, THEN AA) -->
+            <div class="flex flex-col gap-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                <span class="text-base font-extrabold text-amber-400 uppercase tracking-wide">
+                  ⚡ Ability / Action
+                </span>
+                <span v-if="selectedActorStats" class="text-base text-purple-400 font-bold">
+                  {{ selectedActorStats.abilityHaste }} AH
+                </span>
+              </div>
+
+              <!-- Vertical Abilities: P ➔ Q ➔ W ➔ E ➔ R ➔ AA -->
+              <div class="flex flex-col gap-2 flex-1">
+                <button
+                  v-for="act in (['P', 'Q', 'W', 'E', 'R', 'AA'] as const)"
+                  :key="act"
+                  @click="selectSpellAction(act)"
+                  :title="getAbilityFullTooltip(act)"
+                  class="flex items-center justify-between p-2.5 px-3 rounded-xl text-base font-bold transition-all border cursor-pointer min-w-0 flex-1 min-h-[46px]"
+                  :class="
+                    actionCreatorSpell === act
+                      ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md shadow-amber-500/30 font-black'
+                      : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-slate-700 hover:text-white'
+                  "
+                >
+                  <div class="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
+                    <span
+                      class="w-8 h-8 rounded-lg flex items-center justify-center font-black text-base shrink-0"
+                      :class="
+                        actionCreatorSpell === act
+                          ? 'bg-slate-950 text-amber-400'
+                          : 'bg-slate-800 text-slate-300'
+                      "
+                    >
+                      {{ act }}
+                    </span>
+                    <span class="text-base font-extrabold truncate">
+                      {{ getShortAbilityName(act) }}
+                    </span>
+                  </div>
+
+                  <span
+                    class="text-base font-bold px-2 py-0.5 rounded-md shrink-0 whitespace-nowrap"
+                    :class="
+                      actionCreatorSpell === act
+                        ? 'bg-amber-600/30 text-slate-950 font-black'
+                        : 'bg-slate-950 text-slate-400 border border-slate-800'
+                    "
                   >
-                  <button
-                    @click="removeTeamfightAction(idx)"
-                    class="text-rose-400 hover:text-rose-300 font-bold text-lg cursor-pointer"
+                    {{ getSpellBadgeInfo(act) }}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <!-- RIGHT: RED TEAM -->
+            <div class="flex flex-col gap-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-rose-400"></span>
+                  <span class="text-base font-extrabold text-rose-400 uppercase tracking-wide">
+                    Red Team
+                  </span>
+                </div>
+                <span class="text-base text-slate-400 font-bold">
+                  {{ selectedDefenderSlots.length }} Active
+                </span>
+              </div>
+
+              <!-- Red Champions List -->
+              <div class="flex flex-col gap-2">
+                <button
+                  v-for="s in selectedDefenderSlots"
+                  :key="s.id"
+                  @click="actionCreatorActorId = s.id"
+                  class="flex items-center p-3 rounded-xl text-base font-bold border cursor-pointer transition-all text-left min-w-0"
+                  :class="
+                    actionCreatorActorId === s.id
+                      ? 'bg-rose-950/90 text-white border-rose-400 shadow-lg shadow-rose-950/50 ring-2 ring-rose-400/80'
+                      : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-rose-700 hover:text-white'
+                  "
+                >
+                  <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <img
+                      v-if="s.champion"
+                      :src="getChampionIconUrl(s.champion)"
+                      class="w-11 h-11 rounded-lg object-cover border-2 shrink-0"
+                      :class="actionCreatorActorId === s.id ? 'border-rose-400' : 'border-slate-800'"
+                    />
+                    <div class="min-w-0 flex-1">
+                      <div class="text-base font-extrabold text-white truncate">
+                        {{ s.champion ? s.champion.name : s.role }}
+                      </div>
+                      <div class="text-base text-rose-400 font-semibold truncate">
+                        {{ s.role }} • Lvl {{ s.level }}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. OPPOSING TARGET(S) SELECTION ROW -->
+          <div class="flex flex-col gap-2 bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+            <div class="flex items-center justify-between">
+              <label class="text-base font-bold text-slate-400 uppercase tracking-wide">
+                🎯 Opposing Target(s) ({{ availableTargets.length }} Available):
+              </label>
+              <button
+                @click="toggleSelectAllTargets"
+                class="text-base text-cyan-400 hover:text-cyan-300 hover:underline cursor-pointer font-bold"
+              >
+                {{ isAllTargetsSelected ? 'Deselect All' : 'Select All (AOE)' }}
+              </button>
+            </div>
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <label
+                v-for="s in availableTargets"
+                :key="s.id"
+                class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-base font-bold border cursor-pointer transition-all"
+                :class="
+                  actionCreatorTargetIds.includes(s.id)
+                    ? 'bg-amber-950 text-amber-300 border-amber-500 font-bold shadow-md shadow-amber-950/40'
+                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-700'
+                "
+              >
+                <input
+                  type="checkbox"
+                  :value="s.id"
+                  v-model="actionCreatorTargetIds"
+                  class="hidden"
+                />
+                <img
+                  v-if="s.champion"
+                  :src="getChampionIconUrl(s.champion)"
+                  class="w-6 h-6 rounded-md object-cover"
+                />
+                <span>{{ s.champion ? s.champion.name : s.role }}</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Cooldown Warning / Status & Smart Snap -->
+          <div
+            v-if="isSelectedSpellOnCooldown"
+            class="flex items-center justify-between gap-3 p-3 bg-rose-950/30 border border-rose-900/60 rounded-xl text-base text-rose-300 font-mono"
+          >
+            <div class="flex items-center gap-2">
+              <span>⚠️</span>
+              <span>
+                <strong>{{ actionCreatorSpell }} is on Cooldown at {{ actionCreatorTime.toFixed(1) }}s!</strong>
+                Ready at {{ nextReadyTimeForSelectedSpell.toFixed(1) }}s
+              </span>
+            </div>
+            <button
+              @click="snapToReadyTime"
+              class="px-3 py-1 bg-amber-500 text-slate-950 font-extrabold rounded-lg hover:bg-amber-400 transition-all cursor-pointer text-base"
+            >
+              ⏱️ Snap to {{ nextReadyTimeForSelectedSpell.toFixed(1) }}s
+            </button>
+          </div>
+
+          <!-- Step 4: Timestamp & Submit -->
+          <div class="flex items-center justify-between gap-4 pt-2 border-t border-slate-800/80 flex-wrap text-base">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <span class="text-base font-bold text-slate-400 uppercase">Timestamp:</span>
+              <input
+                type="number"
+                min="0"
+                max="30"
+                step="0.1"
+                v-model.number="actionCreatorTime"
+                class="h-11 w-24 bg-slate-950 text-white font-bold text-center rounded-xl border border-slate-800 text-base"
+              />
+              <button
+                @click="actionCreatorTime = Math.round((actionCreatorTime + 0.5) * 10) / 10"
+                class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-base text-amber-400 hover:text-amber-300 font-bold cursor-pointer"
+              >
+                +0.5s
+              </button>
+              <button
+                @click="actionCreatorTime = 0"
+                class="text-base text-slate-500 hover:text-slate-400 underline cursor-pointer"
+              >
+                Reset 0s
+              </button>
+            </div>
+
+            <button
+              @click="submitTeamfightAction"
+              class="px-6 py-2.5 bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold rounded-xl text-base transition-all shadow-lg shadow-orange-500/20 cursor-pointer flex items-center gap-2"
+            >
+              <span>➕ Add Action to Sequence</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. TABS SELECTOR FOR CENTER BODY: ACTIONS SEQUENCE VS LOG -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 font-mono text-base">
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <button
+              @click="centerViewTab = 'all'"
+              class="px-4 py-2 rounded-xl text-base font-bold border transition-all cursor-pointer"
+              :class="
+                centerViewTab === 'all'
+                  ? 'bg-amber-500 text-slate-950 border-amber-400 font-extrabold shadow'
+                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+              "
+            >
+              👁️ Full View (Actions + Log)
+            </button>
+            <button
+              @click="centerViewTab = 'actions'"
+              class="px-4 py-2 rounded-xl text-base font-bold border transition-all cursor-pointer"
+              :class="
+                centerViewTab === 'actions'
+                  ? 'bg-amber-500 text-slate-950 border-amber-400 font-extrabold shadow'
+                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+              "
+            >
+              ⚡ Action Sequence ({{ teamfightActions.length }})
+            </button>
+            <button
+              @click="centerViewTab = 'log'"
+              class="px-4 py-2 rounded-xl text-base font-bold border transition-all cursor-pointer"
+              :class="
+                centerViewTab === 'log'
+                  ? 'bg-amber-500 text-slate-950 border-amber-400 font-extrabold shadow'
+                  : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+              "
+            >
+              📜 Combat Log ({{ filteredEvents.length }})
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. VERTICAL ACTIONS SEQUENCE (CHAMPION ACTIONS IN VERTICAL SEQUENCE) -->
+        <div
+          v-if="centerViewTab === 'all' || centerViewTab === 'actions'"
+          class="bg-[#131926] border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 font-mono text-base"
+        >
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="text-base font-bold text-amber-400 uppercase tracking-wider">
+                ⚡ Champion Action Sequence
+              </span>
+              <span class="text-base text-slate-400 bg-slate-950 px-2.5 py-0.5 rounded-lg border border-slate-800">
+                {{ teamfightActions.length }} Scheduled
+              </span>
+            </div>
+
+            <span class="text-base text-slate-500 hidden sm:inline">
+              Executed in chronological order during combat
+            </span>
+          </div>
+
+          <!-- Vertical List of Actions -->
+          <div v-if="teamfightActions.length > 0" class="flex flex-col gap-3">
+            <div
+              v-for="(act, aIdx) in teamfightActions"
+              :key="act.id"
+              class="p-4 rounded-xl border bg-slate-950 border-slate-800 hover:border-slate-700 transition-all flex items-center justify-between gap-3 flex-wrap"
+            >
+              <!-- Left: Step number & Time -->
+              <div class="flex items-center gap-3">
+                <div
+                  class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 text-base font-extrabold text-slate-400"
+                >
+                  #{{ aIdx + 1 }}
+                </div>
+                <span
+                  class="px-2.5 py-1 rounded-lg bg-slate-900 text-amber-400 font-extrabold text-base border border-slate-800"
+                >
+                  ⏱️ {{ (act.timestamp ?? 0).toFixed(1) }}s
+                </span>
+              </div>
+
+              <!-- Center: Champion ➔ Spell ➔ Targets -->
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <!-- Champion -->
+                <div
+                  class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-base font-bold"
+                  :class="
+                    act.actorSlotId <= 5
+                      ? 'bg-cyan-950/70 text-cyan-300 border-cyan-800/70'
+                      : 'bg-rose-950/70 text-rose-300 border-rose-800/70'
+                  "
+                >
+                  <img
+                    v-if="getSlotById(act.actorSlotId)?.champion"
+                    :src="getChampionIconUrl(getSlotById(act.actorSlotId)!.champion!)"
+                    class="w-5 h-5 rounded-md object-cover"
+                  />
+                  <span>
+                    {{ act.actorSlotId <= 5 ? '🟦' : '🟥' }}
+                    {{ getSlotById(act.actorSlotId)?.champion?.name || 'Champion' }}
+                  </span>
+                </div>
+
+                <!-- Spell Badge -->
+                <div
+                  class="px-3 py-1 rounded-lg font-extrabold text-base border"
+                  :class="
+                    act.action === 'AA'
+                      ? 'bg-emerald-950/80 text-emerald-300 border-emerald-700/60'
+                      : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                  "
+                >
+                  {{ act.action === 'AA' ? 'Basic Attack (AA)' : 'Ability ' + act.action }}
+                </div>
+
+                <span class="text-slate-500 text-base font-bold">➔</span>
+
+                <!-- Targets -->
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <div
+                    v-for="targetSlot in getTargetSlots(act.targetSlotIds)"
+                    :key="targetSlot.id"
+                    class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-base"
+                    :class="
+                      targetSlot.id <= 5
+                        ? 'bg-cyan-950/40 text-cyan-300 border-cyan-800/40'
+                        : 'bg-rose-950/40 text-rose-300 border-rose-800/40'
+                    "
                   >
-                    ✕
-                  </button>
+                    <img
+                      v-if="targetSlot.champion"
+                      :src="getChampionIconUrl(targetSlot.champion)"
+                      class="w-4 h-4 rounded-md object-cover"
+                    />
+                    <span>{{ targetSlot.champion?.name || targetSlot.role }}</span>
+                  </div>
+                  <span
+                    v-if="act.targetSlotIds.length > 1"
+                    class="text-base font-bold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded-lg border border-amber-800/40"
+                  >
+                    AOE ({{ act.targetSlotIds.length }})
+                  </span>
                 </div>
               </div>
 
-              <!-- Target Damage Breakdown Pills -->
-              <div
-                class="flex flex-col gap-2 bg-slate-900/60 p-3 rounded-lg border border-slate-800"
-              >
-                <div
-                  v-for="(res, tIdx) in step.targetResults"
-                  :key="tIdx"
-                  class="flex items-center justify-between text-base"
+              <!-- Right: Reorder & Delete -->
+              <div class="flex items-center gap-1.5">
+                <button
+                  @click="moveActionUp(aIdx)"
+                  :disabled="aIdx === 0"
+                  class="p-1.5 px-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-base font-bold"
+                  title="Move earlier (up)"
                 >
-                  <div class="flex items-center gap-2">
-                    <span class="text-rose-300 font-semibold">➔ {{ res.targetName }}:</span>
-                    <span
-                      class="font-bold px-2 py-0.5 rounded"
-                      :class="
-                        res.type === 'physical'
-                          ? 'bg-orange-950/80 text-orange-400'
-                          : res.type === 'magic'
-                            ? 'bg-cyan-950/80 text-cyan-400'
-                            : 'bg-slate-950 text-slate-300'
-                      "
-                    >
-                      {{ res.amount }} {{ res.type.toUpperCase() }}
-                    </span>
-                    <span
-                      v-if="res.blackCleaverStacks > 0"
-                      class="text-base text-amber-400 font-semibold"
-                      >[🪓 BC {{ res.blackCleaverStacks }}x]</span
-                    >
-                    <span
-                      v-if="res.vileDecayStacks > 0"
-                      class="text-base text-purple-400 font-semibold"
-                      >[🩸 Vile Decay {{ res.vileDecayStacks }}x]</span
-                    >
-                    <span
-                      v-if="res.conquerorStacks > 0"
-                      class="text-base text-amber-300 font-semibold"
-                      >[⚡ Conqueror {{ res.conquerorStacks }}x{{
-                        res.conquerorStacks === 12 ? ' (MAX)' : ''
-                      }}]</span
-                    >
-                    <span
-                      v-if="res.lethalTempoStacks > 0"
-                      class="text-base text-cyan-300 font-semibold"
-                      >[⚡ Lethal Tempo {{ res.lethalTempoStacks }}x{{
-                        res.lethalTempoStacks === 6
-                          ? ` (MAX +${res.lethalTempoOnHitDmg || 0} Dmg)`
-                          : ''
-                      }}]</span
-                    >
-                    <span
-                      v-if="res.electrocuteProcDmg && res.electrocuteProcDmg > 0"
-                      class="text-base text-purple-400 font-bold bg-purple-950/80 px-2 py-0.5 rounded border border-purple-500/50"
-                      >⚡ ELECTROCUTE PROC (+{{ res.electrocuteProcDmg }} Dmg)</span
-                    >
-                    <span
-                      v-else-if="res.electrocuteStacks && res.electrocuteStacks > 0"
-                      class="text-base text-purple-300 font-semibold"
-                      >[⚡ Electrocute {{ Math.min(3, res.electrocuteStacks) }}/3]</span
-                    >
-                    <span
-                      v-if="res.darkHarvestProcDmg && res.darkHarvestProcDmg > 0"
-                      class="text-base text-rose-400 font-bold bg-rose-950/80 px-2 py-0.5 rounded border border-rose-500/50"
-                      >💀 DARK HARVEST PROC (+{{ res.darkHarvestProcDmg }} Dmg)</span
-                    >
-                    <span
-                      v-if="res.hobRemainingAttacks !== undefined"
-                      class="text-base text-rose-300 font-semibold"
-                      >[🗡️ Hail of Blades
-                      {{
-                        res.hobRemainingAttacks > 0
-                          ? `${res.hobRemainingAttacks} left`
-                          : 'EXHAUSTED'
-                      }}]</span
-                    >
-                    <span
-                      v-if="res.ptaExposed"
-                      class="text-base text-amber-400 font-bold bg-amber-950/80 px-2 py-0.5 rounded border border-amber-500/50"
-                      >🎯 PtA EXPOSED (+8% Dmg)</span
-                    >
-                    <span
-                      v-else-if="res.ptaStacks > 0"
-                      class="text-base text-amber-300 font-semibold"
-                      >[🎯 PtA {{ res.ptaStacks }}/3]</span
-                    >
-                    <span v-if="res.coupDeGrace" class="text-base text-rose-300 font-semibold"
-                      >[🗡️ Coup de Grace (+8%)]</span
-                    >
-                    <span v-if="res.cutDown" class="text-base text-amber-300 font-semibold"
-                      >[🩸 Cut Down (+8%)]</span
-                    >
-                    <span
-                      v-if="res.lastStandBonusPct && res.lastStandBonusPct > 0"
-                      class="text-base text-red-400 font-semibold"
-                      >[🛡️ Last Stand (+{{ res.lastStandBonusPct }}%)]</span
-                    >
-                  </div>
-                  <div class="flex items-center gap-3">
-                    <span class="text-base text-slate-400">HP: {{ res.remainingHp }}</span>
-                    <span
-                      v-if="res.isKo"
-                      class="text-base bg-rose-500 text-slate-950 font-bold px-2 py-0.5 rounded animate-pulse"
-                      >☠️ K.O.</span
-                    >
-                  </div>
+                  ▲
+                </button>
+                <button
+                  @click="moveActionDown(aIdx)"
+                  :disabled="aIdx === teamfightActions.length - 1"
+                  class="p-1.5 px-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer text-base font-bold"
+                  title="Move later (down)"
+                >
+                  ▼
+                </button>
+                <button
+                  @click="removeTeamfightAction(aIdx)"
+                  class="p-1.5 px-2.5 rounded-lg bg-rose-950/40 hover:bg-rose-900 border border-rose-900/60 text-rose-300 hover:text-white cursor-pointer text-base font-bold ml-1"
+                  title="Remove action"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty Actions Placeholder -->
+          <div
+            v-else
+            class="py-10 flex flex-col items-center justify-center border border-dashed border-slate-800 rounded-xl text-slate-500 text-base text-center p-6 gap-2"
+          >
+            <span class="text-lg font-bold text-slate-300">⚡ No actions scheduled.</span>
+            <span class="text-slate-400 max-w-lg text-base">
+              Select a champion and ability above, then click <strong>Add Action to Sequence</strong> to start simulating combat!
+            </span>
+          </div>
+        </div>
+
+        <!-- 5. COMBAT EXCHANGE & DAMAGE LOG (DAMAGE & EVENT LOG IN CENTER) -->
+        <div
+          v-if="centerViewTab === 'all' || centerViewTab === 'log'"
+          class="bg-[#131926] border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 font-mono text-base"
+        >
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3 flex-wrap gap-2">
+            <div class="flex items-center gap-2.5">
+              <span class="text-base font-bold text-amber-400 uppercase tracking-wider">
+                📜 Combat Damage & Event Log
+              </span>
+              <span class="text-base text-slate-400 bg-slate-950 px-2.5 py-0.5 rounded-lg border border-slate-800">
+                {{ filteredEvents.length }} Events
+              </span>
+            </div>
+
+            <!-- Event Filters -->
+            <div class="flex items-center gap-2 text-base flex-wrap">
+              <button
+                @click="eventFilter = 'all'"
+                class="px-3 py-1 rounded-lg border cursor-pointer font-bold transition-all text-base"
+                :class="
+                  eventFilter === 'all'
+                    ? 'bg-amber-500 text-slate-950 border-amber-400'
+                    : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                "
+              >
+                All ({{ combatResults.events.length }})
+              </button>
+              <button
+                @click="eventFilter = 'blue'"
+                class="px-3 py-1 rounded-lg border cursor-pointer font-bold transition-all text-base"
+                :class="
+                  eventFilter === 'blue'
+                    ? 'bg-cyan-600 text-white border-cyan-400'
+                    : 'bg-slate-950 text-cyan-400 border-slate-800 hover:text-white'
+                "
+              >
+                🟦 Blue
+              </button>
+              <button
+                @click="eventFilter = 'red'"
+                class="px-3 py-1 rounded-lg border cursor-pointer font-bold transition-all text-base"
+                :class="
+                  eventFilter === 'red'
+                    ? 'bg-rose-600 text-white border-rose-400'
+                    : 'bg-slate-950 text-rose-400 border-slate-800 hover:text-white'
+                "
+              >
+                🟥 Red
+              </button>
+              <button
+                @click="eventFilter = 'dot'"
+                class="px-3 py-1 rounded-lg border cursor-pointer font-bold transition-all text-base"
+                :class="
+                  eventFilter === 'dot'
+                    ? 'bg-purple-600 text-white border-purple-400'
+                    : 'bg-slate-950 text-purple-300 border-slate-800 hover:text-white'
+                "
+              >
+                🔥 DoTs
+              </button>
+            </div>
+          </div>
+
+          <!-- Chronological Combat Events Feed (Vertical Scrollable) -->
+          <div
+            v-if="filteredEvents.length > 0"
+            class="flex flex-col gap-2.5 font-mono text-base max-h-[550px] overflow-y-auto pr-1"
+          >
+            <div
+              v-for="(evt, idx) in filteredEvents"
+              :key="idx"
+              class="p-3.5 rounded-xl border flex items-center justify-between gap-3 transition-all flex-wrap"
+              :class="
+                evt.isDot
+                  ? 'bg-purple-950/20 border-purple-900/40 hover:border-purple-800/60'
+                  : evt.actorSide === 'blue'
+                    ? 'bg-cyan-950/20 border-cyan-900/40 hover:border-cyan-800/60'
+                    : 'bg-rose-950/20 border-rose-900/40 hover:border-rose-800/60'
+              "
+            >
+              <!-- Left: Timestamp, Actor, Action, Target -->
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <span
+                  class="px-2 py-0.5 rounded-lg bg-slate-900 text-amber-400 font-bold text-base border border-slate-800"
+                >
+                  {{ evt.timestamp.toFixed(1) }}s
+                </span>
+                <span
+                  class="font-bold text-base"
+                  :class="evt.actorSide === 'blue' ? 'text-cyan-400' : 'text-rose-400'"
+                >
+                  {{ evt.actorName }}
+                </span>
+                <span
+                  class="px-2 py-0.5 rounded-lg text-base font-bold border"
+                  :class="
+                    evt.isDot
+                      ? 'bg-purple-950 text-purple-300 border-purple-700/60'
+                      : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                  "
+                >
+                  {{ evt.action }}
+                </span>
+                <span class="text-slate-500 text-base font-bold">➔</span>
+                <span
+                  class="font-bold text-base"
+                  :class="evt.targetSide === 'blue' ? 'text-cyan-300' : 'text-rose-300'"
+                >
+                  {{ evt.targetName }}
+                </span>
+              </div>
+
+              <!-- Right: Damage Amount, Target Rem. HP & Badges -->
+              <div class="flex items-center gap-2.5 flex-wrap justify-end">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span
+                    v-for="(badge, bIdx) in evt.badges || []"
+                    :key="bIdx"
+                    class="text-base bg-slate-900 text-amber-300 px-2 py-0.5 rounded-lg border border-slate-800"
+                  >
+                    {{ badge }}
+                  </span>
                 </div>
+                <span
+                  class="text-base font-extrabold px-2.5 py-0.5 rounded-lg"
+                  :class="
+                    evt.dmgType === 'physical'
+                      ? 'bg-orange-950/80 text-orange-400'
+                      : evt.dmgType === 'magic'
+                        ? 'bg-cyan-950/80 text-cyan-400'
+                        : 'bg-slate-900 text-white'
+                  "
+                >
+                  {{ evt.amount }} {{ evt.dmgType.toUpperCase() }}
+                </span>
+                <span class="text-base text-slate-400">
+                  HP: <strong :class="evt.remainingHp === 0 ? 'text-rose-500' : 'text-slate-200'">{{ evt.remainingHp }}</strong>
+                </span>
+                <span
+                  v-if="evt.isKo"
+                  class="text-base bg-rose-600 text-slate-950 font-extrabold px-2 py-0.5 rounded-lg animate-pulse"
+                >
+                  ☠️ K.O.
+                </span>
               </div>
             </div>
           </div>
 
           <div
             v-else
-            class="py-16 flex flex-col items-center justify-center border border-dashed border-slate-800 rounded-xl text-slate-500 font-mono text-base"
+            class="py-14 flex flex-col items-center justify-center border border-dashed border-slate-800 rounded-xl text-slate-500 text-base font-mono"
           >
-            <span>No teamfight actions added yet.</span>
-            <span class="text-slate-400 mt-2"
-              >Use the Action Creator above to build a teamfight scenario!</span
-            >
+            <span class="text-slate-300 font-bold">No combat events recorded.</span>
+            <span class="text-slate-400 mt-2 text-base">
+              Add actions to the sequence above to start the simulation!
+            </span>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT COLUMN: DEFENDER SQUAD ROSTER WITH LIVE HP BARS -->
-      <div class="lg:col-span-3 flex flex-col gap-5">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-          <span class="text-base font-mono uppercase font-bold text-rose-400"
-            >Defender Squad Roster</span
-          >
-          <span class="text-base font-mono text-slate-500 font-semibold">Live Health & Shred</span>
+      <!-- ================================================================= -->
+      <!-- RIGHT COLUMN: RED SQUAD (Defenders / Opponents)                   -->
+      <!-- ================================================================= -->
+      <div class="lg:col-span-3 flex flex-col gap-5 order-3 lg:order-3 text-base">
+        <!-- Red Squad Header & Roster Picker -->
+        <div
+          class="bg-[#131926] border border-rose-900/40 rounded-2xl p-5 flex flex-col gap-3.5 shadow-xl"
+        >
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="h-4 w-4 rounded-full bg-rose-400 animate-pulse"></span>
+              <span class="text-lg font-mono font-bold uppercase tracking-wider text-rose-400">
+                Red Squad
+              </span>
+            </div>
+            <span
+              class="text-base font-mono text-rose-300 font-bold bg-rose-950 px-2.5 py-1 rounded-lg border border-rose-800/60"
+            >
+              {{ selectedDefenderSlots.length }} Active
+            </span>
+          </div>
+
+          <!-- Roster Slot Buttons -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <button
+              v-for="s in redDraft"
+              :key="s.id"
+              @click="toggleDefenderSlot(s.id)"
+              class="flex items-center gap-2 px-3 py-2 rounded-xl border font-mono text-base cursor-pointer transition-all"
+              :class="
+                selectedDefenderSlotIds.includes(s.id)
+                  ? 'bg-rose-950 text-rose-300 border-rose-500 font-bold shadow'
+                  : 'bg-slate-950 text-slate-500 border-slate-800 hover:text-slate-300'
+              "
+              :title="s.champion ? s.champion.name : s.role"
+            >
+              <img
+                v-if="s.champion"
+                :src="getChampionIconUrl(s.champion)"
+                class="w-6 h-6 rounded-md object-cover"
+              />
+              <span>{{ s.role }}</span>
+              <span v-if="s.champion" class="text-white font-semibold truncate max-w-[100px]">
+                {{ s.champion.name }}
+              </span>
+            </button>
+          </div>
         </div>
 
+        <!-- Red Participating Champions Cards (Stacked Vertically) -->
         <div
           v-for="slot in selectedDefenderSlots"
           :key="slot.id"
-          class="bg-[#131926] border border-slate-800 rounded-xl p-5 flex flex-col gap-4 shadow-lg"
+          class="bg-[#131926] border border-slate-800 hover:border-rose-800/60 rounded-2xl p-5 flex flex-col gap-4 shadow-lg transition-all text-base"
         >
-          <!-- Header -->
+          <!-- Champion Header -->
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <img
                 v-if="slot.champion"
                 :src="getChampionIconUrl(slot.champion)"
-                class="h-12 w-12 rounded-lg border border-rose-500/50 object-cover"
+                class="h-14 w-14 rounded-xl border border-rose-500/50 object-cover shadow"
               />
+              <div
+                v-else
+                class="h-14 w-14 rounded-xl border border-slate-800 bg-slate-950 flex items-center justify-center text-slate-600 font-mono text-base"
+              >
+                Empty
+              </div>
               <div>
-                <h4 class="text-base font-bold text-white leading-tight">
+                <h4 class="text-lg font-bold text-white leading-tight">
                   {{ slot.champion?.name || 'Unassigned' }}
                 </h4>
-                <span class="text-base font-mono text-rose-400 font-semibold"
-                  >{{ slot.side.toUpperCase() }} {{ slot.role }} • Lvl {{ slot.level }}</span
-                >
+                <span class="text-base font-mono text-rose-400 font-semibold">
+                  RED {{ slot.role }} • Lvl {{ slot.level }}
+                </span>
               </div>
             </div>
             <button
               @click="openWorkbenchForSlot(slot.id)"
-              class="text-base text-rose-400 hover:text-white font-mono px-2.5 py-1 rounded bg-slate-950 border border-slate-800 hover:border-rose-500 transition-all cursor-pointer"
+              class="text-base text-rose-400 hover:text-white font-mono px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 hover:border-rose-500 transition-all cursor-pointer font-semibold"
+              title="Edit build in Workbench"
             >
-              ⚙️
+              ⚙️ Build
             </button>
           </div>
 
-          <!-- Live HP Bar -->
+          <!-- Live HP Bar & Status -->
           <div
-            class="flex flex-col gap-1.5 font-mono text-base bg-slate-950 p-3 rounded-lg border border-slate-800"
+            class="flex flex-col gap-1.5 font-mono text-base bg-slate-950 p-3 rounded-xl border border-slate-800"
           >
             <div class="flex items-center justify-between font-bold">
               <span class="text-slate-400">Health</span>
               <span
                 :class="
-                  getDefenderEndState(slot.id).isKo
+                  getChampionEndState(slot.id).isKo
                     ? 'text-rose-500 font-extrabold'
                     : 'text-emerald-400'
                 "
               >
-                {{ getDefenderEndState(slot.id).currentHp }} /
-                {{ getDefenderEndState(slot.id).maxHp }} ({{ getDefenderEndState(slot.id).hpPct }}%)
+                {{ getChampionEndState(slot.id).currentHp }} /
+                {{ getChampionEndState(slot.id).maxHp }} ({{ getChampionEndState(slot.id).hpPct }}%)
               </span>
             </div>
             <div
-              class="h-4 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative"
+              class="h-3.5 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative"
             >
               <div
                 class="h-full transition-all duration-300"
                 :class="
-                  getDefenderEndState(slot.id).hpPct > 50
+                  getChampionEndState(slot.id).hpPct > 50
                     ? 'bg-linear-to-r from-emerald-500 to-green-400'
-                    : getDefenderEndState(slot.id).hpPct > 20
+                    : getChampionEndState(slot.id).hpPct > 20
                       ? 'bg-linear-to-r from-amber-500 to-yellow-400'
                       : 'bg-linear-to-r from-rose-600 to-red-500'
                 "
-                :style="{ width: getDefenderEndState(slot.id).hpPct + '%' }"
+                :style="{ width: getChampionEndState(slot.id).hpPct + '%' }"
               ></div>
             </div>
           </div>
 
-          <!-- Live Effective Armor & MR after Shred -->
+          <!-- DPS & Total Damage Card -->
           <div
-            class="grid grid-cols-2 gap-3 font-mono text-base bg-slate-950 p-3 rounded-lg border border-slate-800"
-          >
-            <div class="flex flex-col">
-              <span class="text-slate-500">Armor (Shred)</span>
-              <span class="text-amber-400 font-bold text-lg">
-                {{ getDefenderEndState(slot.id).effectiveArmor }}
-                <span
-                  v-if="getDefenderEndState(slot.id).blackCleaverStacks > 0"
-                  class="text-rose-400 text-base"
-                  >(-{{ getDefenderEndState(slot.id).blackCleaverStacks * 5 }}%)</span
-                >
-              </span>
-            </div>
-            <div class="flex flex-col">
-              <span class="text-slate-500">MR (Shred)</span>
-              <span class="text-purple-400 font-bold text-lg">
-                {{ getDefenderEndState(slot.id).effectiveMr }}
-                <span
-                  v-if="getDefenderEndState(slot.id).vileDecayStacks > 0"
-                  class="text-rose-400 text-base"
-                  >(-{{ (getDefenderEndState(slot.id).vileDecayStacks * 7.5).toFixed(1) }}%)</span
-                >
-              </span>
-            </div>
-          </div>
-
-          <!-- Status Badges -->
-          <div class="flex items-center gap-2 flex-wrap">
-            <span
-              v-if="getDefenderEndState(slot.id).isKo"
-              class="bg-rose-500 text-slate-950 font-extrabold text-base px-2.5 py-1 rounded font-mono shadow animate-pulse"
-              >☠️ K.O. / ELIMINATED</span
-            >
-            <span
-              v-if="getDefenderEndState(slot.id).blackCleaverStacks > 0"
-              class="bg-amber-950/80 text-amber-300 border border-amber-800/60 text-base px-2.5 py-1 rounded font-mono font-bold"
-              >🪓 Black Cleaver {{ getDefenderEndState(slot.id).blackCleaverStacks }}x</span
-            >
-            <span
-              v-if="getDefenderEndState(slot.id).vileDecayStacks > 0"
-              class="bg-purple-950/80 text-purple-300 border border-purple-800/60 text-base px-2.5 py-1 rounded font-mono font-bold"
-              >🩸 Vile Decay {{ getDefenderEndState(slot.id).vileDecayStacks }}x</span
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- VIEW MODE 2: CHRONOLOGICAL FEED VIEW -->
-    <div v-else class="flex flex-col gap-6 text-base font-mono">
-      <!-- Sticky Team Health Summary Header -->
-      <div
-        class="bg-[#131926] border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col gap-4 sticky top-4 z-20"
-      >
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-          <span class="text-base font-bold uppercase text-slate-300"
-            >Defender Squad Health Summary</span
-          >
-          <span class="text-base text-slate-400"
-            >Total Teamfight Damage Dealt:
-            <strong class="text-amber-400 text-lg">{{
-              teamfightSimulationResults.totalTeamDamage
-            }}</strong></span
-          >
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-          <div
-            v-for="slot in selectedDefenderSlots"
-            :key="slot.id"
-            class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col gap-2"
+            class="flex flex-col gap-2 font-mono bg-slate-950 p-3 rounded-xl border border-slate-800 text-base"
           >
             <div class="flex items-center justify-between">
-              <span class="font-bold text-white text-base">{{
-                slot.champion?.name || slot.role
-              }}</span>
-              <span
-                v-if="getDefenderEndState(slot.id).isKo"
-                class="text-base text-rose-400 font-extrabold"
-                >K.O.</span
-              >
+              <span class="text-slate-400 text-base uppercase">Damage Dealt</span>
+              <span class="text-amber-400 font-extrabold text-lg">
+                🔥 {{ getChampionEndState(slot.id).dps }} DPS
+              </span>
             </div>
-            <div
-              class="h-3 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800 relative"
-            >
-              <div
-                class="h-full bg-linear-to-r from-emerald-500 to-rose-500 transition-all duration-300"
-                :style="{ width: getDefenderEndState(slot.id).hpPct + '%' }"
-              ></div>
-            </div>
-            <div class="flex items-center justify-between text-base text-slate-400">
-              <span>HP: {{ getDefenderEndState(slot.id).currentHp }}</span>
-              <span>Armor: {{ getDefenderEndState(slot.id).effectiveArmor }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Chronological Action Cards Feed -->
-      <div class="flex flex-col gap-5">
-        <div
-          v-for="(step, idx) in teamfightSimulationResults.logSteps"
-          :key="idx"
-          class="bg-[#131926] border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-4 font-mono transition-all hover:border-slate-700"
-        >
-          <!-- Step Top Header -->
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-              <span
-                class="h-10 w-10 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center font-bold text-slate-300 text-base"
-                >#{{ idx + 1 }}</span
-              >
-              <div class="flex items-center gap-3 text-lg">
-                <span class="font-extrabold text-cyan-400">{{ step.actorName }}</span>
-                <span class="text-base text-slate-400">casts</span>
-                <span
-                  class="px-3.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 text-base"
-                  >{{ step.action }}</span
-                >
-              </div>
+            <div class="flex items-center justify-between text-base">
+              <span class="text-white font-bold">
+                {{ getChampionEndState(slot.id).totalDamageDealt.toLocaleString() }} Total
+              </span>
+              <span class="text-slate-400">
+                Taken: {{ getChampionEndState(slot.id).damageTaken.toLocaleString() }}
+              </span>
             </div>
 
-            <div class="flex items-center gap-5">
-              <div class="flex flex-col items-end">
-                <span class="text-base text-slate-400 uppercase font-semibold"
-                  >AOE Step Damage</span
-                >
-                <span class="text-lg font-extrabold text-amber-400"
-                  >{{ step.totalStepDamage }} Dmg</span
-                >
-              </div>
-              <button
-                @click="removeTeamfightAction(idx)"
-                class="px-3 py-1.5 rounded bg-rose-950/60 text-rose-300 hover:bg-rose-900 border border-rose-900/50 text-base cursor-pointer"
+            <!-- Damage Breakdown Badges -->
+            <div class="flex items-center gap-1.5 flex-wrap text-base font-bold pt-1">
+              <span
+                v-if="getChampionEndState(slot.id).damageDealtByType.physical > 0"
+                class="bg-orange-950/80 text-orange-400 border border-orange-800/60 px-2 py-0.5 rounded-md"
               >
-                Delete
-              </button>
+                {{ getChampionEndState(slot.id).damageDealtByType.physical }} Phys
+              </span>
+              <span
+                v-if="getChampionEndState(slot.id).damageDealtByType.magic > 0"
+                class="bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 px-2 py-0.5 rounded-md"
+              >
+                {{ getChampionEndState(slot.id).damageDealtByType.magic }} Mag
+              </span>
+              <span
+                v-if="getChampionEndState(slot.id).damageDealtByType.true > 0"
+                class="bg-slate-900 text-slate-200 border border-slate-700 px-2 py-0.5 rounded-md"
+              >
+                {{ getChampionEndState(slot.id).damageDealtByType.true }} True
+              </span>
+              <span
+                v-if="getChampionEndState(slot.id).damageDealtByType.dot > 0"
+                class="bg-purple-950/80 text-purple-300 border border-purple-800/60 px-2 py-0.5 rounded-md"
+              >
+                🔥 {{ getChampionEndState(slot.id).damageDealtByType.dot }} DoT
+              </span>
             </div>
           </div>
 
-          <!-- Target Cards Grid -->
+          <!-- Active DoTs on this champion -->
           <div
-            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800"
+            v-if="getChampionEndState(slot.id).activeDoTs.length > 0"
+            class="flex items-center gap-2 flex-wrap font-mono text-base"
           >
-            <div
-              v-for="(res, tIdx) in step.targetResults"
-              :key="tIdx"
-              class="bg-slate-900/90 p-4 rounded-lg border border-slate-800 flex flex-col gap-2"
+            <span
+              v-for="dot in getChampionEndState(slot.id).activeDoTs"
+              :key="dot.id"
+              class="bg-rose-950/90 text-rose-300 border border-rose-800/60 px-2.5 py-1 rounded-lg font-semibold animate-pulse"
             >
-              <div class="flex items-center justify-between text-base">
-                <span class="text-rose-300 font-bold">➔ {{ res.targetName }}</span>
-                <span v-if="res.isKo" class="text-base text-rose-400 font-bold">☠️ K.O.</span>
-              </div>
+              🩸 {{ dot.name }} ({{ dot.remainingDuration.toFixed(1) }}s)
+            </span>
+          </div>
 
-              <div
-                class="text-lg font-extrabold"
-                :class="
-                  res.type === 'physical'
-                    ? 'text-orange-400'
-                    : res.type === 'magic'
-                      ? 'text-cyan-400'
-                      : 'text-slate-200'
-                "
-              >
-                +{{ res.amount }} {{ res.type.toUpperCase() }}
-              </div>
-
-              <div class="flex items-center gap-2 text-base text-slate-400 flex-wrap">
-                <span>Rem. HP: {{ res.remainingHp }}</span>
-                <span v-if="res.blackCleaverStacks > 0" class="text-amber-400 font-semibold"
-                  >[BC {{ res.blackCleaverStacks }}x]</span
-                >
-                <span v-if="res.vileDecayStacks > 0" class="text-purple-400 font-semibold"
-                  >[VD {{ res.vileDecayStacks }}x]</span
-                >
-                <span v-if="res.conquerorStacks > 0" class="text-amber-300 font-semibold"
-                  >[⚡ Conq {{ res.conquerorStacks }}x{{
-                    res.conquerorStacks === 12 ? ' (MAX)' : ''
-                  }}]</span
-                >
-                <span v-if="res.lethalTempoStacks > 0" class="text-cyan-300 font-semibold"
-                  >[⚡ LT {{ res.lethalTempoStacks }}x{{
-                    res.lethalTempoStacks === 6
-                      ? ` (MAX +${res.lethalTempoOnHitDmg || 0} Dmg)`
-                      : ''
-                  }}]</span
-                >
-                <span v-if="res.ptaExposed" class="text-amber-400 font-bold"
-                  >[🎯 PtA EXPOSED (+8%)]</span
-                >
-                <span v-else-if="res.ptaStacks > 0" class="text-amber-300 font-semibold"
-                  >[🎯 PtA {{ res.ptaStacks }}/3]</span
-                >
-                <span v-if="res.coupDeGrace" class="text-rose-300 font-semibold"
-                  >[🗡️ CdG (+8%)]</span
-                >
-                <span v-if="res.cutDown" class="text-amber-300 font-semibold"
-                  >[🩸 Cut Down (+8%)]</span
-                >
-                <span
-                  v-if="res.lastStandBonusPct && res.lastStandBonusPct > 0"
-                  class="text-red-400 font-semibold"
-                  >[🛡️ Last Stand (+{{ res.lastStandBonusPct }}%)]</span
-                >
-              </div>
+          <!-- Stats Grid -->
+          <div
+            v-if="getCalculatedStatsForSlot(slot)"
+            class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-base font-mono bg-slate-950 p-3 rounded-xl border border-slate-800"
+          >
+            <div>
+              <span class="text-slate-400 block text-base font-semibold">AD</span>
+              <span class="text-orange-400 font-bold text-lg">
+                {{ getCalculatedStatsForSlot(slot)?.ad }}
+              </span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-base font-semibold">AP</span>
+              <span class="text-cyan-400 font-bold text-lg">
+                {{ getCalculatedStatsForSlot(slot)?.ap }}
+              </span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-base font-semibold">AS</span>
+              <span class="text-emerald-400 font-bold text-lg">
+                {{ getCalculatedStatsForSlot(slot)?.as }}
+              </span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-base font-semibold">Armor</span>
+              <span class="text-amber-400 font-bold text-lg">
+                {{ getChampionEndState(slot.id).effectiveArmor }}
+              </span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-base font-semibold">MR</span>
+              <span class="text-purple-400 font-bold text-lg">
+                {{ getChampionEndState(slot.id).effectiveMr }}
+              </span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-base font-semibold">Crit</span>
+              <span class="text-amber-300 font-bold text-lg">
+                {{ getCalculatedStatsForSlot(slot)?.crit }}%
+              </span>
             </div>
           </div>
-        </div>
 
-        <div
-          v-if="teamfightSimulationResults.logSteps.length === 0"
-          class="py-20 flex flex-col items-center justify-center border border-dashed border-slate-800 rounded-2xl text-slate-500 font-mono text-base"
-        >
-          <span>No teamfight steps logged yet.</span>
-          <span class="text-slate-400 mt-2"
-            >Use the Teamfight Action Creator to append actions step-by-step!</span
-          >
+          <!-- Items Row -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <div
+              v-for="(item, idx) in slot.items"
+              :key="idx"
+              class="h-10 w-10 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center overflow-hidden"
+            >
+              <img v-if="item" :src="getItemIconUrl(item)" class="h-full w-full object-cover" />
+              <span v-else class="text-base text-slate-700">-</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -840,7 +1226,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDraftStore } from '@/stores/draft'
 import { storeToRefs } from 'pinia'
@@ -850,8 +1236,9 @@ import {
   calculateStats,
   calculateMonsterBuffStats,
   getChampionDefaultAdaptiveType,
-  calculateSpellDamage,
   detectItemPassives,
+  runCombatSimulation,
+  getSpellEffectiveCooldown,
 } from '@/services'
 import type { DraftSlot } from '@/types'
 import { useCalculatorStore } from '@/stores/calculator'
@@ -866,7 +1253,7 @@ const { selectCustomizerSlot } = draftStore
 const {
   selectedAttackerSlotIds,
   selectedDefenderSlotIds,
-  teamfightViewMode,
+  enforceCooldowns,
   teamfightActions,
   attackerBuffs,
   defenderBuffs,
@@ -875,13 +1262,13 @@ const {
 const { addTeamfightAction, removeTeamfightAction, clearComboSequence, setPresetScenario } =
   calculatorStore
 
-// Preset Scenarios
+// Presets
 const presetOptions = [
   { id: '1v1', label: '⚔️ 1v1 Dual' },
   { id: '1v2', label: '⚔️ 1v2 Gank' },
   { id: '2v2', label: '⚔️ 2v2 Skirmish' },
-  { id: '3v3', label: '⚔️ 3v3 Dragon Fight' },
-  { id: '5v5', label: '⚔️ 5v5 Full Teamfight' },
+  { id: '3v3', label: '⚔️ 3v3 Dragon' },
+  { id: '5v5', label: '⚔️ 5v5 Teamfight' },
 ] as const
 
 const isPresetActive = (presetId: string) => {
@@ -897,6 +1284,9 @@ const isPresetActive = (presetId: string) => {
     return selectedAttackerSlotIds.value.length === 5 && selectedDefenderSlotIds.value.length === 5
   return false
 }
+
+// Center view mode tab: 'all' (both actions sequence and log) | 'actions' | 'log'
+const centerViewTab = ref<'all' | 'actions' | 'log'>('all')
 
 // Slot helpers
 const selectedAttackerSlots = computed<DraftSlot[]>(() => {
@@ -929,20 +1319,142 @@ const toggleDefenderSlot = (slotId: number) => {
   }
 }
 
+const getSlotById = (slotId: number): DraftSlot | undefined => {
+  return [...blueDraft.value, ...redDraft.value].find((s) => s.id === slotId)
+}
+
+const getTargetSlots = (targetIds: number[]): DraftSlot[] => {
+  return targetIds.map((id) => getSlotById(id)).filter(Boolean) as DraftSlot[]
+}
+
 // Action Creator State
 const actionCreatorActorId = ref<number>(1)
 const actionCreatorSpell = ref<'Q' | 'W' | 'E' | 'R' | 'P' | 'AA'>('Q')
+const actionCreatorTime = ref<number>(0.0)
+
+// Active Actor details & cooldown stats
+const selectedActorSlot = computed(() => getSlotById(actionCreatorActorId.value))
+const selectedActorStats = computed(() =>
+  selectedActorSlot.value ? getCalculatedStatsForSlot(selectedActorSlot.value) : null,
+)
+
+const getSpellCd = (spellKey: 'Q' | 'W' | 'E' | 'R') => {
+  if (!selectedActorSlot.value) return 8
+  const ah = selectedActorStats.value?.abilityHaste ?? 0
+  return getSpellEffectiveCooldown(selectedActorSlot.value, spellKey, ah)
+}
+
+const getSpellBadgeInfo = (act: 'Q' | 'W' | 'E' | 'R' | 'AA' | 'P') => {
+  if (act === 'AA') {
+    const as = selectedActorStats.value?.as || 0.65
+    return `${(1 / as).toFixed(1)}s AS`
+  }
+  if (act === 'P') return 'Innate'
+  const cd = getSpellCd(act)
+  return `${cd}s CD`
+}
+
+const getShortAbilityName = (act: 'P' | 'Q' | 'W' | 'E' | 'R' | 'AA') => {
+  if (act === 'P') return 'Passive'
+  if (act === 'AA') return 'Attack'
+  if (act === 'R') return 'Ultimate'
+  return `Spell ${act}`
+}
+
+const getAbilityFullTooltip = (act: 'P' | 'Q' | 'W' | 'E' | 'R' | 'AA') => {
+  if (!selectedActorSlot.value || !selectedActorSlot.value.champion) return ''
+  const cName = selectedActorSlot.value.champion.name
+  if (act === 'P') {
+    const pName = selectedActorSlot.value.champion.passive?.name || 'Passive'
+    return `${cName} Passive: ${pName}`
+  }
+  if (act === 'AA') {
+    const as = (1 / (selectedActorStats.value?.as || 0.65)).toFixed(1)
+    return `${cName} Basic Attack (${as}s AS)`
+  }
+  const idx = { Q: 0, W: 1, E: 2, R: 3 }[act]
+  const sName = selectedActorSlot.value.champion.spells?.[idx]?.name || `Spell ${act}`
+  const cd = getSpellCd(act)
+  return `${cName} [${act}]: ${sName} (${cd}s CD)`
+}
+
+// Track when this spell was last scheduled for the actor
+const lastCastTimeForSelectedSpell = computed(() => {
+  const acts = teamfightActions.value.filter(
+    (a) => a.actorSlotId === actionCreatorActorId.value && a.action === actionCreatorSpell.value,
+  )
+  if (acts.length === 0) return -1
+  return Math.max(...acts.map((a) => a.timestamp ?? 0))
+})
+
+const nextReadyTimeForSelectedSpell = computed(() => {
+  if (['AA', 'P'].includes(actionCreatorSpell.value)) return 0
+  if (lastCastTimeForSelectedSpell.value < 0) return 0
+  const cd = getSpellCd(actionCreatorSpell.value as 'Q' | 'W' | 'E' | 'R')
+  return Math.round((lastCastTimeForSelectedSpell.value + cd) * 10) / 10
+})
+
+const isSelectedSpellOnCooldown = computed(() => {
+  if (['AA', 'P'].includes(actionCreatorSpell.value)) return false
+  if (lastCastTimeForSelectedSpell.value < 0) return false
+  return actionCreatorTime.value < nextReadyTimeForSelectedSpell.value - 0.05
+})
+
+const snapToReadyTime = () => {
+  actionCreatorTime.value = Math.min(30, nextReadyTimeForSelectedSpell.value)
+}
+
+const selectSpellAction = (act: 'Q' | 'W' | 'E' | 'R' | 'AA' | 'P') => {
+  actionCreatorSpell.value = act
+  // If this spell was already cast and would be on cooldown at current time, snap to ready
+  if (['Q', 'W', 'E', 'R'].includes(act)) {
+    const acts = teamfightActions.value.filter(
+      (a) => a.actorSlotId === actionCreatorActorId.value && a.action === act,
+    )
+    if (acts.length > 0) {
+      const lastT = Math.max(...acts.map((a) => a.timestamp ?? 0))
+      const cd = getSpellCd(act as 'Q' | 'W' | 'E' | 'R')
+      const readyAt = Math.round((lastT + cd) * 10) / 10
+      if (actionCreatorTime.value < readyAt) {
+        actionCreatorTime.value = Math.min(30, readyAt)
+      }
+    }
+  }
+}
+
+// Opponents dynamically computed based on acting champion's side
+const availableTargets = computed(() => {
+  const isBlueActor = actionCreatorActorId.value <= 5
+  return isBlueActor ? selectedDefenderSlots.value : selectedAttackerSlots.value
+})
+
 const actionCreatorTargetIds = ref<number[]>([6])
 
+// Update default target when actor changes
+watch(
+  actionCreatorActorId,
+  (newActorId) => {
+    const isBlue = newActorId <= 5
+    const oppSlots = isBlue ? selectedDefenderSlots.value : selectedAttackerSlots.value
+    const firstId = oppSlots[0]?.id
+    actionCreatorTargetIds.value = firstId !== undefined ? [firstId] : []
+  },
+  { immediate: true },
+)
+
 const isAllTargetsSelected = computed(() => {
-  return selectedDefenderSlots.value.every((s) => actionCreatorTargetIds.value.includes(s.id))
+  return (
+    availableTargets.value.length > 0 &&
+    availableTargets.value.every((s) => actionCreatorTargetIds.value.includes(s.id))
+  )
 })
 
 const toggleSelectAllTargets = () => {
   if (isAllTargetsSelected.value) {
-    actionCreatorTargetIds.value = [selectedDefenderSlots.value[0]?.id || 6]
+    const firstId = availableTargets.value[0]?.id
+    actionCreatorTargetIds.value = firstId !== undefined ? [firstId] : []
   } else {
-    actionCreatorTargetIds.value = selectedDefenderSlots.value.map((s) => s.id)
+    actionCreatorTargetIds.value = availableTargets.value.map((s) => s.id)
   }
 }
 
@@ -951,16 +1463,53 @@ const submitTeamfightAction = () => {
     actionCreatorActorId.value,
     actionCreatorSpell.value,
     actionCreatorTargetIds.value,
+    actionCreatorTime.value,
   )
+  // Auto-advance timestamp by cast animation time (0.3s) for seamless combo queuing
+  actionCreatorTime.value = Math.min(
+    30,
+    Math.round((actionCreatorTime.value + 0.3) * 10) / 10,
+  )
+}
+
+const clearActionsAndResetTime = () => {
+  clearComboSequence()
+  actionCreatorTime.value = 0.0
+}
+
+const moveActionUp = (index: number) => {
+  if (index <= 0) return
+  const current = teamfightActions.value[index]
+  const prev = teamfightActions.value[index - 1]
+  if (!current || !prev) return
+  if (current.timestamp !== undefined && prev.timestamp !== undefined && current.timestamp !== prev.timestamp) {
+    const tempTime = current.timestamp
+    current.timestamp = prev.timestamp
+    prev.timestamp = tempTime
+  }
+  teamfightActions.value.splice(index - 1, 2, current, prev)
+}
+
+const moveActionDown = (index: number) => {
+  if (index >= teamfightActions.value.length - 1) return
+  const current = teamfightActions.value[index]
+  const next = teamfightActions.value[index + 1]
+  if (!current || !next) return
+  if (current.timestamp !== undefined && next.timestamp !== undefined && current.timestamp !== next.timestamp) {
+    const tempTime = current.timestamp
+    current.timestamp = next.timestamp
+    next.timestamp = tempTime
+  }
+  teamfightActions.value.splice(index, 2, next, current)
 }
 
 const openWorkbenchForSlot = (slotId: number) => {
   const slot = [...blueDraft.value, ...redDraft.value].find((s) => s.id === slotId)
   if (slot) selectCustomizerSlot(slot)
-  router.push('/workbench')
+  router.push('/')
 }
 
-// Calculated Base Stats for any slot
+// Stats helper
 const getCalculatedStatsForSlot = (slot: DraftSlot) => {
   if (!slot || !slot.champion) return null
   const base = calculateStats(slot)
@@ -973,7 +1522,6 @@ const getCalculatedStatsForSlot = (slot: DraftSlot) => {
   const baseAp = Math.round((base.ap.total + mStats.bonusAP) * mStats.apMultiplier)
 
   if (itemPassives.hasBlackfireTorch) {
-    // Find max targets hit by an ability action for this slot in current teamfightActions
     let maxTargetsHit = 0
     teamfightActions.value.forEach((actStep) => {
       if (actStep.actorSlotId === slot.id && ['Q', 'W', 'E', 'R', 'P'].includes(actStep.action)) {
@@ -994,6 +1542,7 @@ const getCalculatedStatsForSlot = (slot: DraftSlot) => {
     ad: Math.round((base.ad.total + mStats.bonusAD) * mStats.adMultiplier),
     baseAd: Math.round(base.ad.base * mStats.adMultiplier),
     ap: baseAp + blackfireBonusAp,
+    as: Math.round((base.as?.total || 0.65) * 100) / 100,
     baseAp,
     blackfireBonusAp,
     mana: base.mp.total,
@@ -1011,596 +1560,67 @@ const getCalculatedStatsForSlot = (slot: DraftSlot) => {
   }
 }
 
-interface TargetResult {
-  targetSlotId: number
-  targetName: string
-  amount: number
-  type: 'physical' | 'magic' | 'true'
-  effectiveArmor: number
-  effectiveMr: number
-  blackCleaverStacks: number
-  vileDecayStacks: number
-  conquerorStacks: number
-  lethalTempoStacks: number
-  lethalTempoOnHitDmg?: number
-  ptaStacks: number
-  ptaExposed: boolean
-  electrocuteStacks?: number
-  electrocuteProcDmg?: number
-  darkHarvestStacks?: number
-  darkHarvestProcDmg?: number
-  hobRemainingAttacks?: number
-  coupDeGrace?: boolean
-  cutDown?: boolean
-  lastStandBonusPct?: number
-  isKo: boolean
-  remainingHp: number
-}
-
-// TEAMFIGHT SIMULATION ENGINE
-const teamfightSimulationResults = computed(() => {
-  const defenderStateMap: Record<
-    number,
-    {
-      currentHp: number
-      maxHp: number
-      baseArmor: number
-      baseMr: number
-      blackCleaverStacks: number
-      vileDecayStacks: number
-      isKo: boolean
-      name: string
-    }
-  > = {}
-
-  const castCounters: Record<number, number> = {}
-  const aatroxQSeqMap: Record<number, number> = {}
-  const attackerConquerorMap: Record<number, number> = {}
-  const attackerLethalTempoMap: Record<number, number> = {}
-  const attackerHobMap: Record<number, number> = {}
-  const targetPtaMap: Record<string, { stacks: number; exposed: boolean }> = {}
-  const targetElectrocuteMap: Record<string, { stacks: number; procced: boolean }> = {}
-  const targetDarkHarvestMap: Record<string, { procced: boolean }> = {}
-
-  // Initialize Defender States
-  selectedDefenderSlots.value.forEach((slot) => {
-    const stats = getCalculatedStatsForSlot(slot)
-    const hp = stats?.hp || 1000
-    defenderStateMap[slot.id] = {
-      currentHp: hp,
-      maxHp: hp,
-      baseArmor: stats?.armor || 50,
-      baseMr: stats?.mr || 40,
-      blackCleaverStacks: 0,
-      vileDecayStacks: 0,
-      isKo: false,
-      name: slot.champion ? slot.champion.name : `Red ${slot.role}`,
-    }
+// MAIN COMBAT SIMULATION ENGINE CALL
+const combatResults = computed(() => {
+  return runCombatSimulation({
+    allSlots: [...blueDraft.value, ...redDraft.value],
+    activeBlueSlotIds: selectedAttackerSlotIds.value,
+    activeRedSlotIds: selectedDefenderSlotIds.value,
+    actions: teamfightActions.value,
+    duration: 30.0,
+    enableAutoAttacks: false,
+    autoCastSpells: false,
+    enforceCooldowns: enforceCooldowns.value,
+    attackerBuffs: attackerBuffs.value,
+    defenderBuffs: defenderBuffs.value,
   })
-
-  let totalTeamDamage = 0
-  const logSteps: Array<{
-    stepIndex: number
-    actorSlotId: number
-    actorName: string
-    actorKeystone?: unknown
-    action: string
-    targetResults: TargetResult[]
-    totalStepDamage: number
-  }> = []
-
-  teamfightActions.value.forEach((actStep, idx) => {
-    const actorSlot =
-      blueDraft.value.find((b) => b.id === actStep.actorSlotId) || selectedAttackerSlots.value[0]
-    if (!actorSlot || !actorSlot.champion) return
-
-    const keystoneName = (actorSlot.primaryKeystone?.name || '').toLowerCase()
-    const hasConqueror = keystoneName.includes('conqueror')
-    const hasLethalTempo = keystoneName.includes('lethal tempo')
-    const hasPtA = keystoneName.includes('press the attack')
-    const hasElectrocute = keystoneName.includes('electrocute')
-    const hasDarkHarvest =
-      keystoneName.includes('dark harvest') || keystoneName.includes('darkharvest')
-
-    const hasHailOfBlades =
-      keystoneName.includes('hail of blades') || keystoneName.includes('hailofblades')
-
-    let currentConquerorStacks = attackerConquerorMap[actorSlot.id] || 0
-    let currentLethalTempoStacks = attackerLethalTempoMap[actorSlot.id] || 0
-    const currentHobAttacksLeft = attackerHobMap[actorSlot.id] ?? 3
-
-    if (['Q', 'W', 'E', 'R', 'P', 'AA'].includes(actStep.action)) {
-      const isMelee = (actorSlot.champion.stats.attackrange || 125) <= 225
-      if (hasConqueror) {
-        currentConquerorStacks = Math.min(12, currentConquerorStacks + (isMelee ? 2 : 1))
-        attackerConquerorMap[actorSlot.id] = currentConquerorStacks
-      }
-      if (hasLethalTempo && actStep.action === 'AA') {
-        currentLethalTempoStacks = Math.min(6, currentLethalTempoStacks + 1)
-        attackerLethalTempoMap[actorSlot.id] = currentLethalTempoStacks
-      }
-      if (hasHailOfBlades && actStep.action === 'AA') {
-        if (currentHobAttacksLeft > 0) {
-          attackerHobMap[actorSlot.id] = Math.max(0, currentHobAttacksLeft - 1)
-        }
-      }
-    }
-
-    const isHobActive = hasHailOfBlades && currentHobAttacksLeft > 0
-
-    // Get actor stats dynamically updated with current keystone stacks
-    const baseStats = calculateStats({
-      ...actorSlot,
-      conquerorStacks: currentConquerorStacks,
-      lethalTempoStacks: currentLethalTempoStacks,
-      hailOfBladesActive: isHobActive,
-    })
-    if (!baseStats) return
-    const isAttacker = blueDraft.value.some((b) => b.id === actorSlot.id)
-    const mStats = calculateMonsterBuffStats(isAttacker ? attackerBuffs.value : defenderBuffs.value)
-
-    const att = {
-      ad: Math.round((baseStats.ad.total + mStats.bonusAD) * mStats.adMultiplier),
-      baseAd: Math.round(baseStats.ad.base * mStats.adMultiplier),
-      ap: Math.round((baseStats.ap.total + mStats.bonusAP) * mStats.apMultiplier),
-      as: Math.round(baseStats.as.total * 100) / 100,
-      mana: baseStats.mp.total,
-      hp: baseStats.hp.total + mStats.bonusShield,
-      armor: Math.round(baseStats.armor.total * mStats.armorMultiplier),
-      mr: Math.round(baseStats.mr.total * mStats.mrMultiplier),
-      crit: baseStats.crit.total,
-      lethality: baseStats.lethality.total,
-      armorPen: baseStats.armorPen.total,
-      magicPenFlat: baseStats.magicPenFlat.total,
-      magicPenPercent: baseStats.magicPenPercent.total,
-      abilityHaste: Math.round(baseStats.abilityHaste.total + mStats.bonusAH),
-      tenacity: Math.round(baseStats.tenacity.total + mStats.bonusTenacity),
-      adaptiveType: getChampionDefaultAdaptiveType(actorSlot.champion.id, actorSlot.champion.tags),
-    }
-
-    const actorName = actorSlot.champion.name
-    const action = actStep.action
-
-    const itemPassives = detectItemPassives(actorSlot.items)
-    const hasMuramana = itemPassives.hasMuramana
-    const hasBlackCleaver = itemPassives.hasBlackCleaver
-    const hasBloodletter = itemPassives.hasBloodletter
-    const hasAbyssalMask = itemPassives.hasAbyssalMask
-    const hasBlackfireTorch = itemPassives.hasBlackfireTorch
-    const hasLudensEcho = itemPassives.hasLudens
-
-    // Blackfire Torch dynamic AP scaling (+4% AP per enemy champion hit, max 5 = 20%)
-    if (hasBlackfireTorch && ['Q', 'W', 'E', 'R', 'P'].includes(action)) {
-      const targetCount = Math.min(5, Math.max(1, actStep.targetSlotIds.length))
-      const extraApPct = targetCount * 0.04
-      att.ap = Math.round(att.ap * (1 + extraApPct))
-    }
-
-    const isApAttacker =
-      att.ap > att.ad ||
-      getChampionDefaultAdaptiveType(actorSlot.champion.id, actorSlot.champion.tags) === 'AP'
-
-    // Seraphine Stage Presence: Every 3rd basic ability cast is echoed
-    let isEchoCast = false
-    if (actorSlot.champion.id === 'Seraphine' && ['Q', 'W', 'E'].includes(action)) {
-      const currentVal = castCounters[actorSlot.id] || 0
-      castCounters[actorSlot.id] = currentVal + 1
-      if ((currentVal + 1) % 3 === 0) {
-        isEchoCast = true
-      }
-    }
-
-    // Aatrox Q sequence (Q1 -> Q2 -> Q3)
-    let aatroxQSeq = 1
-    if (actorSlot.champion.id === 'Aatrox' && action === 'Q') {
-      const prev = aatroxQSeqMap[actorSlot.id] || 0
-      aatroxQSeq = (prev % 3) + 1
-      aatroxQSeqMap[actorSlot.id] = aatroxQSeq
-    }
-
-    let stepTotalDmg = 0
-    const targetResults: TargetResult[] = []
-
-    const executeActionForTargets = (isEcho: boolean) => {
-      actStep.targetSlotIds.forEach((targetId) => {
-        const defState = defenderStateMap[targetId]
-        if (!defState) return
-
-        // Press the Attack Stacking
-        const ptaKey = `${actorSlot.id}_${targetId}`
-        if (!targetPtaMap[ptaKey]) {
-          targetPtaMap[ptaKey] = { stacks: 0, exposed: false }
-        }
-        const ptaState = targetPtaMap[ptaKey]
-        let ptaProcDmg = 0
-
-        if (hasPtA && action === 'AA') {
-          if (!ptaState.exposed) {
-            ptaState.stacks++
-            if (ptaState.stacks >= 3) {
-              ptaState.exposed = true
-              const lvl = actorSlot.level || 1
-              ptaProcDmg = Math.round(40 + (lvl - 1) * (140 / 17))
-            }
-          }
-        }
-
-        // Stack shred items on hit
-        if (['Q', 'W', 'E', 'R', 'P', 'AA'].includes(action)) {
-          if (!isApAttacker && hasBlackCleaver && defState.blackCleaverStacks < 6)
-            defState.blackCleaverStacks++
-          if (isApAttacker && hasBloodletter && defState.vileDecayStacks < 4)
-            defState.vileDecayStacks++
-        }
-
-        const actorRunes = [
-          actorSlot.primaryKeystone,
-          actorSlot.primaryRune1,
-          actorSlot.primaryRune2,
-          actorSlot.primaryRune3,
-          actorSlot.secondaryRune1,
-          actorSlot.secondaryRune2,
-          ...(actorSlot.runes || []),
-        ]
-        const hasCoupDeGrace = actorRunes.some((r) => {
-          const str = `${r?.name || ''} ${r?.key || ''}`.toLowerCase()
-          return str.includes('coup') || str.includes('grace')
-        })
-        const hasLastStand = actorRunes.some((r) => {
-          const str = `${r?.name || ''} ${r?.key || ''}`.toLowerCase()
-          return str.includes('last stand') || str.includes('laststand')
-        })
-        const hasCutDown = actorRunes.some((r) => {
-          const str = `${r?.name || ''} ${r?.key || ''}`.toLowerCase()
-          return str.includes('cut down') || str.includes('cutdown')
-        })
-
-        const spellRes = calculateSpellDamage({
-          champion: actorSlot.champion,
-          action,
-          spellRanks: actorSlot.spellRanks,
-          attacker: {
-            ad: att.ad,
-            baseAd: att.baseAd,
-            ap: att.ap,
-            crit: att.crit,
-            level: actorSlot.level,
-            hp: att.hp,
-            maxHp: att.hp,
-            mana: att.mana,
-            armorPen: att.armorPen,
-            lethality: att.lethality,
-            magicPenPercent: att.magicPenPercent,
-            magicPenFlat: att.magicPenFlat,
-            adaptiveType: att.adaptiveType,
-          },
-          defender: {
-            currentHp: defState.currentHp,
-            maxHp: defState.maxHp,
-            armor: defState.baseArmor,
-            mr: defState.baseMr,
-            blackCleaverStacks: defState.blackCleaverStacks,
-            vileDecayStacks: defState.vileDecayStacks,
-          },
-          options: {
-            aatroxQSeq,
-            hasAbyssalMask,
-            hasCoupDeGrace,
-            hasLastStand,
-            hasCutDown,
-          },
-        })
-
-        // Electrocute Stacking (3 unique attacks/abilities within 3s window)
-        const eleKey = `${actorSlot.id}_${targetId}`
-        if (!targetElectrocuteMap[eleKey]) {
-          targetElectrocuteMap[eleKey] = { stacks: 0, procced: false }
-        }
-        const eleState = targetElectrocuteMap[eleKey]
-        let electrocuteProcDmg = 0
-
-        if (hasElectrocute && ['Q', 'W', 'E', 'R', 'P', 'AA'].includes(action)) {
-          if (!eleState.procced) {
-            eleState.stacks++
-            if (eleState.stacks >= 3) {
-              eleState.procced = true
-              const lvl = actorSlot.level || 1
-              // Electrocute base damage: 50 - 190 (based on level) + 0.40 bonus AD OR + 0.25 AP
-              const baseEleDmg = 50 + (lvl - 1) * (140 / 17)
-              const baseAdValue = actorSlot.champion?.stats?.attackdamage || 0
-              const bonusEleDmg = isApAttacker ? att.ap * 0.25 : (att.ad - baseAdValue) * 0.4
-              const rawEleDmg = baseEleDmg + Math.max(0, bonusEleDmg)
-              const mult = isApAttacker ? spellRes.magicMult : spellRes.physMult
-              electrocuteProcDmg = Math.round(rawEleDmg * mult)
-            }
-          }
-        }
-
-        if (electrocuteProcDmg > 0) {
-          defState.currentHp = Math.max(0, defState.currentHp - electrocuteProcDmg)
-          if (defState.currentHp === 0) defState.isKo = true
-          stepTotalDmg += electrocuteProcDmg
-          totalTeamDamage += electrocuteProcDmg
-        }
-
-        const rawDmg = spellRes.rawDmg
-        const dmgType = spellRes.dmgType
-        const hitMult = spellRes.hitMult
-        const effArmor = spellRes.effArmor
-        const effMr = spellRes.effMr
-
-        // Lethal Tempo Max-Stack (6x) Bonus Adaptive On-Hit Damage
-        let ltOnHitProcDmg = 0
-        if (hasLethalTempo && action === 'AA' && currentLethalTempoStacks >= 6) {
-          const lvl = actorSlot.level || 1
-          const baseOnHit = 6 + (lvl - 1) * (24 / 17)
-          const champBaseAs = actorSlot.champion?.stats?.attackspeed || 0.65
-          const bonusAsPct = Math.max(0, ((att.as || 0.65) - champBaseAs) / champBaseAs) * 100
-          const physMult = spellRes.physMult
-          const magicMult = spellRes.magicMult
-          const rawLtDmg = baseOnHit * (1 + bonusAsPct / 100)
-          ltOnHitProcDmg = Math.round(rawLtDmg * (isApAttacker ? magicMult : physMult))
-        }
-
-        let finalDmg = Math.round(rawDmg * hitMult)
-
-        // Apply PtA Exposed 8% damage bonus if exposed
-        if (ptaState.exposed) {
-          finalDmg = Math.round(finalDmg * 1.08)
-        }
-
-        finalDmg += ptaProcDmg + ltOnHitProcDmg
-
-        defState.currentHp = Math.max(0, defState.currentHp - finalDmg)
-        if (defState.currentHp === 0) defState.isKo = true
-
-        stepTotalDmg += finalDmg
-        totalTeamDamage += finalDmg
-
-        let nameSuffix = ''
-        if (ptaProcDmg > 0 && ltOnHitProcDmg > 0) nameSuffix = ' (PtA + LT Proc)'
-        else if (ptaProcDmg > 0) nameSuffix = ' (PtA Proc)'
-        else if (ltOnHitProcDmg > 0) nameSuffix = ' (LT Proc)'
-        else if (isEcho) nameSuffix = ' (Echo)'
-
-        // Dark Harvest Stacking & Proc (Damaging champions below 50% HP)
-        const dhKey = `${actorSlot.id}_${targetId}`
-        if (!targetDarkHarvestMap[dhKey]) {
-          targetDarkHarvestMap[dhKey] = { procced: false }
-        }
-        const dhState = targetDarkHarvestMap[dhKey]
-        let darkHarvestProcDmg = 0
-        const dhStacks = actorSlot.darkHarvestStacks ?? 5
-
-        const targetHpPct = (defState.currentHp / defState.maxHp) * 100
-        if (
-          hasDarkHarvest &&
-          targetHpPct <= 50 &&
-          !dhState.procced &&
-          ['Q', 'W', 'E', 'R', 'P', 'AA'].includes(action)
-        ) {
-          dhState.procced = true
-          const lvl = actorSlot.level || 1
-          // Dark Harvest base damage: 20 - 60 (level scaling) + (9 * stacks) + 0.10 bonus AD OR + 0.05 AP
-          const baseDhDmg = 20 + (lvl - 1) * (40 / 17) + dhStacks * 9
-          const baseAdVal = actorSlot.champion?.stats?.attackdamage || 0
-          const bonusDhDmg = isApAttacker ? att.ap * 0.05 : (att.ad - baseAdVal) * 0.1
-          const rawDhDmg = baseDhDmg + Math.max(0, bonusDhDmg)
-          const mult = isApAttacker ? spellRes.magicMult : spellRes.physMult
-          darkHarvestProcDmg = Math.round(rawDhDmg * mult)
-        }
-
-        if (darkHarvestProcDmg > 0) {
-          defState.currentHp = Math.max(0, defState.currentHp - darkHarvestProcDmg)
-          if (defState.currentHp === 0) defState.isKo = true
-          stepTotalDmg += darkHarvestProcDmg
-          totalTeamDamage += darkHarvestProcDmg
-        }
-
-        targetResults.push({
-          targetSlotId: targetId,
-          targetName: `${defState.name}${nameSuffix}`,
-          amount: finalDmg,
-          type: dmgType,
-          effectiveArmor: Math.round(effArmor),
-          effectiveMr: Math.round(effMr),
-          blackCleaverStacks: defState.blackCleaverStacks,
-          vileDecayStacks: defState.vileDecayStacks,
-          conquerorStacks: hasConqueror ? currentConquerorStacks : 0,
-          lethalTempoStacks: hasLethalTempo ? currentLethalTempoStacks : 0,
-          lethalTempoOnHitDmg: ltOnHitProcDmg,
-          ptaStacks: hasPtA ? ptaState.stacks : 0,
-          ptaExposed: ptaState.exposed,
-          electrocuteStacks: hasElectrocute ? eleState.stacks : 0,
-          electrocuteProcDmg: electrocuteProcDmg,
-          darkHarvestStacks: hasDarkHarvest ? dhStacks : 0,
-          darkHarvestProcDmg: darkHarvestProcDmg,
-          hobRemainingAttacks: hasHailOfBlades ? currentHobAttacksLeft : undefined,
-          coupDeGrace: spellRes.isCoupDeGraceProc,
-          cutDown: spellRes.isCutDownProc,
-          lastStandBonusPct: spellRes.lastStandBonusPct,
-          isKo: defState.isKo,
-          remainingHp: defState.currentHp,
-        })
-
-        // Muramana Shock Passive
-        if (hasMuramana && ['Q', 'W', 'E', 'R', 'AA'].includes(action) && !defState.isKo) {
-          const maxMana = att.mana || 0
-          let shockRawDmg = 0
-          if (action === 'AA') {
-            shockRawDmg = maxMana * 0.015
-          } else {
-            const isRanged = (actorSlot.champion?.stats?.attackrange ?? 125) > 300
-            const manaPct = isRanged ? 0.027 : 0.035
-            shockRawDmg = maxMana * manaPct + att.ad * 0.06
-          }
-
-          const shockFinalDmg = Math.round(shockRawDmg * spellRes.physMult)
-          if (shockFinalDmg > 0) {
-            defState.currentHp = Math.max(0, defState.currentHp - shockFinalDmg)
-            if (defState.currentHp === 0) defState.isKo = true
-
-            stepTotalDmg += shockFinalDmg
-            totalTeamDamage += shockFinalDmg
-
-            targetResults.push({
-              targetSlotId: targetId,
-              targetName: isEcho
-                ? `${defState.name} (Echo + Muramana)`
-                : `${defState.name} (Muramana)`,
-              amount: shockFinalDmg,
-              type: 'physical',
-              effectiveArmor: Math.round(spellRes.effArmor),
-              effectiveMr: Math.round(spellRes.effMr),
-              blackCleaverStacks: defState.blackCleaverStacks,
-              vileDecayStacks: defState.vileDecayStacks,
-              conquerorStacks: hasConqueror ? currentConquerorStacks : 0,
-              lethalTempoStacks: hasLethalTempo ? currentLethalTempoStacks : 0,
-              ptaStacks: hasPtA ? ptaState.stacks : 0,
-              ptaExposed: ptaState.exposed,
-              isKo: defState.isKo,
-              remainingHp: defState.currentHp,
-            })
-          }
-        }
-
-        // Blackfire Torch (Baleful Blaze Burn: 60 + 6% AP over 3s)
-        if (hasBlackfireTorch && ['Q', 'W', 'E', 'R', 'P'].includes(action) && !defState.isKo) {
-          const burnRawDmg = 60 + att.ap * 0.06
-          const burnFinalDmg = Math.round(burnRawDmg * spellRes.magicMult)
-          if (burnFinalDmg > 0) {
-            defState.currentHp = Math.max(0, defState.currentHp - burnFinalDmg)
-            if (defState.currentHp === 0) defState.isKo = true
-
-            stepTotalDmg += burnFinalDmg
-            totalTeamDamage += burnFinalDmg
-
-            targetResults.push({
-              targetSlotId: targetId,
-              targetName: isEcho
-                ? `${defState.name} (Echo + Blackfire Burn)`
-                : `${defState.name} (Blackfire Burn)`,
-              amount: burnFinalDmg,
-              type: 'magic',
-              effectiveArmor: Math.round(spellRes.effArmor),
-              effectiveMr: Math.round(spellRes.effMr),
-              blackCleaverStacks: defState.blackCleaverStacks,
-              vileDecayStacks: defState.vileDecayStacks,
-              conquerorStacks: hasConqueror ? currentConquerorStacks : 0,
-              lethalTempoStacks: hasLethalTempo ? currentLethalTempoStacks : 0,
-              ptaStacks: hasPtA ? ptaState.stacks : 0,
-              ptaExposed: ptaState.exposed,
-              isKo: defState.isKo,
-              remainingHp: defState.currentHp,
-            })
-          }
-        }
-
-        // Luden's Echo Passive (Echo Shot)
-        if (hasLudensEcho && ['Q', 'W', 'E', 'R', 'P'].includes(action) && !defState.isKo) {
-          const isPrimaryTarget = targetId === actStep.targetSlotIds[0]
-          const totalTargetsHit = Math.min(6, actStep.targetSlotIds.length)
-          const secondaryTargetsHit = Math.max(0, totalTargetsHit - 1)
-
-          let ludenRawDmg = 0
-          if (isPrimaryTarget) {
-            // Primary target: 75 (+5% AP) base + 15 (+1% AP) for each unused stack beyond 1st (max 150 + 10% AP if single target)
-            const unusedStacks = 5 - secondaryTargetsHit
-            ludenRawDmg = 75 + unusedStacks * 15 + att.ap * (0.05 + unusedStacks * 0.01)
-          } else {
-            // Secondary targets: 75 (+5% AP) each
-            ludenRawDmg = 75 + att.ap * 0.05
-          }
-
-          const ludenFinalDmg = Math.round(ludenRawDmg * spellRes.magicMult)
-
-          if (ludenFinalDmg > 0) {
-            defState.currentHp = Math.max(0, defState.currentHp - ludenFinalDmg)
-            if (defState.currentHp === 0) defState.isKo = true
-
-            stepTotalDmg += ludenFinalDmg
-            totalTeamDamage += ludenFinalDmg
-
-            targetResults.push({
-              targetSlotId: targetId,
-              targetName: isEcho
-                ? `${defState.name} (Echo + Luden Proc)`
-                : `${defState.name} (Luden Proc)`,
-              amount: ludenFinalDmg,
-              type: 'magic',
-              effectiveArmor: Math.round(spellRes.effArmor),
-              effectiveMr: Math.round(spellRes.effMr),
-              blackCleaverStacks: defState.blackCleaverStacks,
-              vileDecayStacks: defState.vileDecayStacks,
-              conquerorStacks: hasConqueror ? currentConquerorStacks : 0,
-              lethalTempoStacks: hasLethalTempo ? currentLethalTempoStacks : 0,
-              ptaStacks: hasPtA ? ptaState.stacks : 0,
-              ptaExposed: ptaState.exposed,
-              isKo: defState.isKo,
-              remainingHp: defState.currentHp,
-            })
-          }
-        }
-      })
-    }
-
-    // First cast (Normal)
-    executeActionForTargets(false)
-
-    // Second cast (Echo)
-    if (isEchoCast) {
-      executeActionForTargets(true)
-    }
-
-    let stepActionName: string = action
-    if (actorSlot.champion.id === 'Aatrox' && action === 'Q') {
-      stepActionName = `Q${aatroxQSeq} (Sweetspot)`
-    } else if (isEchoCast) {
-      stepActionName = `${action} + 🎶 Echo`
-    }
-
-    logSteps.push({
-      stepIndex: idx + 1,
-      actorSlotId: actStep.actorSlotId,
-      actorName,
-      actorKeystone: actorSlot.primaryKeystone || null,
-      action: stepActionName,
-      targetResults,
-      totalStepDamage: stepTotalDmg,
-    })
-  })
-
-  return {
-    defenderStateMap,
-    logSteps,
-    totalTeamDamage,
-  }
 })
 
-const getDefenderEndState = (slotId: number) => {
-  const def = teamfightSimulationResults.value.defenderStateMap[slotId]
-  if (!def) {
+const blueDamageSharePct = computed(() => {
+  const total = combatResults.value.blueTeamTotalDamage + combatResults.value.redTeamTotalDamage
+  if (total <= 0) return 50
+  return Math.round((combatResults.value.blueTeamTotalDamage / total) * 100)
+})
+
+// Event Filter State
+const eventFilter = ref<'all' | 'blue' | 'red' | 'dot'>('all')
+
+const filteredEvents = computed(() => {
+  const evts = combatResults.value.events
+  if (eventFilter.value === 'blue') return evts.filter((e) => e.actorSide === 'blue')
+  if (eventFilter.value === 'red') return evts.filter((e) => e.actorSide === 'red')
+  if (eventFilter.value === 'dot') return evts.filter((e) => e.isDot)
+  return evts
+})
+
+// End State Helper for any participant slot (Blue or Red)
+const getChampionEndState = (slotId: number) => {
+  const res = combatResults.value.championResults[slotId]
+  if (!res) {
     return {
+      slotId,
+      championName: 'Unassigned',
+      side: (slotId <= 5 ? 'blue' : 'red') as 'blue' | 'red',
+      role: '',
+      initialHp: 1000,
       currentHp: 1000,
       maxHp: 1000,
       hpPct: 100,
+      isKo: false,
+      totalDamageDealt: 0,
+      dps: 0,
+      damageDealtByType: { physical: 0, magic: 0, true: 0, dot: 0 },
+      damageTaken: 0,
+      activeDoTs: [],
       effectiveArmor: 50,
       effectiveMr: 40,
       blackCleaverStacks: 0,
       vileDecayStacks: 0,
-      isKo: false,
+      conquerorStacks: 0,
+      lethalTempoStacks: 0,
     }
   }
-  const hpPct = Math.max(0, Math.round((def.currentHp / def.maxHp) * 100))
-  return {
-    currentHp: def.currentHp,
-    maxHp: def.maxHp,
-    hpPct,
-    effectiveArmor: Math.round(def.baseArmor * (1 - def.blackCleaverStacks * 0.05)),
-    effectiveMr: Math.round(def.baseMr * (1 - def.vileDecayStacks * 0.075)),
-    blackCleaverStacks: def.blackCleaverStacks,
-    vileDecayStacks: def.vileDecayStacks,
-    isKo: def.isKo,
-  }
+  return res
 }
 </script>
+

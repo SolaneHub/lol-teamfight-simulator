@@ -20,6 +20,9 @@ export interface ItemPassiveState {
   hasJaksho: boolean
   hasTerminus: boolean
   hasOverlord: boolean
+  hasMalignance: boolean
+  hasSunfire: boolean
+  hasHollowRadiance: boolean
 }
 
 export interface ItemDamageResult {
@@ -60,6 +63,9 @@ export function detectItemPassives(items: (Item | null | undefined)[]): ItemPass
     hasJaksho: check(["jak'sho"], ['6665']),
     hasTerminus: check(['terminus'], ['3302']),
     hasOverlord: check(["overlord's bloodmail"], ['6664']),
+    hasMalignance: check(['malignance', 'malignità'], ['3118', '223118']),
+    hasSunfire: check(['sunfire', 'egida del sole'], ['3068']),
+    hasHollowRadiance: check(['hollow radiance', 'irradiazione vuota'], ['2502', '3002']),
   }
 }
 

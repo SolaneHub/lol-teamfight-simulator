@@ -20,6 +20,7 @@ export interface TeamfightAction {
   actorSlotId: number
   action: 'Q' | 'W' | 'E' | 'R' | 'P' | 'AA'
   targetSlotIds: number[]
+  timestamp?: number
 }
 
 export const useCalculatorStore = defineStore('calculator', () => {
@@ -33,7 +34,10 @@ export const useCalculatorStore = defineStore('calculator', () => {
   // UI view mode: 'split' (3-column) vs 'feed' (chronological timeline)
   const teamfightViewMode = ref<'split' | 'feed'>('split')
 
-  const comboSequence = ref<string[]>([])
+  // Combat time settings
+  const testDuration = ref<number>(5.0) // 1 to 20 seconds
+  const enforceCooldowns = ref<boolean>(true) // Respect spell cooldowns
+
   const teamfightActions = ref<TeamfightAction[]>([])
 
   const attackerBuffs = ref<SideBuffState>({
@@ -80,6 +84,10 @@ export const useCalculatorStore = defineStore('calculator', () => {
         selectedDefenderSlotIds.value = parsed.selectedDefenderSlotIds
       if (parsed.teamfightActions && Array.isArray(parsed.teamfightActions))
         teamfightActions.value = parsed.teamfightActions
+      if (typeof parsed.testDuration === 'number')
+        testDuration.value = parsed.testDuration
+      if (typeof parsed.enforceCooldowns === 'boolean')
+        enforceCooldowns.value = parsed.enforceCooldowns
       if (parsed.attackerBuffs) attackerBuffs.value = parsed.attackerBuffs
       if (parsed.defenderBuffs) defenderBuffs.value = parsed.defenderBuffs
     } catch (e) {
@@ -94,6 +102,8 @@ export const useCalculatorStore = defineStore('calculator', () => {
       selectedAttackerSlotIds,
       selectedDefenderSlotIds,
       teamfightActions,
+      testDuration,
+      enforceCooldowns,
       attackerBuffs,
       defenderBuffs,
     ],
@@ -107,6 +117,8 @@ export const useCalculatorStore = defineStore('calculator', () => {
             selectedAttackerSlotIds: selectedAttackerSlotIds.value,
             selectedDefenderSlotIds: selectedDefenderSlotIds.value,
             teamfightActions: teamfightActions.value,
+            testDuration: testDuration.value,
+            enforceCooldowns: enforceCooldowns.value,
             attackerBuffs: attackerBuffs.value,
             defenderBuffs: defenderBuffs.value,
           }),
@@ -116,27 +128,23 @@ export const useCalculatorStore = defineStore('calculator', () => {
     { deep: true, immediate: true },
   )
 
-  const addActionToCombo = (action: string) => {
-    comboSequence.value.push(action)
-    // Also push to teamfightActions for active attacker -> active defender
-    teamfightActions.value.push({
-      id: Math.random().toString(36).substring(2, 9),
-      actorSlotId: selectedAttackerSlotId.value,
-      action: action as 'Q' | 'W' | 'E' | 'R' | 'P' | 'AA',
-      targetSlotIds: [...selectedDefenderSlotIds.value],
-    })
-  }
-
   const addTeamfightAction = (
     actorSlotId: number,
     action: 'Q' | 'W' | 'E' | 'R' | 'P' | 'AA',
     targetSlotIds: number[],
+    timestamp?: number,
   ) => {
+    const isBlue = actorSlotId <= 5
+    const fallbackTargets = isBlue
+      ? [...selectedDefenderSlotIds.value]
+      : [...selectedAttackerSlotIds.value]
+
     teamfightActions.value.push({
       id: Math.random().toString(36).substring(2, 9),
       actorSlotId,
       action,
-      targetSlotIds: targetSlotIds.length > 0 ? targetSlotIds : [...selectedDefenderSlotIds.value],
+      targetSlotIds: targetSlotIds.length > 0 ? targetSlotIds : fallbackTargets,
+      timestamp,
     })
   }
 
@@ -146,15 +154,7 @@ export const useCalculatorStore = defineStore('calculator', () => {
     }
   }
 
-  const removeActionFromCombo = (index: number) => {
-    comboSequence.value.splice(index, 1)
-    if (index >= 0 && index < teamfightActions.value.length) {
-      teamfightActions.value.splice(index, 1)
-    }
-  }
-
   const clearComboSequence = () => {
-    comboSequence.value = []
     teamfightActions.value = []
   }
 
@@ -185,14 +185,13 @@ export const useCalculatorStore = defineStore('calculator', () => {
     selectedAttackerSlotIds,
     selectedDefenderSlotIds,
     teamfightViewMode,
-    comboSequence,
+    testDuration,
+    enforceCooldowns,
     teamfightActions,
     attackerBuffs,
     defenderBuffs,
-    addActionToCombo,
     addTeamfightAction,
     removeTeamfightAction,
-    removeActionFromCombo,
     clearComboSequence,
     setPresetScenario,
   }
