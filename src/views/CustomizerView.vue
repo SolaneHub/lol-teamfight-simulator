@@ -38,7 +38,7 @@
               <h2 class="text-2xl font-bold text-white tracking-wide leading-none mb-1.5">
                 {{ activeCustomizerSlot.champion?.name }}
               </h2>
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-3 flex-wrap">
                 <span
                   :class="[
                     'text-base px-2 py-0.5 rounded font-mono border uppercase tracking-wider font-semibold',
@@ -56,15 +56,15 @@
                   v-if="activeCustomizerSlot.role === 'Mid'"
                   @click="toggleQuestCompleted"
                   :class="[
-                    'text-xs px-2.5 py-1 rounded-md font-mono font-semibold border flex items-center gap-1.5 transition-all cursor-pointer',
+                    'text-base px-2.5 py-1 rounded-md font-mono font-semibold border flex items-center gap-1.5 transition-all cursor-pointer',
                     activeCustomizerSlot.questCompleted
                       ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.25)]'
                       : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-slate-200 hover:border-slate-500',
                   ]"
                   :title="
                     activeCustomizerSlot.questCompleted
-                      ? 'Mid Quest completata (+8% Bonus AD & +8% AP attivo). Clicca per disattivare.'
-                      : 'Clicca per completare la Mid Quest (+8% Bonus AD & +8% AP).'
+                      ? 'Mid Quest completed (+8% Bonus AD & +8% AP active). Click to toggle.'
+                      : 'Click to complete Mid Quest (+8% Bonus AD & +8% AP).'
                   "
                 >
                   <span>⚔️ Mid Quest:</span>
@@ -79,6 +79,16 @@
                       activeCustomizerSlot.questCompleted ? 'COMPLETED (+8% AD/AP)' : 'INCOMPLETE'
                     }}
                   </span>
+                </button>
+
+                <!-- Change / Clear Champion button -->
+                <button
+                  @click="unassignSlot(activeCustomizerSlot)"
+                  class="text-base px-2.5 py-1 rounded-md font-mono font-bold border border-rose-800/80 bg-rose-950/60 text-rose-300 hover:bg-rose-900 hover:text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+                  title="Remove champion to pick a new one"
+                >
+                  <span class="font-black">✕</span>
+                  <span>Change Champion</span>
                 </button>
               </div>
             </div>
@@ -578,18 +588,126 @@
         </div>
       </div>
 
-      <!-- Workbench Empty State -->
-      <div v-else class="flex-1 flex flex-col items-center justify-center py-32 text-center px-6">
+      <!-- If selected slot has NO champion: SHOW CHAMPION SELECTION GRID -->
+      <div v-else class="flex flex-col gap-6">
+        <!-- Search and filter section -->
         <div
-          class="h-16 w-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-550 text-2xl mb-4"
+          class="bg-[#131926] border border-slate-800 rounded-xl p-5 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4"
         >
-          🔧
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span
+                class="w-3 h-3 rounded-full"
+                :class="selectedSlot?.side === 'blue' ? 'bg-sky-400' : 'bg-rose-400'"
+              ></span>
+              <h2 class="text-base font-extrabold text-white uppercase tracking-wide">
+                Select Champion for {{ selectedSlot?.side === 'blue' ? 'Blue Team' : 'Red Team' }} ({{ selectedSlot?.role || 'Slot' }})
+              </h2>
+            </div>
+            <p class="text-base text-slate-400">
+              Click a portrait to draft. Already picked champions are hidden.
+            </p>
+          </div>
+          <div class="relative w-full md:w-80">
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search champion..."
+              class="w-full bg-slate-950 border border-slate-800 rounded-lg pl-4 pr-10 py-2 text-base text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-mono"
+            />
+            <button
+              v-if="searchQuery"
+              @click="searchQuery = ''"
+              type="button"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+              title="Clear search"
+            >
+              <svg
+                class="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
         </div>
-        <h3 class="text-lg font-bold text-white mb-2">Build Workbench Empty</h3>
-        <p class="text-base text-slate-400 max-w-sm">
-          To customize items, levels, or runes, select a draft slot on either team that has an
-          assigned champion first.
-        </p>
+
+        <!-- Loading State -->
+        <div v-if="isLoadingChampions" class="flex flex-col items-center justify-center py-20 text-slate-400">
+          <div
+            class="h-10 w-10 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin mb-4"
+          ></div>
+          <p class="font-mono text-base">Loading champion images...</p>
+        </div>
+
+        <!-- Champion Grid -->
+        <div
+          v-else
+          class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 xl:grid-cols-8 gap-2 auto-rows-max max-h-184 overflow-y-auto p-3 custom-scrollbar rounded-xl bg-slate-950/20"
+        >
+          <div
+            v-for="champ in filteredChampions"
+            :key="champ.id"
+            @click="onSelectChampion(champ)"
+            :class="[
+              'group relative z-0 hover:z-10 w-full aspect-square bg-slate-900 border-2 rounded-xl overflow-hidden transition-all duration-200 cursor-pointer',
+              isChampionImplemented(champ.id)
+                ? 'border-slate-800 hover:scale-105 hover:border-cyan-400 hover:ring-2 hover:ring-cyan-400/40 hover:shadow-xl hover:shadow-cyan-500/25'
+                : 'border-slate-800/50 opacity-60 hover:opacity-100 hover:scale-105 hover:border-slate-600 hover:shadow-lg'
+            ]"
+            :title="isChampionImplemented(champ.id) ? champ.name : `${champ.name} (Untested / No custom logic)`"
+          >
+            <!-- Image -->
+            <img
+              :src="getChampionIconUrl(champ)"
+              :alt="champ.name"
+              :class="[
+                'w-full h-full object-cover select-none transition-all duration-500 group-hover:scale-110',
+                isChampionImplemented(champ.id) ? '' : 'grayscale contrast-125 brightness-90'
+              ]"
+              loading="lazy"
+            />
+            <!-- Name overlay on hover with marquee animation for long names -->
+            <div
+              class="absolute inset-0 bg-linear-to-t from-black/95 via-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end p-1.5 overflow-hidden pointer-events-none"
+            >
+              <!-- Short names: centered -->
+              <span
+                v-if="champ.name.length <= 6"
+                class="text-base font-bold tracking-tight text-white text-center font-mono w-full truncate drop-shadow"
+              >
+                {{ champ.name }}
+              </span>
+
+              <!-- Long names: animated horizontal marquee on hover so full name is readable -->
+              <div
+                v-else
+                class="w-full overflow-hidden whitespace-nowrap flex items-center"
+              >
+                <div class="champion-name-marquee inline-flex items-center gap-3 text-base font-bold font-mono text-white drop-shadow">
+                  <span>{{ champ.name }}</span>
+                  <span class="text-cyan-400 font-bold">•</span>
+                  <span>{{ champ.name }}</span>
+                  <span class="text-cyan-400 font-bold">•</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div
+          v-if="!isLoadingChampions && filteredChampions.length === 0"
+          class="text-center py-20 text-slate-500 border border-dashed border-slate-800 rounded-xl bg-slate-900/10"
+        >
+          <p class="text-base font-mono">No champions found matching "{{ searchQuery }}"</p>
+        </div>
       </div>
     </div>
 
@@ -622,7 +740,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDraftStore } from '@/stores/draft'
 import { useDDragonStore } from '@/stores/ddragon'
@@ -636,8 +754,9 @@ import {
   getChampionPassiveUrl,
   getChampionSpellUrl,
   formatTooltipTags,
+  isChampionImplemented,
 } from '@/services'
-import type { ChampionPassive, ChampionSpells, Item, Rune, RuneKeystone } from '@/types'
+import type { Champion, ChampionPassive, ChampionSpells, Item, Rune, RuneKeystone } from '@/types'
 import TeamDraftPanel from '@/components/draft/TeamDraftPanel.vue'
 import StatsTable from '@/components/customizer/StatsTable.vue'
 import ItemSelectorModal from '@/components/customizer/ItemSelectorModal.vue'
@@ -647,8 +766,10 @@ import ItemTooltip from '@/components/customizer/ItemTooltip.vue'
 
 const draftStore = useDraftStore()
 
-const { activeCustomizerSlot } = storeToRefs(draftStore)
+const { activeCustomizerSlot, blueDraft, redDraft, selectedSlotId } = storeToRefs(draftStore)
 const {
+  assignChampion,
+  unassignSlot,
   removeRunePage,
   removeItemFromSlot,
   toggleMasterwork,
@@ -658,7 +779,47 @@ const {
 } = draftStore
 
 const ddragonStore = useDDragonStore()
-const { spellFormulasData } = storeToRefs(ddragonStore)
+const { spellFormulasData, allChampions, isLoading: isLoadingChampions } = storeToRefs(ddragonStore)
+
+const searchQuery = ref('')
+
+const selectedSlot = computed(() => {
+  return (
+    activeCustomizerSlot.value ||
+    [...blueDraft.value, ...redDraft.value].find((s) => s.id === selectedSlotId.value) ||
+    blueDraft.value[0]
+  )
+})
+
+const filteredChampions = computed(() => {
+  const pickedIds = new Set([
+    ...blueDraft.value.map((s) => s.champion?.id).filter(Boolean),
+    ...redDraft.value.map((s) => s.champion?.id).filter(Boolean),
+  ])
+
+  const list = allChampions.value.filter((c) => !pickedIds.has(c.id))
+
+  if (!searchQuery.value.trim()) return list
+  const q = searchQuery.value.toLowerCase().trim()
+  return list.filter((c) => c.name.toLowerCase().includes(q))
+})
+
+const onSelectChampion = (champ: Champion) => {
+  assignChampion(champ)
+}
+
+onMounted(() => {
+  if (!activeCustomizerSlot.value) {
+    const current = [...blueDraft.value, ...redDraft.value].find(
+      (s) => s.id === selectedSlotId.value,
+    )
+    if (current && current.champion) {
+      activeCustomizerSlot.value = current
+    } else if (!selectedSlotId.value) {
+      selectedSlotId.value = 1
+    }
+  }
+})
 
 const hoveredRune = ref<Rune | RuneKeystone | Record<string, unknown> | null>(null)
 const hoveredItem = ref<Item | null>(null)
@@ -1401,3 +1562,26 @@ const interpolatePassiveDescription = (
   return text
 }
 </script>
+
+<style scoped>
+@keyframes champion-name-scroll {
+  0%,
+  15% {
+    transform: translateX(0%);
+  }
+  85%,
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.champion-name-marquee {
+  display: inline-flex;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.group:hover .champion-name-marquee {
+  animation: champion-name-scroll 3.5s linear infinite;
+}
+</style>
