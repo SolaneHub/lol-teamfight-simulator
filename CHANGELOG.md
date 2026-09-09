@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-09-09
+
+### Added
+- **Unified Draft & Workshop View**: Merged the Draft Simulator and Build Workbench into a unified, seamless "Draft & Workshop" experience with slot assignment, picking mode, and quick unassignment.
+- **Search Bar Clear Button**: Added an instant `✕` button to clear champion search filters in workshop and browser views.
+- **Champion Name Marquee Animation**: Implemented continuous horizontal marquee scrolling on hover for champion portraits with names longer than 6 characters.
+- **Untested Champion Grayscale Indicator**: Added visual status differentiation rendering untested champions in grayscale (`grayscale contrast-125 brightness-90`) and tested champions in vibrant full color.
+- **Champion Implementation Registry**: Created `championStatusService` centralizing verification status and test suites for all champions.
+- **Real-Time Combat Simulation Engine**: Implemented simulation engine (`combatSimulationService`) with customizable test durations (1–20s), spell cooldown enforcement, ticking DoTs, armor/MR shred stacking, and item passives.
+- **Item Passives Expansion**: Added combat simulation support for Immolate auras (Sunfire Aegis, Hollow Radiance), Hatefog pool (Malignance), and burn DoTs (Fated Ashes).
+- **Comprehensive Documentation Matrices**: Added complete tracking registries under `docs/status/`:
+  - `docs/status/champions.md`: Tracks all 173 champions broken down by Passive, Q, W, E, R with native HTML checkboxes.
+  - `docs/status/items.md`: Tracks all 203 items categorized into Unique, Starter, Basic, Epic, and Legendary tiers.
+- **Modernized README Dashboard**: Updated `README.md` with an overview table linking directly to documentation matrices.
+
+### Fixed & Styled
+- **Slot Card Interaction & Selection Styling**: Harmonized draft slot card borders, eliminated dashed borders and opacity jumps, and centered vector SVG `+` and `✕` icons.
+- **Rune Selection Circle Animations**: Fixed visual jumping in `RuneBuilderModal.vue` by keeping constant 2px borders and adding glowing concentric rings per rune tree.
+
+---
+
+## [1.2.1] - 2026-09-08
+
+### Added
+- **Patch 16.17.1 Assets**: Updated Data Dragon and Community Dragon game assets for patch 16.17.1.
+- **Customizer Enhancements**: Added Mid quest toggle, level 19–20 stats extrapolation, and Heal/Shield power scaling.
+- **Unified Pipeline Script**: Added `scripts/pipeline.cjs` for automated patch data fetching and semantic diff analysis.
+
+### CI / CD
+- **Decoupled Workflows**: Split patch updates into `patch-update.yml` and dedicated GitHub Pages deployment into `deploy.yml`.
+- **Fast Deployments**: Optimized GitHub Pages deployment to run on Ubuntu with `pnpm 10` and frozen lockfiles.
+
+---
+
 ## [1.2.0] - 2026-09-04
 
 ### Added
