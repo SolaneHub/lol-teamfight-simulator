@@ -16,11 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Real-Time Combat Simulation Engine**: Implemented simulation engine (`combatSimulationService`) with customizable test durations (1–20s), spell cooldown enforcement, ticking DoTs, armor/MR shred stacking, and item passives.
 - **Item Passives Expansion**: Added combat simulation support for Immolate auras (Sunfire Aegis, Hollow Radiance), Hatefog pool (Malignance), and burn DoTs (Fated Ashes).
 - **Comprehensive Documentation Matrices**: Added complete tracking registries under `docs/status/`:
-  - `docs/status/champions.md`: Tracks all 173 champions broken down by Passive, Q, W, E, R with native HTML checkboxes.
+  - `docs/status/champions.md`: Tracks all 173 champions broken down by Passive, Q, W, E, R with GitHub Flavored Markdown (GFM) task list checkboxes.
   - `docs/status/items.md`: Tracks all 203 items categorized into Unique, Starter, Basic, Epic, and Legendary tiers.
 - **Modernized README Dashboard**: Updated `README.md` with an overview table linking directly to documentation matrices.
 
 ### Fixed & Styled
+- **GFM Task List Checkboxes**: Switched documentation checkboxes from raw HTML `<input>` tags to GitHub Flavored Markdown (`- [x]` / `- [ ]`) syntax so they render as native interactive checkboxes directly on GitHub.
 - **Slot Card Interaction & Selection Styling**: Harmonized draft slot card borders, eliminated dashed borders and opacity jumps, and centered vector SVG `+` and `✕` icons.
 - **Rune Selection Circle Animations**: Fixed visual jumping in `RuneBuilderModal.vue` by keeping constant 2px borders and adding glowing concentric rings per rune tree.
 
