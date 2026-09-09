@@ -97,7 +97,10 @@ export const IMPLEMENTED_CHAMPIONS: Record<string, ChampionImplementationEntry> 
     hasTests: true,
     description:
       'Demacian Justice R true damage execute scaling with 25-35% missing HP, combat damage verified.',
-    testFiles: ['src/__tests__/spell-calculator.test.ts', 'src/__tests__/combat-simulation.test.ts'],
+    testFiles: [
+      'src/__tests__/spell-calculator.test.ts',
+      'src/__tests__/combat-simulation.test.ts',
+    ],
   },
   Veigar: {
     id: 'Veigar',
@@ -186,8 +189,7 @@ export const IMPLEMENTED_CHAMPIONS: Record<string, ChampionImplementationEntry> 
     hasDoT: true,
     hasCustomPassive: true,
     hasTests: true,
-    description:
-      'Noxious Blast Q ticking poison magic damage DoT in combat simulation engine.',
+    description: 'Noxious Blast Q ticking poison magic damage DoT in combat simulation engine.',
     testFiles: ['src/__tests__/combat-simulation.test.ts'],
   },
   Twitch: {
@@ -212,8 +214,7 @@ export const IMPLEMENTED_CHAMPIONS: Record<string, ChampionImplementationEntry> 
     hasDoT: true,
     hasCustomPassive: true,
     hasTests: true,
-    description:
-      'Malefic Visions E ticking magic damage DoT in combat simulation engine.',
+    description: 'Malefic Visions E ticking magic damage DoT in combat simulation engine.',
     testFiles: ['src/__tests__/combat-simulation.test.ts'],
   },
   Ahri: {
@@ -238,8 +239,7 @@ export const IMPLEMENTED_CHAMPIONS: Record<string, ChampionImplementationEntry> 
     hasDoT: false,
     hasCustomPassive: false,
     hasTests: true,
-    description:
-      'Baseline tank armor scaling and tank itemization stats verified in test suite.',
+    description: 'Baseline tank armor scaling and tank itemization stats verified in test suite.',
     testFiles: ['src/__tests__/champion-builds.test.ts'],
   },
   Zed: {
@@ -251,8 +251,7 @@ export const IMPLEMENTED_CHAMPIONS: Record<string, ChampionImplementationEntry> 
     hasDoT: false,
     hasCustomPassive: false,
     hasTests: true,
-    description:
-      'Baseline AD assassin lethality and ability haste scaling verified in test suite.',
+    description: 'Baseline AD assassin lethality and ability haste scaling verified in test suite.',
     testFiles: ['src/__tests__/champion-builds.test.ts'],
   },
   Thresh: {
@@ -264,8 +263,7 @@ export const IMPLEMENTED_CHAMPIONS: Record<string, ChampionImplementationEntry> 
     hasDoT: false,
     hasCustomPassive: false,
     hasTests: true,
-    description:
-      'Baseline support tank itemization and ability haste verification in test suite.',
+    description: 'Baseline support tank itemization and ability haste verification in test suite.',
     testFiles: ['src/__tests__/champion-builds.test.ts'],
   },
 }
@@ -281,7 +279,9 @@ export function isChampionImplemented(champId?: string | null): boolean {
 /**
  * Get implementation entry details for a champion, if available.
  */
-export function getChampionImplementation(champId?: string | null): ChampionImplementationEntry | null {
+export function getChampionImplementation(
+  champId?: string | null,
+): ChampionImplementationEntry | null {
   if (!champId) return null
   return IMPLEMENTED_CHAMPIONS[champId] || null
 }

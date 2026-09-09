@@ -601,7 +601,10 @@
                 :class="selectedSlot?.side === 'blue' ? 'bg-sky-400' : 'bg-rose-400'"
               ></span>
               <h2 class="text-base font-extrabold text-white uppercase tracking-wide">
-                Select Champion for {{ selectedSlot?.side === 'blue' ? 'Blue Team' : 'Red Team' }} ({{ selectedSlot?.role || 'Slot' }})
+                Select Champion for
+                {{ selectedSlot?.side === 'blue' ? 'Blue Team' : 'Red Team' }} ({{
+                  selectedSlot?.role || 'Slot'
+                }})
               </h2>
             </div>
             <p class="text-base text-slate-400">
@@ -639,7 +642,10 @@
         </div>
 
         <!-- Loading State -->
-        <div v-if="isLoadingChampions" class="flex flex-col items-center justify-center py-20 text-slate-400">
+        <div
+          v-if="isLoadingChampions"
+          class="flex flex-col items-center justify-center py-20 text-slate-400"
+        >
           <div
             class="h-10 w-10 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin mb-4"
           ></div>
@@ -659,9 +665,13 @@
               'group relative z-0 hover:z-10 w-full aspect-square bg-slate-900 border-2 rounded-xl overflow-hidden transition-all duration-200 cursor-pointer',
               isChampionImplemented(champ.id)
                 ? 'border-slate-800 hover:scale-105 hover:border-cyan-400 hover:ring-2 hover:ring-cyan-400/40 hover:shadow-xl hover:shadow-cyan-500/25'
-                : 'border-slate-800/50 opacity-60 hover:opacity-100 hover:scale-105 hover:border-slate-600 hover:shadow-lg'
+                : 'border-slate-800/50 opacity-60 hover:opacity-100 hover:scale-105 hover:border-slate-600 hover:shadow-lg',
             ]"
-            :title="isChampionImplemented(champ.id) ? champ.name : `${champ.name} (Untested / No custom logic)`"
+            :title="
+              isChampionImplemented(champ.id)
+                ? champ.name
+                : `${champ.name} (Untested / No custom logic)`
+            "
           >
             <!-- Image -->
             <img
@@ -669,7 +679,7 @@
               :alt="champ.name"
               :class="[
                 'w-full h-full object-cover select-none transition-all duration-500 group-hover:scale-110',
-                isChampionImplemented(champ.id) ? '' : 'grayscale contrast-125 brightness-90'
+                isChampionImplemented(champ.id) ? '' : 'grayscale contrast-125 brightness-90',
               ]"
               loading="lazy"
             />
@@ -686,11 +696,10 @@
               </span>
 
               <!-- Long names: animated horizontal marquee on hover so full name is readable -->
-              <div
-                v-else
-                class="w-full overflow-hidden whitespace-nowrap flex items-center"
-              >
-                <div class="champion-name-marquee inline-flex items-center gap-3 text-base font-bold font-mono text-white drop-shadow">
+              <div v-else class="w-full overflow-hidden whitespace-nowrap flex items-center">
+                <div
+                  class="champion-name-marquee inline-flex items-center gap-3 text-base font-bold font-mono text-white drop-shadow"
+                >
                   <span>{{ champ.name }}</span>
                   <span class="text-cyan-400 font-bold">•</span>
                   <span>{{ champ.name }}</span>

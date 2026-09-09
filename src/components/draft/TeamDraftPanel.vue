@@ -17,7 +17,9 @@
       <span
         :class="[
           'text-base px-2.5 py-0.5 rounded border font-mono font-bold',
-          side === 'blue' ? 'bg-sky-950/50 text-sky-400 border-sky-900/30' : 'bg-rose-950/50 text-rose-400 border-rose-900/30',
+          side === 'blue'
+            ? 'bg-sky-950/50 text-sky-400 border-sky-900/30'
+            : 'bg-rose-950/50 text-rose-400 border-rose-900/30',
         ]"
       >
         {{ side === 'blue' ? 'Team 1' : 'Team 2' }}

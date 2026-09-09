@@ -84,8 +84,7 @@ export const useCalculatorStore = defineStore('calculator', () => {
         selectedDefenderSlotIds.value = parsed.selectedDefenderSlotIds
       if (parsed.teamfightActions && Array.isArray(parsed.teamfightActions))
         teamfightActions.value = parsed.teamfightActions
-      if (typeof parsed.testDuration === 'number')
-        testDuration.value = parsed.testDuration
+      if (typeof parsed.testDuration === 'number') testDuration.value = parsed.testDuration
       if (typeof parsed.enforceCooldowns === 'boolean')
         enforceCooldowns.value = parsed.enforceCooldowns
       if (parsed.attackerBuffs) attackerBuffs.value = parsed.attackerBuffs
