@@ -90,7 +90,8 @@ export const STACKABLE_RUNES: Record<string, Omit<StackableRuneInfo, 'key'>> = {
     min: 0,
     max: 10,
     default: 5,
-    description: (s) => `+${s} AH${s >= 10 ? ' (+25 AP / 15 AD)' : s >= 5 ? ' (+10 AP / 6 AD)' : ''}`,
+    description: (s) =>
+      `+${s} AH${s >= 10 ? ' (+25 AP / 15 AD)' : s >= 5 ? ' (+10 AP / 6 AD)' : ''}`,
   },
   gatheringStorm: {
     name: 'Gathering Storm',
@@ -109,16 +110,32 @@ export function detectRuneKey(rune: Rune | null | undefined): string | null {
   const key = (rune.key || '').toLowerCase()
   const id = rune.id
 
-  if (name.includes('dark harvest') || key.includes('darkharvest') || id === 8128) return 'darkHarvest'
-  if (name.includes('grasp of the undying') || key.includes('graspoftheundying') || id === 8437) return 'grasp'
+  if (name.includes('dark harvest') || key.includes('darkharvest') || id === 8128)
+    return 'darkHarvest'
+  if (name.includes('grasp of the undying') || key.includes('graspoftheundying') || id === 8437)
+    return 'grasp'
   if (name.includes('conqueror') || id === 8010) return 'conqueror'
   if (name.includes('lethal tempo') || id === 8008) return 'lethalTempo'
-  if (name.includes('legend: alacrity') || name.includes('alacrity') || id === 9104) return 'legendAlacrity'
-  if (name.includes('legend: bloodline') || name.includes('bloodline') || id === 9103) return 'legendBloodline'
-  if (name.includes('legend: haste') || (name.includes('haste') && name.includes('legend')) || id === 9105) return 'legendHaste'
-  if (name.includes('eyeball collection') || name.includes('ghost poro') || name.includes('zombie ward') || [8138, 8120, 8136].includes(id)) return 'eyeball'
+  if (name.includes('legend: alacrity') || name.includes('alacrity') || id === 9104)
+    return 'legendAlacrity'
+  if (name.includes('legend: bloodline') || name.includes('bloodline') || id === 9103)
+    return 'legendBloodline'
+  if (
+    name.includes('legend: haste') ||
+    (name.includes('haste') && name.includes('legend')) ||
+    id === 9105
+  )
+    return 'legendHaste'
+  if (
+    name.includes('eyeball collection') ||
+    name.includes('ghost poro') ||
+    name.includes('zombie ward') ||
+    [8138, 8120, 8136].includes(id)
+  )
+    return 'eyeball'
   if (name.includes('overgrowth') || id === 8451) return 'overgrowth'
-  if (name.includes('jack of all trades') || key.includes('jackofalltrades') || id === 8306) return 'jackOfAllTrades'
+  if (name.includes('jack of all trades') || key.includes('jackofalltrades') || id === 8306)
+    return 'jackOfAllTrades'
   if (name.includes('gathering storm') || id === 8237) return 'gatheringStorm'
 
   return null

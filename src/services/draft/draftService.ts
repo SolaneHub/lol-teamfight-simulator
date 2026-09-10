@@ -371,8 +371,7 @@ export const calculateStats = (slot: DraftSlot) => {
       }
     } else if (runeName.includes('gathering storm')) {
       const gsMin =
-        slot.runeStacks?.gatheringStorm ??
-        (lvl >= 16 ? 30 : lvl >= 11 ? 20 : lvl >= 6 ? 10 : 0)
+        slot.runeStacks?.gatheringStorm ?? (lvl >= 16 ? 30 : lvl >= 11 ? 20 : lvl >= 6 ? 10 : 0)
       const intervals = Math.floor(gsMin / 10)
       const apBonus =
         intervals === 1
@@ -392,7 +391,10 @@ export const calculateStats = (slot: DraftSlot) => {
         bonusAd += apBonus * 0.6
       }
     } else if (runeName.includes('conqueror')) {
-      const stacks = Math.min(12, Math.max(0, slot.runeStacks?.conqueror ?? slot.conquerorStacks ?? 12))
+      const stacks = Math.min(
+        12,
+        Math.max(0, slot.runeStacks?.conqueror ?? slot.conquerorStacks ?? 12),
+      )
       const adaptivePerStack = 1.8 + (lvl - 1) * (1.8 / 17)
       const totalAdaptive = stacks * adaptivePerStack
       if (isApAdaptive) {
@@ -404,7 +406,10 @@ export const calculateStats = (slot: DraftSlot) => {
         bonusOmnivamp += isMelee ? 8 : 5
       }
     } else if (runeName.includes('lethal tempo')) {
-      const stacks = Math.min(6, Math.max(0, slot.runeStacks?.lethalTempo ?? slot.lethalTempoStacks ?? 6))
+      const stacks = Math.min(
+        6,
+        Math.max(0, slot.runeStacks?.lethalTempo ?? slot.lethalTempoStacks ?? 6),
+      )
       const asPerStack = 0.05 + (lvl - 1) * (0.11 / 17)
       bonusAsPercent += stacks * asPerStack
     } else if (runeName.includes('hail of blades') || runeName.includes('hailofblades')) {

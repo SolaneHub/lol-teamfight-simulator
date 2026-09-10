@@ -469,7 +469,12 @@ describe('Domination Tree Runes', () => {
 describe('Stackable Runes Service & Detection', () => {
   it('detects equipped stackable runes on a slot', () => {
     const darkHarvest: Rune = { id: 8128, key: 'DarkHarvest', name: 'Dark Harvest', icon: '' }
-    const grasp: Rune = { id: 8437, key: 'GraspOfTheUndying', name: 'Grasp of the Undying', icon: '' }
+    const grasp: Rune = {
+      id: 8437,
+      key: 'GraspOfTheUndying',
+      name: 'Grasp of the Undying',
+      icon: '',
+    }
     const alacrity: Rune = { id: 9104, key: 'LegendAlacrity', name: 'Legend: Alacrity', icon: '' }
     const overgrowth: Rune = { id: 8451, key: 'Overgrowth', name: 'Overgrowth', icon: '' }
 
@@ -500,7 +505,12 @@ describe('Stackable Runes Service & Detection', () => {
 
 describe('Stackable Runes Dynamic Stats Scaling', () => {
   it('scales Grasp of the Undying HP with runeStacks (melee vs ranged)', () => {
-    const grasp: Rune = { id: 8437, key: 'GraspOfTheUndying', name: 'Grasp of the Undying', icon: '' }
+    const grasp: Rune = {
+      id: 8437,
+      key: 'GraspOfTheUndying',
+      name: 'Grasp of the Undying',
+      icon: '',
+    }
 
     // Darius is melee (attack range 175 <= 225) -> +7 HP per stack
     const slotMelee = createSlot(mockChampionAD, [grasp], 1, {
@@ -556,7 +566,12 @@ describe('Stackable Runes Dynamic Stats Scaling', () => {
   })
 
   it('scales Legend: Bloodline lifesteal and grants +85 HP at 15 stacks', () => {
-    const bloodline: Rune = { id: 9103, key: 'LegendBloodline', name: 'Legend: Bloodline', icon: '' }
+    const bloodline: Rune = {
+      id: 9103,
+      key: 'LegendBloodline',
+      name: 'Legend: Bloodline',
+      icon: '',
+    }
 
     const slot5 = createSlot(mockChampionAD, [bloodline], 1, {
       runeStacks: { legendBloodline: 5 },
@@ -661,7 +676,12 @@ describe('Combat Simulation Rune Triggers & Badges', () => {
   })
 
   it('triggers Grasp of the Undying on basic attack and records badge with heal', () => {
-    const grasp: Rune = { id: 8437, key: 'GraspOfTheUndying', name: 'Grasp of the Undying', icon: '' }
+    const grasp: Rune = {
+      id: 8437,
+      key: 'GraspOfTheUndying',
+      name: 'Grasp of the Undying',
+      icon: '',
+    }
     const attacker = createSlot(mockChampionAD, [grasp], 6, { id: 1, side: 'blue' })
     const defender = createSlot(mockChampionAP, [], 6, { id: 2, side: 'red' })
 

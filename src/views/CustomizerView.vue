@@ -223,7 +223,8 @@
                     <span>🔮</span> RUNE STACKS CONFIGURATION
                   </span>
                   <span class="text-xs text-slate-500 font-mono">
-                    {{ equippedStackableRunes.length }} Active Stackable {{ equippedStackableRunes.length === 1 ? 'Rune' : 'Runes' }}
+                    {{ equippedStackableRunes.length }} Active Stackable
+                    {{ equippedStackableRunes.length === 1 ? 'Rune' : 'Runes' }}
                   </span>
                 </div>
 
@@ -240,9 +241,16 @@
                         class="w-7 h-7 rounded-full object-contain shrink-0 border border-amber-500/30 p-0.5 bg-slate-950"
                       />
                       <div class="flex flex-col min-w-0">
-                        <span class="text-xs font-bold text-white truncate">{{ runeInfo.name }}</span>
+                        <span class="text-xs font-bold text-white truncate">{{
+                          runeInfo.name
+                        }}</span>
                         <span class="text-[11px] font-mono text-emerald-400 truncate">
-                          {{ runeInfo.description(getCurrentRuneStacks(runeInfo.key), isCurrentSlotMelee) }}
+                          {{
+                            runeInfo.description(
+                              getCurrentRuneStacks(runeInfo.key),
+                              isCurrentSlotMelee,
+                            )
+                          }}
                         </span>
                       </div>
                     </div>
@@ -256,7 +264,9 @@
                         @input="onRuneStackInput(runeInfo.key, $event)"
                         class="w-14 h-7 text-center font-mono font-bold text-sm bg-slate-950 text-amber-300 border border-amber-500/40 rounded px-1 focus:outline-none focus:border-amber-400"
                       />
-                      <span v-if="runeInfo.unit" class="text-xs font-mono text-slate-400">{{ runeInfo.unit }}</span>
+                      <span v-if="runeInfo.unit" class="text-xs font-mono text-slate-400">{{
+                        runeInfo.unit
+                      }}</span>
                     </div>
                   </div>
                 </div>
@@ -816,10 +826,7 @@ import {
   formatTooltipTags,
   isChampionImplemented,
 } from '@/services'
-import {
-  getEquippedStackableRunes,
-  getRuneStackValue,
-} from '@/services/runes/runeStackService'
+import { getEquippedStackableRunes, getRuneStackValue } from '@/services/runes/runeStackService'
 import type { Champion, ChampionPassive, ChampionSpells, Item, Rune, RuneKeystone } from '@/types'
 import TeamDraftPanel from '@/components/draft/TeamDraftPanel.vue'
 import StatsTable from '@/components/customizer/StatsTable.vue'

@@ -643,7 +643,8 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       targetHasGuardian &&
       target.guardianReady &&
       currentTime >= target.guardianCooldown &&
-      (target.currentHp - effectiveDamage < target.maxHp * 0.7 || effectiveDamage > target.maxHp * 0.15)
+      (target.currentHp - effectiveDamage < target.maxHp * 0.7 ||
+        effectiveDamage > target.maxHp * 0.15)
     ) {
       target.guardianReady = false
       target.guardianCooldown = currentTime + Math.max(40, 90 - (target.level - 1) * (50 / 17))
@@ -1135,21 +1136,31 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
     const hasPtA = keystoneName.includes('press the attack') || keystoneId === 8005
     const hasElectrocute = keystoneName.includes('electrocute') || keystoneId === 8112
     const hasDarkHarvest =
-      keystoneName.includes('dark harvest') || keystoneName.includes('darkharvest') || keystoneId === 8128
+      keystoneName.includes('dark harvest') ||
+      keystoneName.includes('darkharvest') ||
+      keystoneId === 8128
     const hasComet =
       keystoneName.includes('comet') || keystoneKey.includes('arcanecomet') || keystoneId === 8229
     const hasAery =
       keystoneName.includes('aery') || keystoneKey.includes('summonaery') || keystoneId === 8214
     const hasPhaseRush =
-      keystoneName.includes('phase rush') || keystoneKey.includes('phaserush') || keystoneId === 8230
+      keystoneName.includes('phase rush') ||
+      keystoneKey.includes('phaserush') ||
+      keystoneId === 8230
     const hasFleet =
       keystoneName.includes('fleet') || keystoneKey.includes('fleetfootwork') || keystoneId === 8021
     const hasGrasp =
-      keystoneName.includes('grasp') || keystoneKey.includes('graspoftheundying') || keystoneId === 8437
+      keystoneName.includes('grasp') ||
+      keystoneKey.includes('graspoftheundying') ||
+      keystoneId === 8437
     const hasAftershock =
-      keystoneName.includes('aftershock') || keystoneKey.includes('veteranaftershock') || keystoneId === 8439
+      keystoneName.includes('aftershock') ||
+      keystoneKey.includes('veteranaftershock') ||
+      keystoneId === 8439
     const hasGlacial =
-      keystoneName.includes('glacial') || keystoneKey.includes('glacialaugment') || keystoneId === 8358
+      keystoneName.includes('glacial') ||
+      keystoneKey.includes('glacialaugment') ||
+      keystoneId === 8358
     const hasDeathfireTouch =
       actor.slot.primaryKeystone?.id === 8992 ||
       keystoneName.includes('deathfire touch') ||
@@ -2621,7 +2632,8 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
   // Pre-sort scheduled user actions by timestamp
   const sortedActions = [...actions].map((act, index) => ({
     ...act,
-    id: act.id ?? `action_${index}_${act.actorSlotId}_${act.action}_${act.timestamp ?? index * 0.6}`,
+    id:
+      act.id ?? `action_${index}_${act.actorSlotId}_${act.action}_${act.timestamp ?? index * 0.6}`,
     timestamp: act.timestamp !== undefined ? act.timestamp : index * 0.6, // Default 0.6s spacing if omitted
   }))
 
@@ -2847,16 +2859,9 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         shockTargets.forEach((tgt) => {
           const effMr = Math.max(0, tgt.baseMr - (tgt.malignanceShredDuration > 0 ? 10 : 0))
           const shockDmg = Math.max(1, Math.round(shockBase * (100 / (100 + effMr))))
-          applyDamageToTarget(
-            target,
-            tgt,
-            shockDmg,
-            'magic',
-            '💥 Aftershock Shockwave',
-            t,
-            false,
-            [`💥 Aftershock (+${shockDmg})`],
-          )
+          applyDamageToTarget(target, tgt, shockDmg, 'magic', '💥 Aftershock Shockwave', t, false, [
+            `💥 Aftershock (+${shockDmg})`,
+          ])
         })
       }
 
