@@ -14,73 +14,241 @@
 
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
+const { spawnSync } = require('child_process');
 
 const args = process.argv.slice(2);
-let oldFile = '';
-let newFile = path.join(__dirname, '..', 'public', 'data', 'spellFormulas.json');
-let outputFile = path.join(__dirname, '..', 'patch-diff-report.md');
 
-const oldIdx = args.indexOf('--old');
-if (oldIdx !== -1 && args[oldIdx + 1]) oldFile = args[oldIdx + 1];
-
-const newIdx = args.indexOf('--new');
-if (newIdx !== -1 && args[newIdx + 1]) newFile = args[newIdx + 1];
-
-const outIdx = args.indexOf('--output');
-if (outIdx !== -1 && args[outIdx + 1]) outputFile = args[outIdx + 1];
-
-const fromPatchIdx = args.indexOf('--from-patch');
-const fromPatch = fromPatchIdx !== -1 ? args[fromPatchIdx + 1] : '';
-
-const toPatchIdx = args.indexOf('--to-patch');
-const toPatch = toPatchIdx !== -1 ? args[toPatchIdx + 1] : '';
-
-let resolvedFromPatch = fromPatch;
-let resolvedToPatch = toPatch;
-
-if (!oldFile && fromPatch && toPatch) {
-  const candidateOld = path.join(__dirname, '..', 'public', 'data', `spellFormulas-${fromPatch}.json`);
-  const candidateNew = path.join(__dirname, '..', 'public', 'data', `spellFormulas-${toPatch}.json`);
-  if (fs.existsSync(candidateOld)) oldFile = candidateOld;
-  if (fs.existsSync(candidateNew)) newFile = candidateNew;
+function getArg(flags, defaultValue = '') {
+  for (const flag of (Array.isArray(flags) ? flags : [flags])) {
+    const idx = args.indexOf(flag);
+    if (idx !== -1 && args[idx + 1] && !args[idx + 1].startsWith('--')) {
+      return args[idx + 1];
+    }
+  }
+  return defaultValue;
 }
 
-if (!oldFile) {
-  // Try to find the two most recent patch formula files (e.g. spellFormulas-16.16.1.json vs spellFormulas-16.17.1.json)
+function parseSemver(v) {
+  if (!v) return [0, 0, 0];
+  const parts = v.split('.').map((n) => parseInt(n, 10) || 0);
+  return [parts[0] || 0, parts[1] || 0, parts[2] || 0];
+}
+
+function compareSemver(a, b) {
+  const [a1, a2, a3] = parseSemver(a);
+  const [b1, b2, b3] = parseSemver(b);
+  if (a1 !== b1) return a1 - b1;
+  if (a2 !== b2) return a2 - b2;
+  return a3 - b3;
+}
+
+const oldFileArg = getArg('--old');
+const newFileArg = getArg('--new');
+const outputFileArg = getArg('--output', path.join(__dirname, '..', 'patch-diff-report.md'));
+let fromPatchArg = getArg(['--from-patch', '--from']);
+let toPatchArg = getArg(['--to-patch', '--to']);
+
+// Positional arguments fallback (e.g. `npm run diff:patch -- 16.16.1 16.17.1`)
+const positional = args.filter((a) => /^\d+\.\d+\.\d+$/.test(a));
+if (!fromPatchArg && positional.length >= 2) {
+  const sortedPos = [positional[0], positional[1]].sort(compareSemver);
+  fromPatchArg = sortedPos[0];
+  toPatchArg = sortedPos[1];
+} else if (!toPatchArg && positional.length === 1) {
+  toPatchArg = positional[0];
+}
+
+function fetchJsonWithTimeout(url, timeoutMs = 3500) {
+  return new Promise((resolve, reject) => {
+    const req = https.get(url, { headers: { 'User-Agent': 'LoL-Simulator-Diff/1.0' } }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        return resolve(fetchJsonWithTimeout(res.headers.location, timeoutMs));
+      }
+      if (res.statusCode !== 200) {
+        return reject(new Error(`HTTP ${res.statusCode}`));
+      }
+      let raw = '';
+      res.on('data', (chunk) => (raw += chunk));
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(raw));
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+    req.on('error', reject);
+    req.setTimeout(timeoutMs, () => {
+      req.destroy();
+      reject(new Error(`Request timed out after ${timeoutMs}ms`));
+    });
+  });
+}
+
+function getLocalVersions() {
+  const versions = new Set();
+  const ddragonDir = path.join(__dirname, '..', 'public', 'ddragon');
+  if (fs.existsSync(ddragonDir)) {
+    for (const f of fs.readdirSync(ddragonDir)) {
+      if (/^\d+\.\d+\.\d+$/.test(f)) {
+        const full = path.join(ddragonDir, f);
+        if (fs.statSync(full).isDirectory()) versions.add(f);
+      }
+    }
+    const latestJson = path.join(ddragonDir, 'latest.json');
+    if (fs.existsSync(latestJson)) {
+      try {
+        const p = JSON.parse(fs.readFileSync(latestJson, 'utf8')).patch;
+        if (p && /^\d+\.\d+\.\d+$/.test(p)) versions.add(p);
+      } catch {}
+    }
+  }
+
   const dataDir = path.join(__dirname, '..', 'public', 'data');
   if (fs.existsSync(dataDir)) {
-    const patchFiles = fs.readdirSync(dataDir)
-      .filter(f => /^spellFormulas-\d+\.\d+\.\d+\.json$/.test(f))
-      .sort((a, b) => b.localeCompare(a, undefined, { numeric: true, sensitivity: 'base' }));
+    for (const f of fs.readdirSync(dataDir)) {
+      const m = f.match(/^spellFormulas-(\d+\.\d+\.\d+)\.json$/);
+      if (m && m[1]) versions.add(m[1]);
+    }
+  }
 
-    if (patchFiles.length >= 2) {
-      newFile = path.join(dataDir, patchFiles[0]);
-      oldFile = path.join(dataDir, patchFiles[1]);
-      const mTo = patchFiles[0].match(/spellFormulas-(.+)\.json/);
-      const mFrom = patchFiles[1].match(/spellFormulas-(.+)\.json/);
-      if (mTo) resolvedToPatch = mTo[1];
-      if (mFrom) resolvedFromPatch = mFrom[1];
-      console.log(`[Diff-Patch] Auto-detected patches for comparison: ${patchFiles[1]} ➔ ${patchFiles[0]}`);
-    } else if (patchFiles.length === 1) {
-      newFile = path.join(dataDir, patchFiles[0]);
+  return Array.from(versions).sort((a, b) => compareSemver(b, a));
+}
+
+async function resolvePatches(reqFrom, reqTo) {
+  let toPatch = reqTo;
+  let fromPatch = reqFrom;
+
+  let onlineVersions = [];
+  try {
+    const raw = await fetchJsonWithTimeout('https://ddragon.leagueoflegends.com/api/versions.json');
+    if (Array.isArray(raw)) {
+      onlineVersions = raw.filter((v) => /^\d+\.\d+\.\d+$/.test(v));
+    }
+  } catch (err) {
+    console.warn(`[Diff-Patch] Notice: Could not reach Riot versions API (${err.message}). Using local cache.`);
+  }
+
+  const localVersions = getLocalVersions();
+  const allMap = new Map();
+  for (const v of onlineVersions) allMap.set(v, true);
+  for (const v of localVersions) allMap.set(v, true);
+  const allVersions = Array.from(allMap.keys()).sort((a, b) => compareSemver(b, a));
+
+  if (!toPatch || toPatch === 'latest') {
+    toPatch = allVersions[0] || '16.18.1';
+  }
+
+  if (!fromPatch) {
+    const toIndex = allVersions.indexOf(toPatch);
+    if (toIndex !== -1 && toIndex + 1 < allVersions.length) {
+      fromPatch = allVersions[toIndex + 1];
+    } else if (allVersions.length >= 2) {
+      fromPatch = allVersions[1];
+    } else {
+      fromPatch = toPatch;
+    }
+  }
+
+  return { fromPatch, toPatch };
+}
+
+function ensureDDragonData(patch) {
+  if (!patch) return;
+  const champFile = path.join(__dirname, '..', 'public', 'ddragon', patch, 'championFull.json');
+  const itemFile = path.join(__dirname, '..', 'public', 'ddragon', patch, 'item.json');
+  if (!fs.existsSync(champFile) || !fs.existsSync(itemFile)) {
+    console.log(`[Diff-Patch] 📥 Missing DDragon files for patch ${patch}. Downloading...`);
+    const res = spawnSync(process.execPath, [path.join(__dirname, 'sync-ddragon.cjs'), '--patch', patch], {
+      stdio: 'inherit',
+      cwd: path.join(__dirname, '..'),
+    });
+    if (res.status !== 0) {
+      console.warn(`[Diff-Patch] ⚠️ sync-ddragon exited with code ${res.status}`);
     }
   }
 }
 
-if (!oldFile) {
-  const candidateOld = path.join(__dirname, '..', 'public', 'data', 'spellFormulas-prev.json');
-  if (fs.existsSync(candidateOld)) {
-    oldFile = candidateOld;
+function ensureSpellFormulas(patch) {
+  if (!patch) return;
+  const formulasFile = path.join(__dirname, '..', 'public', 'data', `spellFormulas-${patch}.json`);
+  if (!fs.existsSync(formulasFile)) {
+    console.log(`[Diff-Patch] ⚙️ Missing spell formulas for patch ${patch}. Generating...`);
+    const res = spawnSync(process.execPath, [path.join(__dirname, 'generate-spell-formulas.cjs'), '--patch', patch], {
+      stdio: 'inherit',
+      cwd: path.join(__dirname, '..'),
+    });
+    if (res.status !== 0) {
+      console.warn(`[Diff-Patch] ⚠️ generate-spell-formulas exited with code ${res.status}`);
+    }
   }
 }
 
-if (!oldFile || !fs.existsSync(oldFile)) {
-  console.log('[Diff-Patch] Notice: No previous spellFormulas file found to compare against.');
-  process.exit(0);
-}
+let resolvedFromPatch = '';
+let resolvedToPatch = '';
 
-const oldData = JSON.parse(fs.readFileSync(oldFile, 'utf8'));
-const newData = JSON.parse(fs.readFileSync(newFile, 'utf8'));
+async function main() {
+  let oldFile = oldFileArg;
+  let newFile = newFileArg;
+  let outputFile = outputFileArg;
+  resolvedFromPatch = fromPatchArg;
+  resolvedToPatch = toPatchArg;
+
+  const dataDir = path.join(__dirname, '..', 'public', 'data');
+
+  if (oldFile && newFile) {
+    // Explicit files supplied
+    if (!resolvedFromPatch) {
+      const m = path.basename(oldFile).match(/spellFormulas-(.+)\.json/);
+      if (m) resolvedFromPatch = m[1];
+    }
+    if (!resolvedToPatch) {
+      const m = path.basename(newFile).match(/spellFormulas-(.+)\.json/);
+      if (m) resolvedToPatch = m[1];
+    }
+  } else {
+    // Dynamic resolution: latest patch vs previous patch
+    const patches = await resolvePatches(resolvedFromPatch, resolvedToPatch);
+    resolvedFromPatch = patches.fromPatch;
+    resolvedToPatch = patches.toPatch;
+
+    console.log(`[Diff-Patch] 🔍 Auto-detected patches for comparison: ${resolvedFromPatch} ➔ ${resolvedToPatch} (Previous vs Latest)`);
+
+    // Ensure assets and formulas are generated
+    ensureDDragonData(resolvedFromPatch);
+    ensureDDragonData(resolvedToPatch);
+    ensureSpellFormulas(resolvedFromPatch);
+    ensureSpellFormulas(resolvedToPatch);
+
+    oldFile = path.join(dataDir, `spellFormulas-${resolvedFromPatch}.json`);
+    newFile = path.join(dataDir, `spellFormulas-${resolvedToPatch}.json`);
+
+    // Keep default spellFormulas.json updated to the latest target
+    const defaultFormulas = path.join(dataDir, 'spellFormulas.json');
+    if (fs.existsSync(newFile)) {
+      try {
+        fs.copyFileSync(newFile, defaultFormulas);
+      } catch {}
+    }
+
+    const latestJsonPath = path.join(__dirname, '..', 'public', 'ddragon', 'latest.json');
+    try {
+      fs.writeFileSync(latestJsonPath, JSON.stringify({ patch: resolvedToPatch, syncedAt: new Date().toISOString() }, null, 2), 'utf8');
+    } catch {}
+  }
+
+  if (!oldFile || !fs.existsSync(oldFile)) {
+    console.warn(`[Diff-Patch] Notice: Baseline formulas file not found: ${oldFile}`);
+    process.exit(0);
+  }
+  if (!newFile || !fs.existsSync(newFile)) {
+    console.warn(`[Diff-Patch] Notice: Target formulas file not found: ${newFile}`);
+    process.exit(0);
+  }
+
+  const oldData = JSON.parse(fs.readFileSync(oldFile, 'utf8'));
+  const newData = JSON.parse(fs.readFileSync(newFile, 'utf8'));
 
 const changes = {
   reworks: [], // Critical: needs manual developer review
@@ -482,4 +650,10 @@ if (process.env.GITHUB_OUTPUT) {
     process.env.GITHUB_OUTPUT,
     `needs_review=${needsReview}\nrework_count=${changes.reworks.length}\nnumeric_count=${changes.numericOnly.length}\nitem_changes_count=${itemChanges.modified.length + itemChanges.added.length}\nrune_changes_count=${runeChanges.modified.length + runeChanges.added.length}\nhas_changes=${hasChanges}\n`
   );
+  }
 }
+
+main().catch((err) => {
+  console.error('[Diff-Patch] Fatal error:', err);
+  process.exit(1);
+});

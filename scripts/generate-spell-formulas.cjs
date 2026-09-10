@@ -736,15 +736,28 @@ async function main() {
         console.log(`Latest patch version resolved: ${patchVersion}`);
       }
     } catch (e) {
-      console.warn('Failed to fetch latest patch version, falling back to 16.14.1:', e.message);
-      patchVersion = '16.14.1';
+      const latestJson = path.join(__dirname, '..', 'public', 'ddragon', 'latest.json');
+      let fallback = null;
+      if (fs.existsSync(latestJson)) {
+        try { fallback = JSON.parse(fs.readFileSync(latestJson, 'utf8')).patch; } catch {}
+      }
+      if (!fallback) {
+        const ddBase = path.join(__dirname, '..', 'public', 'ddragon');
+        if (fs.existsSync(ddBase)) {
+          const dirs = fs.readdirSync(ddBase).filter(d => /^\d+\.\d+\.\d+$/.test(d));
+          dirs.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+          if (dirs.length > 0) fallback = dirs[0];
+        }
+      }
+      patchVersion = fallback || '16.18.1';
+      console.warn(`Failed to fetch latest patch version from Riot API, falling back to local patch: ${patchVersion}`);
     }
   }
 
   const DDRAGON_BASE = path.join(__dirname, '..', 'public', 'ddragon');
   const DDRAGON_FULL = path.join(DDRAGON_BASE, patchVersion, 'championFull.json');
   DDRAGON_DIR = path.join(DDRAGON_BASE, patchVersion, 'data', 'en_US', 'champion');
-  OUTPUT_FILE = path.join(__dirname, '..', 'public', 'data', patchIdx !== -1 ? `spellFormulas-${outputPatchName}.json` : 'spellFormulas.json');
+  OUTPUT_FILE = path.join(__dirname, '..', 'public', 'data', `spellFormulas-${patchVersion}.json`);
 
   let championNames = [];
   let useCDN = false;

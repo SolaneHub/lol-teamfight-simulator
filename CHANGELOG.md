@@ -5,9 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-09-10
+
+### Added
+- **Dynamic Latest vs Previous Patch Diffing**:
+  - Upgraded `scripts/diff-patch.cjs` and `scripts/pipeline.cjs` to automatically query Riot's API (`versions.json`) and compare the latest live patch against its immediate predecessor (e.g. `16.17.1` ➔ `16.18.1`).
+  - Added autonomous fallback to local semver-sorted versions if offline.
+  - Automatically fetches missing Data Dragon assets and compiles formula files on demand.
+- **Automated Patch Data Cleaner (`npm run clean:patches`)**:
+  - Added [`scripts/clean-patches.cjs`](scripts/clean-patches.cjs) to automatically prune obsolete DDragon version directories and older `spellFormulas-<patch>.json` files based on a configurable retention policy (default: retains the 2 most recent patches for diff comparisons).
+  - Automatically cleans redundant legacy files (`spellFormulas-latest.json`, etc.).
+  - Integrated into [`scripts/pipeline.cjs`](scripts/pipeline.cjs) as Step 6/6 during automated patch synchronization.
+- **Full Implementation of All 24 AP Legendary Items**:
+  - Implemented all remaining 24 AP Legendary items into the simulator engine while strictly preserving `itemClassMap` in `src/services/items/itemService.ts`:
+    - **Nashor's Tooth**: Icathian Bite on-hit magic damage scaling (`15 + 15% AP`) with combat badge `🦷 Nashor`.
+    - **Guinsoo's Rageblade**: Wrath on-hit flat magic damage (`30`) with combat badge `⚔️ Guinsoo`.
+    - **Hextech Gunblade**: Active lightning bolt burst (`150-250 + 30% AP`) with combat badge `⚡ Gunblade`.
+    - **Hextech Rocketbelt**: Supersonic active dash burst (`125 + 15% AP`) with combat badge `🚀 Rocketbelt`.
+    - **Dusk and Dawn**: Solar/Lunar strike scaling (`100% Base AD + 50% AP`) with combat badge `🌅 Dusk & Dawn`.
+    - **Imperial Mandate**: Coordinated Fire ability damage scaling (`60 + 3.5/lvl`) with combat badge `👑 Mandate`.
+    - **Echoes of Helia**: Soul Siphon ability damage scaling (`60 + 3/lvl`) with combat badge `🌟 Helia`.
+    - **Ardent Censer**: Sanctify bonus on-hit magic damage (`20`) with combat badge `✨ Ardent`.
+    - **Horizon Focus**: Hyperfocus +10% damage amplification in both `spellCalculatorService` and `combatSimulationService` with combat badge `🎯 Horizon (+10%)`.
+    - **Actualizer**: +15% spell damage amplification with combat badge `⚡ Actualizer (+15%)`.
+    - **Rylai's Crystal Scepter**: Rimefrost ability slow with combat badge `❄️ Rylai Slow`.
+    - **Banshee's Veil**: Annul spell shield blocking the first hostile magic damage spell (`0 damage`, `🛡️ Banshee Blocked`) and zeroing attacker inflated metrics.
+    - **Morellonomicon**: Affliction applying Grievous Wounds for 3.0s (`🩸 Grievous Wounds`), cutting incoming heals by 40%.
+    - **Seraph's Embrace**: Awe bonus AP from bonus mana (`2% bonus mana`) and Lifeline emergency shield (`250 + 20% max mana`) triggered below 30% HP with combat badge `🛡️ Lifeline (+Shield)`.
+    - **Archangel's Staff**: Awe bonus AP from bonus mana (`1% bonus mana`).
+    - **Rod of Ages**: Timeless stacking (+10 HP, +30 MP, +3 AP per stack up to 10 stacks, default 10 stacks) with custom stack control.
+    - **Mejai's Soulstealer**: Glory stack scaling (+5 AP per stack up to 25 stacks, +10% Move Speed at >= 10 stacks).
+    - **Cryptbloom**: 30% Magic Penetration and Life from Death healing nova (`50 + 50% AP`) on champion takedown to all living allies with combat badge `🌸 Cryptbloom Nova`.
+    - **Dawncore**: First Light AP & Heal/Shield conversion (+10 AP & +2% Heal/Shield Power per 100% base mana regen).
+    - **Cosmic Drive, Zhonya's Hourglass, Moonstone Renewer, Shurelya's Battlesong, Staff of Flowing Water**: Full passive detection, ability haste, and live stat tracking.
+- **Dedicated Unit Test Suite (`ap-legendaries.test.ts`)**: Added 21 unit tests validating all 24 AP Legendary item passives, scalings, shields, heals, damage amps, and combat events (100% passing).
+- **Documentation Matrix Update**: Updated `docs/status/items.md` tracking matrix, elevating Legendary coverage to 43% (48/111 items) and total coverage to 46% (94/203 items).
+
+---
+
 ## [1.3.1] - 2026-09-09
 
 ### Added
+- **Void Staff Implementation**: Fully implemented Void Staff (ID 3135, 3000g) with Dissolve (+40% Magic Penetration) and +95 AP:
+  - Integrated into `ItemPassiveState` (`hasVoidStaff`) and `detectItemPassives`.
+  - Added Magic Penetration and Armor Penetration filters and Italian keyword resolution (`bastone del vuoto`) to `ItemSelectorModal.vue`.
+  - Added support for `rPercentMagicPenetrationMod` and `rFlatMagicPenetrationMod` in `parseItemStatsFromDescription`, `mapItem`, and `draftService`.
+  - Verified spell damage mitigation (+25% damage against 100 MR targets) and combat simulation scaling with dedicated test suite (`void-staff.test.ts`).
+  - Updated `docs/status/items.md` tracking matrix.
 - **Deathfire Touch Keystone**: Fully simulated Deathfire Touch (ID 8992) with 2s AoE / 4s Single Target magic burn (3–12 + 2.5% AP + 7% bAD/s) and +75% damage amplification after 3 seconds of continuous burn (`🔥 DFT +75%`).
 - **Runes & Keystones Matrix**: Added `docs/status/runes.md` tracking all active and backlog Keystones and combat runes.
 - **Action Creator Quick Snap**: Added `⏱️ Last Damage (X.Xs)` button in the Action Creator toolbar and made combat log event timestamps directly clickable to instantly snap next action timestamps.

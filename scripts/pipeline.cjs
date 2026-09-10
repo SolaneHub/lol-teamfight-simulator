@@ -65,6 +65,20 @@ function runScript(scriptPath, scriptArgs = []) {
   }
 }
 
+function parseSemver(v) {
+  if (!v) return [0, 0, 0];
+  const parts = v.split('.').map((n) => parseInt(n, 10) || 0);
+  return [parts[0] || 0, parts[1] || 0, parts[2] || 0];
+}
+
+function compareSemver(a, b) {
+  const [a1, a2, a3] = parseSemver(a);
+  const [b1, b2, b3] = parseSemver(b);
+  if (a1 !== b1) return a1 - b1;
+  if (a2 !== b2) return a2 - b2;
+  return a3 - b3;
+}
+
 async function main() {
   console.log('====================================================');
   console.log('⚡ LoL Teamfight Simulator - Data Pipeline');
@@ -72,15 +86,38 @@ async function main() {
 
   // 1. Resolve patches
   console.log('\n🔍 [Step 1/5] Resolving patch versions...');
-  const versions = await fetchJson('https://ddragon.leagueoflegends.com/api/versions.json');
-  const validVersions = versions.filter((v) => /^\d+\.\d+\.\d+$/.test(v));
-
-  let targetTo = getArg('--to', 'latest');
-  if (targetTo === 'latest') {
-    targetTo = validVersions[0];
+  let validVersions = [];
+  try {
+    const versions = await fetchJson('https://ddragon.leagueoflegends.com/api/versions.json');
+    validVersions = versions.filter((v) => /^\d+\.\d+\.\d+$/.test(v));
+  } catch (err) {
+    console.warn(`   ⚠️ Could not reach Riot versions API (${err.message}). Using local cache.`);
   }
 
-  let targetFrom = getArg('--from', null);
+  if (validVersions.length === 0) {
+    const ddragonDir = path.join(__dirname, '..', 'public', 'ddragon');
+    const localVersions = new Set();
+    if (fs.existsSync(ddragonDir)) {
+      for (const f of fs.readdirSync(ddragonDir)) {
+        if (/^\d+\.\d+\.\d+$/.test(f)) localVersions.add(f);
+      }
+      const latestJson = path.join(ddragonDir, 'latest.json');
+      if (fs.existsSync(latestJson)) {
+        try {
+          const p = JSON.parse(fs.readFileSync(latestJson, 'utf8')).patch;
+          if (p) localVersions.add(p);
+        } catch {}
+      }
+    }
+    validVersions = Array.from(localVersions).sort((a, b) => compareSemver(b, a));
+  }
+
+  let targetTo = getArg('--to', getArg('--to-patch', 'latest'));
+  if (targetTo === 'latest') {
+    targetTo = validVersions[0] || '16.18.1';
+  }
+
+  let targetFrom = getArg('--from', getArg('--from-patch', null));
   if (!targetFrom) {
     const toIndex = validVersions.indexOf(targetTo);
     if (toIndex !== -1 && toIndex + 1 < validVersions.length) {
@@ -172,7 +209,7 @@ async function main() {
   }
 
   // 5. Semantic Diff Report
-  console.log('\n📊 [Step 5/5] Performing Semantic Diff Analysis...');
+  console.log('\n📊 [Step 5/6] Performing Semantic Diff Analysis...');
   const diffScript = path.join(__dirname, 'diff-patch.cjs');
   runScript(diffScript, [
     '--old', path.join(__dirname, '..', 'public', 'data', `spellFormulas-${targetFrom}.json`),
@@ -180,6 +217,13 @@ async function main() {
     '--from-patch', targetFrom,
     '--to-patch', targetTo
   ]);
+
+  // 6. Automatic Clean-up of obsolete older patches (retains last 2: target + baseline)
+  if (!hasFlag('--skip-clean')) {
+    console.log('\n🧹 [Step 6/6] Cleaning up obsolete patch data...');
+    const cleanScript = path.join(__dirname, 'clean-patches.cjs');
+    runScript(cleanScript, ['--keep', '2']);
+  }
 
   console.log('\n====================================================');
   console.log(`🎉 Pipeline completed successfully!`);
