@@ -171,6 +171,53 @@ export const calculateStats = (slot: DraftSlot) => {
       bonusAp += currentStacks * 3
     }
 
+    // Heartsteel (Colossus stacks: +1 HP per stack)
+    const isHeartsteel =
+      name.includes('heartsteel') ||
+      name.includes("cuore d'acciaio") ||
+      itemId === '3084' ||
+      itemId === '223084'
+    if (isHeartsteel) {
+      const defaultStacks = 300
+      const currentStacks =
+        slot.itemStacks && slot.itemStacks[i] !== undefined
+          ? Math.min(2000, Math.max(0, slot.itemStacks[i]!))
+          : defaultStacks
+      bonusHp += currentStacks
+    }
+
+    // Hubris (Eminence stacks: +15 + 2 * stacks Bonus AD)
+    const isHubris =
+      name.includes('hubris') ||
+      name.includes('superbia') ||
+      itemId === '6697' ||
+      itemId === '226697'
+    if (isHubris) {
+      const defaultStacks = 5
+      const currentStacks =
+        slot.itemStacks && slot.itemStacks[i] !== undefined
+          ? Math.min(50, Math.max(0, slot.itemStacks[i]!))
+          : defaultStacks
+      bonusAd += 15 + currentStacks * 2
+    }
+
+    // Tear of the Goddess / Winter's Approach (Mana Charge stacks: +1 Mana per stack)
+    const isTearOrWinter =
+      name.includes('tear of the goddess') ||
+      name.includes('lacrima della dea') ||
+      name.includes("winter's approach") ||
+      name.includes("approccio dell'inverno") ||
+      itemId === '3070' ||
+      itemId === '3119'
+    if (isTearOrWinter && usesMana) {
+      const defaultStacks = 360
+      const currentStacks =
+        slot.itemStacks && slot.itemStacks[i] !== undefined
+          ? Math.min(360, Math.max(0, slot.itemStacks[i]!))
+          : defaultStacks
+      bonusMp += currentStacks
+    }
+
     // Parse advanced stats from description
     const parsed = parseStatsFromDescription(item.description)
     bonusCrit += s.FlatCritChanceMod ? s.FlatCritChanceMod * 100 : parsed.critChance
@@ -359,6 +406,7 @@ export const calculateStats = (slot: DraftSlot) => {
     if (!item) continue
     const name = item.name.toLowerCase()
     const desc = item.description.toLowerCase()
+    const itemId = String(item.id || '')
 
     // 1. Rabadon's Deathcap: Increases AP by X%
     if (name.includes("rabadon's deathcap")) {
@@ -419,6 +467,49 @@ export const calculateStats = (slot: DraftSlot) => {
     if (name.includes("jak'sho")) {
       bonusArmor = bonusArmor * 1.3
       bonusMr = bonusMr * 1.3
+    }
+
+    // 9. Sterak's Gage: The Claws That Catch (+50% base AD as bonus AD)
+    if (
+      name.includes("sterak's gage") ||
+      name.includes('guanto di sterak') ||
+      name.includes('sterak') ||
+      itemId === '3053' ||
+      itemId === '223053'
+    ) {
+      bonusAd += baseAd * 0.5
+    }
+
+    // 10. Fimbulwinter: Awe (+8% total mana as bonus HP)
+    if ((name.includes('fimbulwinter') || itemId === '3121' || itemId === '223121') && usesMana) {
+      const maxMana = baseMp + bonusMp
+      bonusHp += Math.round(maxMana * 0.08)
+    }
+
+    // 11. Bloodthirster: Ichorshield (+15 bonus AD while above 70% HP)
+    if (
+      name.includes('bloodthirster') ||
+      name.includes('sanguinaria') ||
+      itemId === '3072' ||
+      itemId === '223072'
+    ) {
+      bonusAd += 15
+    }
+
+    // 12. Opportunity: Preparation (+10 Lethality)
+    if (name.includes('opportunity') || itemId === '6700' || itemId === '226700') {
+      bonusLethality += 10
+    }
+
+    // 13. Lord Dominik's Regards / Mortal Reminder / Serylda's Grudge baseline Armor Pen checks
+    if (name.includes('lord dominik') || itemId === '3036' || itemId === '223036') {
+      bonusArmorPen = Math.max(bonusArmorPen, 40)
+    }
+    if (name.includes('mortal reminder') || itemId === '3033' || itemId === '223033') {
+      bonusArmorPen = Math.max(bonusArmorPen, 35)
+    }
+    if (name.includes('serylda') || itemId === '6694' || itemId === '226694') {
+      bonusArmorPen = Math.max(bonusArmorPen, 30)
     }
 
     // Blackfire Torch AP bonus is applied dynamically in combat (CalculatorView) per target affected

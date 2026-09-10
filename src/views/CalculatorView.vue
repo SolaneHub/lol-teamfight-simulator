@@ -1809,6 +1809,493 @@ const getBadgeDisplay = (badgeText: string): { label: string; iconUrl?: string }
     }
   }
 
+  // Heartsteel
+  if (clean.includes('Heartsteel')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3084_tank_t4_heartsteel.png`,
+    }
+  }
+
+  // Sundered Sky
+  if (clean.includes('Sundered Sky')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6610_sunderedsky.png`,
+    }
+  }
+
+  // Eclipse
+  if (clean.includes('Eclipse')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6692_assassin_t4_eclipse.png`,
+    }
+  }
+
+  // Sterak's Gage
+  if (clean.includes("Sterak's Shield") || clean.includes('Sterak')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3053_steraks_gage.png`,
+    }
+  }
+
+  // Maw of Malmortius
+  if (clean.includes('Maw Shield') || clean.includes('Maw')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3156_fighter_t3_mawofmalmortius.png`,
+    }
+  }
+
+  // Immortal Shieldbow
+  if (clean.includes('Shieldbow')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6673_marksman_t4_crimsonshieldbow.png`,
+    }
+  }
+
+  // Spear of Shojin
+  if (clean.includes('Shojin')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3161_fighter_t3_spearofshojin.png`,
+    }
+  }
+
+  // Thornmail
+  if (clean.includes('Thornmail')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3075_tank_t3_thornmail.png`,
+    }
+  }
+
+  // Titanic Hydra
+  if (clean.includes('Titanic')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3748_fighter_t3_titanichydra.png`,
+    }
+  }
+
+  // Statikk Shiv
+  if (clean.includes('Statikk')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3087_statikk_shiv.png`,
+    }
+  }
+
+  // Rapid Firecannon
+  if (clean.includes('Rapid Firecannon')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3094_marksman_t3_rapidfirehandcannon.png`,
+    }
+  }
+
+  // Wit's End
+  if (clean.includes("Wit's End")) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3091_fighter_t3_witsend.png`,
+    }
+  }
+
+  // Runaan's Hurricane
+  if (clean.includes('Runaan')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3085_marksman_t3_runaans.png`,
+    }
+  }
+
+  // Yun Tal Wildarrows
+  if (clean.includes('Yun Tal')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3032_yuntalwildarrows.png`,
+    }
+  }
+
+  // Bloodsong
+  if (clean.includes('Bloodsong')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3877_bloodsong.png`,
+    }
+  }
+
+  // Zaz'Zak's Realmspike
+  if (clean.includes("Zaz'Zak") || clean.includes('ZazZak')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3871_zazzaksrealmspike.png`,
+    }
+  }
+
+  // Celestial Opposition
+  if (clean.includes('Celestial Opposition') || clean.includes('Celestial Exalted')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3869_celestialopposition.png`,
+    }
+  }
+
+  // Dream Maker
+  if (clean.includes('Dream Maker')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3870_dreammaker.png`,
+    }
+  }
+
+  // Solstice Sleigh
+  if (clean.includes('Solstice Sleigh') || clean.includes('Solstice')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3876_solticesleigh.png`,
+    }
+  }
+
+  // Edge of Night
+  if (clean.includes('Edge of Night') || clean.includes('Annul')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3814_assassin_t3_edgeofnight.png`,
+    }
+  }
+
+  // Death's Dance
+  if (
+    clean.includes("Death's Dance") ||
+    clean.includes('Ignore Pain') ||
+    clean.includes('DD Defy')
+  ) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6333_fighter_t3_deathsdance.png`,
+    }
+  }
+
+  // Hullbreaker
+  if (clean.includes('Hullbreaker') || clean.includes('Boarding Party')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3181_hullbreaker.png`,
+    }
+  }
+
+  // Dead Man's Plate
+  if (clean.includes('Dead Man') || clean.includes('Shipwrecker')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3742_tank_t3_deadmansplate.png`,
+    }
+  }
+
+  // Stridebreaker
+  if (clean.includes('Stridebreaker') || clean.includes('Shockwave')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6631_fighter_t4_stridebreaker.png`,
+    }
+  }
+
+  // Stormrazor
+  if (clean.includes('Stormrazor') || clean.includes('Bolt')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3095_windblade.png`,
+    }
+  }
+
+  // Recurve Bow
+  if (clean.includes('Recurve Bow') || clean.includes('Recurve')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/1043_base_t2_recurvebow.png`,
+    }
+  }
+
+  // Hextech Alternator
+  if (clean.includes('Alternator') || clean.includes('Revved')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3145_mage_t2_hextechalternator.png`,
+    }
+  }
+
+  // Tiamat
+  if (clean.includes('Tiamat') || clean.includes('Tiamat Cleave')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3077_fighter_t2_tiamat.png`,
+    }
+  }
+
+  // Ravenous Hydra
+  if (clean.includes('Ravenous') || clean.includes('Crescent')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3074_fighter_t3_ravenoushydra.png`,
+    }
+  }
+
+  // Profane Hydra
+  if (clean.includes('Profane') || clean.includes('Heretic')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6698_profanehydra.png`,
+    }
+  }
+
+  // Experimental Hexplate
+  if (clean.includes('Hexplate') || clean.includes('Overdrive')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3073_hexaegis.png`,
+    }
+  }
+
+  // Haunting Guise
+  if (clean.includes('Haunting Guise') || clean.includes('Madness')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3147_hauntingguise.png`,
+    }
+  }
+
+  // Redemption
+  if (clean.includes('Redemption') || clean.includes('Intervention')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3107_enchanter_t3_redemption.png`,
+    }
+  }
+
+  // Mikael's Blessing
+  if (clean.includes("Mikael's Blessing") || clean.includes('Mikael')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3222_enchanter_t3_mikaelsblessing.png`,
+    }
+  }
+
+  // Trailblazer
+  if (clean.includes('Trailblazer') || clean.includes('Lead the Way')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3002_trailblazer.png`,
+    }
+  }
+
+  // Warden's Mail
+  if (clean.includes("Warden's Mail") || clean.includes('Rock Solid')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3082_tank_t2_wardensmail.png`,
+    }
+  }
+
+  // Force of Nature
+  if (clean.includes('Force of Nature') || clean.includes('Steadfast')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/4401_tank_t3_forceofnature.png`,
+    }
+  }
+
+  // Knight's Vow
+  if (clean.includes("Knight's Vow") || clean.includes('Knights Vow')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3109_tank_t3_knightsvow.png`,
+    }
+  }
+
+  // Hexdrinker
+  if (clean.includes('Hexdrinker')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3155_fighter_t2_hexdrinker.png`,
+    }
+  }
+
+  // Essence Reaver
+  if (clean.includes('Essence Reaver')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3508_marksman_t3_essencereaver.png`,
+    }
+  }
+
+  // Axiom Arc
+  if (clean.includes('Axiom Arc') || clean.includes('Axiom')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6696_axiomarc.png`,
+    }
+  }
+
+  // Warmog's Armor
+  if (
+    clean.includes("Warmog's Armor") ||
+    clean.includes("Warmog's Heart") ||
+    clean.includes('Warmog')
+  ) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3083_tank_t3_warmogs.png`,
+    }
+  }
+
+  // Phantom Dancer
+  if (clean.includes('Phantom Dancer')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3046_marksman_t3_phantomdancer.png`,
+    }
+  }
+
+  // Youmuu's Ghostblade
+  if (clean.includes("Youmuu's Ghostblade") || clean.includes('Youmuu')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3142_assassin_t3_youmuusghostblade.png`,
+    }
+  }
+
+  // Mercurial Scimitar
+  if (
+    clean.includes('Mercurial Scimitar') ||
+    clean.includes('Mercurial') ||
+    clean.includes('Quicksilver')
+  ) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3139_marksman_t3_mercurialscimitar.png`,
+    }
+  }
+
+  // Umbral Glaive
+  if (clean.includes('Umbral Glaive') || clean.includes('Blackout')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3179_assassin_t3_umbralglaive.png`,
+    }
+  }
+
+  // Voltaic Cyclosword
+  if (clean.includes('Voltaic') || clean.includes('Cyclosword')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6699_voltaiccyclosword.png`,
+    }
+  }
+
+  // Hubris
+  if (clean.includes('Hubris') || clean.includes('Eminence')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6697_hubris.png`,
+    }
+  }
+
+  // Liandry's Torment
+  if (clean.includes("Liandry's") || clean.includes('Liandry') || clean.includes('Torment')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6653_mage_t4_liandrysanguish.png`,
+    }
+  }
+
+  // Blackfire Torch
+  if (clean.includes('Blackfire')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/2503_blackfiretorch64.png`,
+    }
+  }
+
+  // Arena items
+  if (clean.includes('Endless Hunger')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/2517_adfighteromnivamp.png`,
+    }
+  }
+
+  if (clean.includes('Bastionbreaker')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/2520_adassassingameender.png`,
+    }
+  }
+
+  if (clean.includes('Fiendhunter')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/2512_adcallin.png`,
+    }
+  }
+
+  if (clean.includes('Hexoptics')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/2523_adcscope.png`,
+    }
+  }
+
+  if (clean.includes('Bandlepipes')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/2524_tankasaura.png`,
+    }
+  }
+
+  if (clean.includes('Protoplasm')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/2525_tanklifeline.png`,
+    }
+  }
+
+  // Zeke's Convergence
+  if (clean.includes('Zeke')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3050_enchanter_t3_zekesconvergence.png`,
+    }
+  }
+
+  // Unending Despair / Anguish
+  if (clean.includes('Unending Despair') || clean.includes('Anguish')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/2502_unendingdespair.png`,
+    }
+  }
+
+  // Serpent's Fang
+  if (clean.includes("Serpent's Fang")) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6695_assassin_t3_serpentsfang.png`,
+    }
+  }
+
+  // Guardian Angel
+  if (clean.includes('Guardian Angel')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3026_fighter_t3_guardianangel.png`,
+    }
+  }
+
   // Runes
   // 22. Press the Attack
   if (clean.includes('PtA')) {
@@ -1906,6 +2393,12 @@ const getDoTIconUrl = (dot: { type?: string; name: string }): string | null => {
   }
   if (type === 'dft' || name.includes('deathfire')) {
     return `${base}cdragon/runes/images/styles/sorcery/deathfiretouch/deathfire_touch_keystone.png`
+  }
+  if (type === 'yun_tal' || name.includes('yun tal')) {
+    return `${base}cdragon/items/icons/3032_yuntalwildarrows.png`
+  }
+  if (type === 'zekes' || name.includes('zeke')) {
+    return `${base}cdragon/items/icons/3050_enchanter_t3_zekesconvergence.png`
   }
   return null
 }

@@ -461,8 +461,33 @@ export const useDraftStore = defineStore('draft', () => {
       name.includes('bastone delle ere') ||
       itemId === '6657' ||
       itemId === '226657'
+    const isHeartsteel =
+      name.includes('heartsteel') ||
+      name.includes("cuore d'acciaio") ||
+      itemId === '3084' ||
+      itemId === '223084'
+    const isHubris =
+      name.includes('hubris') ||
+      name.includes('superbia') ||
+      itemId === '6697' ||
+      itemId === '226697'
+    const isShojin = name.includes('shojin') || itemId === '3161' || itemId === '223161'
+    const isTear =
+      name.includes('tear of the goddess') ||
+      name.includes('lacrima della dea') ||
+      name.includes("winter's approach") ||
+      name.includes("approccio dell'inverno") ||
+      itemId === '3070' ||
+      itemId === '3119'
 
-    const maxStacks = isMejai ? 25 : isDarkSeal || isRoA ? 10 : 0
+    let maxStacks = 0
+    if (isHeartsteel) maxStacks = 2000
+    else if (isTear) maxStacks = 360
+    else if (isHubris) maxStacks = 50
+    else if (isMejai) maxStacks = 25
+    else if (isDarkSeal || isRoA) maxStacks = 10
+    else if (isShojin) maxStacks = 4
+
     const clamped = Math.min(maxStacks, Math.max(0, isNaN(stacks) ? 0 : stacks))
     activeCustomizerSlot.value.itemStacks[itemIndex] = clamped
   }
@@ -488,11 +513,37 @@ export const useDraftStore = defineStore('draft', () => {
         name.includes('bastone delle ere') ||
         itemId === '6657' ||
         itemId === '226657'
+      const isHeartsteel =
+        name.includes('heartsteel') ||
+        name.includes("cuore d'acciaio") ||
+        itemId === '3084' ||
+        itemId === '223084'
+      const isHubris =
+        name.includes('hubris') ||
+        name.includes('superbia') ||
+        itemId === '6697' ||
+        itemId === '226697'
+      const isShojin = name.includes('shojin') || itemId === '3161' || itemId === '223161'
+      const isTear =
+        name.includes('tear of the goddess') ||
+        name.includes('lacrima della dea') ||
+        name.includes("winter's approach") ||
+        name.includes("approccio dell'inverno") ||
+        itemId === '3070' ||
+        itemId === '3119'
 
-      if (isMejai) {
+      if (isHeartsteel) {
+        activeCustomizerSlot.value.itemStacks[idx] = 300
+      } else if (isTear) {
+        activeCustomizerSlot.value.itemStacks[idx] = 360
+      } else if (isHubris) {
+        activeCustomizerSlot.value.itemStacks[idx] = 5
+      } else if (isMejai) {
         activeCustomizerSlot.value.itemStacks[idx] = 25
       } else if (isDarkSeal || isRoA) {
         activeCustomizerSlot.value.itemStacks[idx] = 10
+      } else if (isShojin) {
+        activeCustomizerSlot.value.itemStacks[idx] = 4
       } else {
         activeCustomizerSlot.value.itemStacks[idx] = undefined
       }
