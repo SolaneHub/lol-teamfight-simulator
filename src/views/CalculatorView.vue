@@ -750,7 +750,6 @@
               <input
                 type="number"
                 min="0"
-                max="30"
                 step="0.1"
                 v-model.number="actionCreatorTime"
                 class="h-11 w-24 bg-slate-950 text-white font-bold text-center rounded-xl border border-slate-800 text-base"
@@ -2450,7 +2449,7 @@ const isSelectedSpellOnCooldown = computed(() => {
 })
 
 const snapToReadyTime = () => {
-  actionCreatorTime.value = Math.min(30, nextReadyTimeForSelectedSpell.value)
+  actionCreatorTime.value = nextReadyTimeForSelectedSpell.value
 }
 
 const selectSpellAction = (act: 'Q' | 'W' | 'E' | 'R' | 'AA' | 'P') => {
@@ -2465,7 +2464,7 @@ const selectSpellAction = (act: 'Q' | 'W' | 'E' | 'R' | 'AA' | 'P') => {
       const cd = getSpellCd(act as 'Q' | 'W' | 'E' | 'R')
       const readyAt = Math.round((lastT + cd) * 10) / 10
       if (actionCreatorTime.value < readyAt) {
-        actionCreatorTime.value = Math.min(30, readyAt)
+        actionCreatorTime.value = readyAt
       }
     }
   }
@@ -2518,7 +2517,7 @@ const submitTeamfightAction = () => {
     actionCreatorTime.value,
   )
   // Auto-advance timestamp by cast animation time (0.3s) for seamless combo queuing
-  actionCreatorTime.value = Math.min(30, Math.round((actionCreatorTime.value + 0.3) * 10) / 10)
+  actionCreatorTime.value = Math.round((actionCreatorTime.value + 0.3) * 10) / 10
 }
 
 const clearActionsAndResetTime = () => {
@@ -2620,12 +2619,18 @@ const getCalculatedStatsForSlot = (slot: DraftSlot) => {
 
 // MAIN COMBAT SIMULATION ENGINE CALL
 const combatResults = computed(() => {
+  const maxActionTime =
+    teamfightActions.value.length > 0
+      ? Math.max(...teamfightActions.value.map((a) => a.timestamp ?? 0))
+      : 0
+  const simDuration = Math.max(60.0, maxActionTime + 15.0)
+
   return runCombatSimulation({
     allSlots: [...blueDraft.value, ...redDraft.value],
     activeBlueSlotIds: selectedAttackerSlotIds.value,
     activeRedSlotIds: selectedDefenderSlotIds.value,
     actions: teamfightActions.value,
-    duration: 30.0,
+    duration: simDuration,
     enableAutoAttacks: false,
     autoCastSpells: false,
     enforceCooldowns: enforceCooldowns.value,
@@ -2658,7 +2663,7 @@ const lastCombatEventAction = computed(() => {
 
 const snapToLastEventTime = () => {
   if (lastCombatEventTime.value > 0) {
-    actionCreatorTime.value = Math.min(30, lastCombatEventTime.value)
+    actionCreatorTime.value = lastCombatEventTime.value
   }
 }
 

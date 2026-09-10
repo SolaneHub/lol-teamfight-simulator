@@ -267,7 +267,7 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
     },
   } = input
 
-  const clampedDuration = Math.max(0.5, Math.min(30, duration))
+  const clampedDuration = Math.max(0.5, Math.min(600, duration))
   const timeStep = 0.1 // 100ms discrete time ticks
 
   let timeToKill: number | null = null

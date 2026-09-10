@@ -1220,4 +1220,24 @@ describe('Combat Simulation Engine (DPS, DoT, Two-way Trading)', () => {
     )
     expect(rapid04Events.length).toBe(7)
   })
+
+  it('correctly executes actions and measures combat beyond the former 30-second limit', () => {
+    const resExtended = runCombatSimulation({
+      allSlots: [blueDariusSlot, redGarenSlot],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [6],
+      actions: [
+        { id: 'act1', actorSlotId: 1, action: 'Q', targetSlotIds: [6], timestamp: 10.0 },
+        { id: 'act2', actorSlotId: 1, action: 'W', targetSlotIds: [6], timestamp: 45.0 },
+      ],
+      duration: 60.0,
+      enableAutoAttacks: false,
+      attackerBuffs: defaultBuffs,
+      defenderBuffs: defaultBuffs,
+    })
+
+    const executedActions = resExtended.events.filter((e) => e.actorSlotId === 1)
+    expect(executedActions.some((e) => e.timestamp === 45.0)).toBe(true)
+    expect(resExtended.duration).toBeGreaterThanOrEqual(45.0)
+  })
 })
