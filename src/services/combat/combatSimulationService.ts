@@ -221,6 +221,32 @@ interface InternalParticipantState {
   heartsteelReady: Record<number, boolean>
   nextUnendingDespairTime: number
   guardianAngelUsed: boolean
+  // Runes and Keystones state tracking
+  cometCooldown: number
+  aeryAvailable: boolean
+  aeryReturnTime: number
+  phaseRushHits: number
+  phaseRushCooldown: number
+  fleetFootworkReady: boolean
+  fleetFootworkCooldown: number
+  graspReadyTime: number
+  aftershockReady: boolean
+  aftershockActiveEndTime: number
+  aftershockCooldown: number
+  aftershockExplosionTime: number
+  guardianReady: boolean
+  guardianCooldown: number
+  glacialCooldown: number
+  cheapShotCooldown: number
+  tasteOfBloodCooldown: number
+  suddenImpactCooldown: number
+  scorchCooldown: number
+  shieldBashReady: boolean
+  bonePlatingHitsLeft: number
+  bonePlatingWindowEndTime: number
+  bonePlatingCooldown: number
+  secondWindNextReady: number
+  biscuitUsed: boolean
 }
 
 /**
@@ -321,8 +347,8 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       blackCleaverStacks: 0,
       vileDecayStacks: 0,
       malignanceShredDuration: 0,
-      conquerorStacks: 0,
-      lethalTempoStacks: 0,
+      conquerorStacks: slot.runeStacks?.conqueror ?? slot.conquerorStacks ?? 0,
+      lethalTempoStacks: slot.runeStacks?.lethalTempo ?? slot.lethalTempoStacks ?? 0,
       hobAttacksLeft: hasHob ? 3 : 0,
       ptaStates: {},
       electrocuteStates: {},
@@ -376,6 +402,31 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       heartsteelReady: {},
       nextUnendingDespairTime: 5.0,
       guardianAngelUsed: false,
+      cometCooldown: 0.0,
+      aeryAvailable: true,
+      aeryReturnTime: 0.0,
+      phaseRushHits: 0,
+      phaseRushCooldown: 0.0,
+      fleetFootworkReady: true,
+      fleetFootworkCooldown: 0.0,
+      graspReadyTime: 0.0,
+      aftershockReady: true,
+      aftershockActiveEndTime: 0.0,
+      aftershockCooldown: 0.0,
+      aftershockExplosionTime: 0.0,
+      guardianReady: true,
+      guardianCooldown: 0.0,
+      glacialCooldown: 0.0,
+      cheapShotCooldown: 0.0,
+      tasteOfBloodCooldown: 0.0,
+      suddenImpactCooldown: 0.0,
+      scorchCooldown: 0.0,
+      shieldBashReady: initialShield > 0,
+      bonePlatingHitsLeft: 0,
+      bonePlatingWindowEndTime: 0.0,
+      bonePlatingCooldown: 0.0,
+      secondWindNextReady: 0.0,
+      biscuitUsed: false,
     }
   })
 
@@ -533,6 +584,97 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
     if (targetPassives.hasWardensMail && actionName === 'AA' && effectiveDamage > 0) {
       const flatReduction = Math.min(effectiveDamage * 0.2, (target.maxHp / 1000) * 5)
       effectiveDamage = Math.max(1, Math.round(effectiveDamage - flatReduction))
+    }
+
+    // Target Runes Detection
+    const targetRunes = [
+      target.slot.primaryKeystone,
+      target.slot.primaryRune1,
+      target.slot.primaryRune2,
+      target.slot.primaryRune3,
+      target.slot.secondaryRune1,
+      target.slot.secondaryRune2,
+      ...(target.slot.runes || []),
+    ]
+    const checkTargetRune = (match: string, id?: number) =>
+      targetRunes.some((r) => {
+        if (!r) return false
+        if (id && r.id === id) return true
+        const s = `${r.name || ''} ${r.key || ''}`.toLowerCase()
+        return s.includes(match)
+      })
+
+    // Bone Plating
+    const targetHasBonePlating =
+      checkTargetRune('bone plating', 8473) || checkTargetRune('boneplating', 8473)
+    if (targetHasBonePlating && effectiveDamage > 0 && !isBlocked) {
+      if (target.bonePlatingHitsLeft <= 0 && currentTime >= target.bonePlatingCooldown) {
+        target.bonePlatingHitsLeft = 3
+        target.bonePlatingWindowEndTime = currentTime + 1.5
+        target.bonePlatingCooldown = currentTime + 55.0
+      }
+      if (target.bonePlatingHitsLeft > 0 && currentTime <= target.bonePlatingWindowEndTime) {
+        const block = Math.min(effectiveDamage, Math.round(30 + (target.level - 1) * (30 / 17)))
+        effectiveDamage -= block
+        target.bonePlatingHitsLeft--
+        badges.push(`🦴 Bone Plating (-${block})`)
+      }
+    }
+
+    // Second Wind
+    const targetHasSecondWind =
+      checkTargetRune('second wind', 8444) || checkTargetRune('secondwind', 8444)
+    if (
+      targetHasSecondWind &&
+      effectiveDamage > 0 &&
+      currentTime >= target.secondWindNextReady &&
+      target.currentHp < target.maxHp
+    ) {
+      target.secondWindNextReady = currentTime + 10.0
+      const missingHp = Math.max(0, target.maxHp - target.currentHp)
+      const swHeal = Math.round(3 + missingHp * 0.04)
+      target.currentHp = Math.min(target.maxHp, target.currentHp + swHeal)
+      badges.push(`🍃 Second Wind (+${swHeal})`)
+    }
+
+    // Guardian
+    const targetHasGuardian = checkTargetRune('guardian', 8465)
+    if (
+      targetHasGuardian &&
+      target.guardianReady &&
+      currentTime >= target.guardianCooldown &&
+      (target.currentHp - effectiveDamage < target.maxHp * 0.7 || effectiveDamage > target.maxHp * 0.15)
+    ) {
+      target.guardianReady = false
+      target.guardianCooldown = currentTime + Math.max(40, 90 - (target.level - 1) * (50 / 17))
+      const targetLive = getLiveStats(target)
+      const hspMult = 1 + (targetLive.healShieldPower || 0) / 100
+      const gShield = Math.round(
+        (45 +
+          (target.level - 1) * (75 / 17) +
+          targetLive.ap * 0.125 +
+          (target.maxHp - target.baseHp) * 0.08) *
+          hspMult,
+      )
+      target.currentShield += gShield
+      target.shieldBashReady = true
+      badges.push(`🛡️ Guardian (+${gShield} Shield)`)
+    }
+
+    // Biscuit Delivery
+    const targetHasBiscuit = checkTargetRune('biscuit', 8345)
+    if (
+      targetHasBiscuit &&
+      !target.biscuitUsed &&
+      target.currentHp - effectiveDamage < target.maxHp * 0.5
+    ) {
+      target.biscuitUsed = true
+      const targetLive = getLiveStats(target)
+      const hspMult = 1 + (targetLive.healShieldPower || 0) / 100
+      const missingHp = Math.max(0, target.maxHp - (target.currentHp - effectiveDamage))
+      const bHeal = Math.round(missingHp * 0.08 * hspMult)
+      target.currentHp = Math.min(target.maxHp, target.currentHp + bHeal)
+      badges.push(`🍪 Biscuit (+${bHeal})`)
     }
 
     // Force of Nature Steadfast (builds MR stacks upon taking magic damage)
@@ -702,6 +844,40 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         if (actorPassives.hasAxiomArc) {
           actor.spellCooldowns.R = 0
           badges.push('Axiom Arc (R Reset)')
+        }
+
+        // Takedown Runes: Triumph, Absorb Life, Presence of Mind
+        const actorRunes = [
+          actor.slot.primaryKeystone,
+          actor.slot.primaryRune1,
+          actor.slot.primaryRune2,
+          actor.slot.primaryRune3,
+          actor.slot.secondaryRune1,
+          actor.slot.secondaryRune2,
+          ...(actor.slot.runes || []),
+        ]
+        const checkActorRune = (match: string, id?: number) =>
+          actorRunes.some((r) => {
+            if (!r) return false
+            if (id && r.id === id) return true
+            const s = `${r.name || ''} ${r.key || ''}`.toLowerCase()
+            return s.includes(match)
+          })
+
+        if (checkActorRune('triumph', 9111)) {
+          const aLive = getLiveStats(actor)
+          const hspMult = 1 + (aLive.healShieldPower || 0) / 100
+          const tHeal = Math.round((actor.maxHp * 0.025 + 20) * hspMult)
+          actor.currentHp = Math.min(actor.maxHp, actor.currentHp + tHeal)
+          badges.push(`🏆 Triumph (+${tHeal})`)
+        }
+        if (checkActorRune('absorb life', 9101) || checkActorRune('absorblife', 9101)) {
+          const aHeal = Math.round(2 + (actor.level - 1) * (15 / 17))
+          actor.currentHp = Math.min(actor.maxHp, actor.currentHp + aHeal)
+          badges.push(`🩸 Absorb Life (+${aHeal})`)
+        }
+        if (checkActorRune('presence of mind', 8009) || checkActorRune('presenceofmind', 8009)) {
+          badges.push('⚡ PoM (+15% Mana)')
         }
       }
     } else if (target.currentHp / target.maxHp < 0.3 && !target.lifelineTriggered) {
@@ -952,12 +1128,28 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
 
     // Update rune stacks for actor
     const keystoneName = (actor.slot.primaryKeystone?.name || '').toLowerCase()
-    const hasConqueror = keystoneName.includes('conqueror')
-    const hasLethalTempo = keystoneName.includes('lethal tempo')
-    const hasPtA = keystoneName.includes('press the attack')
-    const hasElectrocute = keystoneName.includes('electrocute')
+    const keystoneKey = (actor.slot.primaryKeystone?.key || '').toLowerCase()
+    const keystoneId = actor.slot.primaryKeystone?.id
+    const hasConqueror = keystoneName.includes('conqueror') || keystoneId === 8010
+    const hasLethalTempo = keystoneName.includes('lethal tempo') || keystoneId === 8008
+    const hasPtA = keystoneName.includes('press the attack') || keystoneId === 8005
+    const hasElectrocute = keystoneName.includes('electrocute') || keystoneId === 8112
     const hasDarkHarvest =
-      keystoneName.includes('dark harvest') || keystoneName.includes('darkharvest')
+      keystoneName.includes('dark harvest') || keystoneName.includes('darkharvest') || keystoneId === 8128
+    const hasComet =
+      keystoneName.includes('comet') || keystoneKey.includes('arcanecomet') || keystoneId === 8229
+    const hasAery =
+      keystoneName.includes('aery') || keystoneKey.includes('summonaery') || keystoneId === 8214
+    const hasPhaseRush =
+      keystoneName.includes('phase rush') || keystoneKey.includes('phaserush') || keystoneId === 8230
+    const hasFleet =
+      keystoneName.includes('fleet') || keystoneKey.includes('fleetfootwork') || keystoneId === 8021
+    const hasGrasp =
+      keystoneName.includes('grasp') || keystoneKey.includes('graspoftheundying') || keystoneId === 8437
+    const hasAftershock =
+      keystoneName.includes('aftershock') || keystoneKey.includes('veteranaftershock') || keystoneId === 8439
+    const hasGlacial =
+      keystoneName.includes('glacial') || keystoneKey.includes('glacialaugment') || keystoneId === 8358
     const hasDeathfireTouch =
       actor.slot.primaryKeystone?.id === 8992 ||
       keystoneName.includes('deathfire touch') ||
@@ -1083,7 +1275,10 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
 
     // Determine target participants
     const oppAlive = getOpposingAliveTargets(actor.slotId)
-    const validTargets = oppAlive.filter((t) => targetSlotIds.includes(t.slotId))
+    const validTargets =
+      targetSlotIds && targetSlotIds.length > 0
+        ? oppAlive.filter((t) => targetSlotIds.includes(t.slotId))
+        : oppAlive.slice(0, 1)
     const finalTargets = validTargets.length > 0 ? validTargets : oppAlive.slice(0, 1)
 
     // Helper to execute single cast for all targets (Normal or Echo)
@@ -1106,18 +1301,29 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
           actor.slot.secondaryRune2,
           ...(actor.slot.runes || []),
         ]
-        const hasCoupDeGrace = actorRunes.some((r) => {
-          const str = `${r?.name || ''} ${r?.key || ''}`.toLowerCase()
-          return str.includes('coup') || str.includes('grace')
-        })
-        const hasLastStand = actorRunes.some((r) => {
-          const str = `${r?.name || ''} ${r?.key || ''}`.toLowerCase()
-          return str.includes('last stand') || str.includes('laststand')
-        })
-        const hasCutDown = actorRunes.some((r) => {
-          const str = `${r?.name || ''} ${r?.key || ''}`.toLowerCase()
-          return str.includes('cut down') || str.includes('cutdown')
-        })
+        const checkActorRune = (match: string, id?: number) =>
+          actorRunes.some((r) => {
+            if (!r) return false
+            if (id && r.id === id) return true
+            const str = `${r.name || ''} ${r.key || ''}`.toLowerCase()
+            return str.includes(match)
+          })
+
+        const hasCoupDeGrace = checkActorRune('coup') || checkActorRune('grace')
+        const hasLastStand = checkActorRune('last stand') || checkActorRune('laststand')
+        const hasCutDown = checkActorRune('cut down') || checkActorRune('cutdown')
+
+        const hasCheapShot = checkActorRune('cheap shot', 8126) || checkActorRune('cheapshot', 8126)
+        const hasTasteOfBlood =
+          checkActorRune('taste of blood', 8139) || checkActorRune('tasteofblood', 8139)
+        const hasSuddenImpact =
+          checkActorRune('sudden impact', 8143) || checkActorRune('suddenimpact', 8143)
+        const hasScorch = checkActorRune('scorch', 8237)
+        const hasShieldBash =
+          checkActorRune('shield bash', 8401) || checkActorRune('shieldbash', 8401)
+        const hasFontOfLife =
+          checkActorRune('font of life', 8463) || checkActorRune('fontoflife', 8463)
+        const hasAxiom = checkActorRune('axiom arcanist')
 
         // Shred stacks (Black Cleaver & Vile Decay)
         if (
@@ -1207,8 +1413,14 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
           defender: {
             currentHp: target.currentHp,
             maxHp: target.maxHp,
-            armor: target.baseArmor,
-            mr: Math.max(0, target.baseMr - (target.malignanceShredDuration > 0 ? 10 : 0)),
+            armor:
+              target.baseArmor +
+              (target.aftershockActiveEndTime > currentTime
+                ? Math.round(35 + target.baseBonusArmor * 0.8)
+                : 0),
+            mr:
+              Math.max(0, target.baseMr - (target.malignanceShredDuration > 0 ? 10 : 0)) +
+              (target.aftershockActiveEndTime > currentTime ? Math.round(35 + 20 * 0.8) : 0),
             blackCleaverStacks: target.blackCleaverStacks,
             vileDecayStacks: target.vileDecayStacks,
           },
@@ -1728,6 +1940,113 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
           badges.push('Hexoptics (+40)')
         }
 
+        // Conqueror Max Stacks Vamp Heal
+        if (hasConqueror && actor.conquerorStacks >= 12) {
+          const vampPct = isMelee ? 0.08 : 0.05
+          const vampHeal = Math.round(finalHitDmg * vampPct)
+          if (vampHeal > 0) {
+            actor.currentHp = Math.min(actor.maxHp, actor.currentHp + vampHeal)
+            badges.push(`⚔️ Conq Vamp (+${vampHeal})`)
+          }
+        }
+
+        // Arcane Comet
+        if (hasComet && isAbility) {
+          if (currentTime >= actor.cometCooldown) {
+            const cometBase = 30 + (actor.level - 1) * (100 / 17)
+            const isAp =
+              actorStats.ap > Math.max(0, actorStats.ad - actorStats.baseAd) ||
+              actor.slot.champion?.tags?.includes('Mage')
+            const bonusAd = Math.max(0, actorStats.ad - actorStats.baseAd)
+            const cometRaw = cometBase + (isAp ? actorStats.ap * 0.05 : bonusAd * 0.1)
+            const cometDmg = Math.round(cometRaw * (isAp ? spellRes.magicMult : spellRes.physMult))
+            finalHitDmg += cometDmg
+            const cometCd = Math.max(8, 20 - (actor.level - 1) * (12 / 17))
+            actor.cometCooldown = currentTime + cometCd
+            badges.push(`☄️ Arcane Comet (+${cometDmg})`)
+          } else {
+            actor.cometCooldown = Math.max(currentTime, actor.cometCooldown - 2.0)
+          }
+        }
+
+        // Summon Aery
+        if (hasAery && (actor.aeryAvailable || currentTime >= actor.aeryReturnTime)) {
+          const isAp =
+            actorStats.ap > Math.max(0, actorStats.ad - actorStats.baseAd) ||
+            actor.slot.champion?.tags?.includes('Mage')
+          const bonusAd = Math.max(0, actorStats.ad - actorStats.baseAd)
+          const aeryBase = 10 + (actor.level - 1) * (40 / 17)
+          const aeryRaw = aeryBase + (isAp ? actorStats.ap * 0.1 : bonusAd * 0.15)
+          const aeryDmg = Math.round(aeryRaw * (isAp ? spellRes.magicMult : spellRes.physMult))
+          finalHitDmg += aeryDmg
+          actor.aeryAvailable = false
+          actor.aeryReturnTime = currentTime + 2.0
+          badges.push(`🕊️ Aery (+${aeryDmg})`)
+        }
+
+        // Phase Rush
+        if (hasPhaseRush && ['Q', 'W', 'E', 'R', 'P', 'AA'].includes(action)) {
+          if (currentTime >= actor.phaseRushCooldown) {
+            actor.phaseRushHits = (actor.phaseRushHits || 0) + 1
+            if (actor.phaseRushHits >= 3) {
+              actor.phaseRushHits = 0
+              actor.phaseRushCooldown = currentTime + (isMelee ? 15 : 25)
+              badges.push('💨 Phase Rush (+MS)')
+            }
+          }
+        }
+
+        // Fleet Footwork
+        if (hasFleet && action === 'AA') {
+          if (actor.fleetFootworkReady || currentTime >= actor.fleetFootworkCooldown) {
+            actor.fleetFootworkReady = false
+            actor.fleetFootworkCooldown = currentTime + 8.0
+            const bonusAd = Math.max(0, actorStats.ad - actorStats.baseAd)
+            const fleetBase =
+              10 + (actor.level - 1) * (120 / 17) + bonusAd * 0.1 + actorStats.ap * 0.05
+            const hspMult = 1 + (actorStats.healShieldPower || 0) / 100
+            const fleetHeal = Math.round(fleetBase * (isMelee ? 1.0 : 0.6) * hspMult)
+            actor.currentHp = Math.min(actor.maxHp, actor.currentHp + fleetHeal)
+            badges.push(`⚡ Fleet (+${fleetHeal})`)
+          }
+        }
+
+        // Grasp of the Undying
+        if (hasGrasp && action === 'AA') {
+          if (currentTime >= actor.graspReadyTime) {
+            actor.graspReadyTime = currentTime + 4.0
+            const dmgPct = isMelee ? 0.035 : 0.021
+            const healPct = isMelee ? 0.012 : 0.0072
+            const graspRaw = Math.round(actor.maxHp * dmgPct)
+            const graspDmg = Math.round(graspRaw * spellRes.magicMult)
+            finalHitDmg += graspDmg
+            const hspMult = 1 + (actorStats.healShieldPower || 0) / 100
+            const graspHeal = Math.round(actor.maxHp * healPct * hspMult)
+            actor.currentHp = Math.min(actor.maxHp, actor.currentHp + graspHeal)
+            badges.push(`✊ Grasp (+${graspDmg})`)
+          }
+        }
+
+        // Aftershock
+        if (
+          hasAftershock &&
+          isAbility &&
+          actor.aftershockReady &&
+          currentTime >= actor.aftershockCooldown
+        ) {
+          actor.aftershockReady = false
+          actor.aftershockCooldown = currentTime + 20.0
+          actor.aftershockActiveEndTime = currentTime + 2.5
+          actor.aftershockExplosionTime = currentTime + 2.5
+          badges.push('💥 Aftershock (+Resist)')
+        }
+
+        // Glacial Augment
+        if (hasGlacial && isAbility && currentTime >= actor.glacialCooldown) {
+          actor.glacialCooldown = currentTime + 25.0
+          badges.push('❄️ Glacial Augment (-15% Dmg)')
+        }
+
         // Electrocute Proc
         if (hasElectrocute && ['Q', 'W', 'E', 'R', 'P', 'AA'].includes(action)) {
           if (!target.electrocuteStates[actor.slotId]) {
@@ -1754,15 +2073,91 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         if (hasDarkHarvest && target.currentHp / target.maxHp <= 0.5) {
           if (!target.darkHarvestProcced[actor.slotId]) {
             target.darkHarvestProcced[actor.slotId] = true
-            const dhBase = 20 + (actor.level - 1) * (40 / 17) + 5 * 9
-            const isAp = actor.slot.champion?.tags?.includes('Mage')
+            const userStacks =
+              actor.slot.runeStacks?.darkHarvest ?? actor.slot.darkHarvestStacks ?? 0
+            const dhBase = 20 + (actor.level - 1) * (40 / 17) + userStacks * 9
+            const isAp =
+              actorStats.ap > Math.max(0, actorStats.ad - actorStats.baseAd) ||
+              actor.slot.champion?.tags?.includes('Mage')
+            const bonusAd = Math.max(0, actorStats.ad - actorStats.baseAd)
             const dhDmg = Math.round(
-              (dhBase + (isAp ? actorStats.ap * 0.05 : actorStats.ad * 0.1)) *
+              (dhBase + (isAp ? actorStats.ap * 0.05 : bonusAd * 0.1)) *
                 (isAp ? spellRes.magicMult : spellRes.physMult),
             )
             finalHitDmg += dhDmg
-            badges.push('💀 Dark Harvest')
+            badges.push(
+              userStacks > 0
+                ? `💀 Dark Harvest (${userStacks}x) (+${dhDmg})`
+                : `💀 Dark Harvest (+${dhDmg})`,
+            )
           }
+        }
+
+        // Cheap Shot Proc
+        if (hasCheapShot && currentTime >= actor.cheapShotCooldown) {
+          const csDmg = Math.round(10 + (actor.level - 1) * (35 / 17))
+          finalHitDmg += csDmg
+          actor.cheapShotCooldown = currentTime + 4.0
+          badges.push(`🎯 Cheap Shot (+${csDmg})`)
+        }
+
+        // Taste of Blood Proc
+        if (hasTasteOfBlood && currentTime >= actor.tasteOfBloodCooldown) {
+          const bonusAd = Math.max(0, actorStats.ad - actorStats.baseAd)
+          const tobBase = 16 + (actor.level - 1) * (24 / 17) + bonusAd * 0.1 + actorStats.ap * 0.05
+          const hspMult = 1 + (actorStats.healShieldPower || 0) / 100
+          const tobHeal = Math.round(tobBase * hspMult)
+          actor.currentHp = Math.min(actor.maxHp, actor.currentHp + tobHeal)
+          actor.tasteOfBloodCooldown = currentTime + 20.0
+          badges.push(`🩸 Taste of Blood (+${tobHeal})`)
+        }
+
+        // Sudden Impact Proc
+        if (hasSuddenImpact && currentTime >= actor.suddenImpactCooldown) {
+          const siDmg = Math.round(20 + (actor.level - 1) * (60 / 17))
+          finalHitDmg += siDmg
+          actor.suddenImpactCooldown = currentTime + 10.0
+          badges.push(`🗡️ Sudden Impact (+${siDmg})`)
+        }
+
+        // Scorch Proc
+        if (hasScorch && isAbility && currentTime >= actor.scorchCooldown) {
+          const scorchBase = 20 + (actor.level - 1) * (20 / 17)
+          const scorchDmg = Math.round(scorchBase * spellRes.magicMult)
+          finalHitDmg += scorchDmg
+          actor.scorchCooldown = currentTime + 10.0
+          badges.push(`🔥 Scorch (+${scorchDmg})`)
+        }
+
+        // Shield Bash Proc
+        if (hasShieldBash && actor.currentShield > 0 && action === 'AA') {
+          const bonusHp = Math.max(0, actor.maxHp - actor.baseHp)
+          const sbBase =
+            5 + (actor.level - 1) * (25 / 17) + bonusHp * 0.015 + actor.currentShield * 0.085
+          const isAp =
+            actorStats.ap > Math.max(0, actorStats.ad - actorStats.baseAd) ||
+            actor.slot.champion?.tags?.includes('Mage')
+          const sbDmg = Math.round(sbBase * (isAp ? spellRes.magicMult : spellRes.physMult))
+          finalHitDmg += sbDmg
+          badges.push(`🛡️ Shield Bash (+${sbDmg})`)
+        }
+
+        // Font of Life Proc
+        if (hasFontOfLife && ['Q', 'W', 'E', 'R'].includes(action)) {
+          const allies = Object.values(participants).filter(
+            (p) => p.side === actor.side && !p.isKo && p.slotId !== actor.slotId,
+          )
+          if (allies.length > 0) {
+            const folHeal = Math.round(10 + (actor.level - 1) * (60 / 17) + actor.maxHp * 0.01)
+            const ally = allies[0]!
+            ally.currentHp = Math.min(ally.maxHp, ally.currentHp + folHeal)
+            badges.push(`🌿 Font of Life (+${folHeal})`)
+          }
+        }
+
+        // Axiom Arcanist Proc
+        if (hasAxiom && action === 'R') {
+          badges.push('🌌 Axiom Arcanist')
         }
 
         finalHitDmg += ptaProcDmg
@@ -2226,6 +2621,7 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
   // Pre-sort scheduled user actions by timestamp
   const sortedActions = [...actions].map((act, index) => ({
     ...act,
+    id: act.id ?? `action_${index}_${act.actorSlotId}_${act.action}_${act.timestamp ?? index * 0.6}`,
     timestamp: act.timestamp !== undefined ? act.timestamp : index * 0.6, // Default 0.6s spacing if omitted
   }))
 
@@ -2440,6 +2836,28 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       // Update Malignance MR shred duration
       if (target.malignanceShredDuration > 0) {
         target.malignanceShredDuration = Math.max(0, target.malignanceShredDuration - timeStep)
+      }
+
+      // Process Aftershock shockwave detonation
+      if (target.aftershockExplosionTime > 0 && t >= target.aftershockExplosionTime - 0.01) {
+        target.aftershockExplosionTime = 0
+        const bonusHp = Math.max(0, target.maxHp - target.baseHp)
+        const shockBase = 25 + (target.level - 1) * (95 / 17) + bonusHp * 0.08
+        const shockTargets = getOpposingAliveTargets(target.slotId)
+        shockTargets.forEach((tgt) => {
+          const effMr = Math.max(0, tgt.baseMr - (tgt.malignanceShredDuration > 0 ? 10 : 0))
+          const shockDmg = Math.max(1, Math.round(shockBase * (100 / (100 + effMr))))
+          applyDamageToTarget(
+            target,
+            tgt,
+            shockDmg,
+            'magic',
+            '💥 Aftershock Shockwave',
+            t,
+            false,
+            [`💥 Aftershock (+${shockDmg})`],
+          )
+        })
       }
 
       // Process each active DoT on target

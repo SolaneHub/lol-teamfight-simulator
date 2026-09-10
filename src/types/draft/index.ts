@@ -34,6 +34,7 @@ export interface DraftSlot {
   lethalTempoStacks?: number
   darkHarvestStacks?: number
   hailOfBladesActive?: boolean
+  runeStacks?: Record<string, number>
   statShards?: (string | null)[]
   runes?: (Rune | null)[]
 }

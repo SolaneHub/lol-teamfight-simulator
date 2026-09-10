@@ -321,32 +321,45 @@ export const calculateStats = (slot: DraftSlot) => {
   for (const rune of activeRunes) {
     if (!rune) continue
     const runeName = (rune.name || '').toLowerCase()
-    if (runeName.includes('overgrowth')) {
-      hasOvergrowth = true
+    const isMelee = (stats.attackrange || 125) <= 225
+
+    if (runeName.includes('grasp of the undying') || runeName.includes('graspoftheundying')) {
+      const graspStacks = Math.max(0, slot.runeStacks?.grasp ?? 0)
+      bonusHp += graspStacks * (isMelee ? 7 : 4)
+    } else if (runeName.includes('overgrowth')) {
+      const ogStacks = slot.runeStacks?.overgrowth ?? 15
+      bonusHp += ogStacks * 3
+      if (ogStacks >= 15) hasOvergrowth = true
     } else if (runeName.includes('conditioning') && lvl >= 12) {
       bonusArmor += 8
       bonusMr += 8
       bonusArmor = bonusArmor * 1.03
       bonusMr = bonusMr * 1.03
     } else if (runeName.includes('legend: alacrity') || runeName.includes('alacrity')) {
-      bonusAsPercent += 0.18
+      const alacrityStacks = Math.min(10, Math.max(0, slot.runeStacks?.legendAlacrity ?? 10))
+      bonusAsPercent += 0.03 + alacrityStacks * 0.015
     } else if (runeName.includes('legend: bloodline') || runeName.includes('bloodline')) {
-      bonusLifeSteal += 5.35
-      bonusHp += 85
+      const bloodlineStacks = Math.min(15, Math.max(0, slot.runeStacks?.legendBloodline ?? 15))
+      bonusLifeSteal += bloodlineStacks * 0.35
+      if (bloodlineStacks >= 15) bonusHp += 85
     } else if (
       runeName.includes('legend: haste') ||
       (runeName.includes('haste') && runeName.includes('legend'))
     ) {
-      bonusBasicHaste += 15
+      const hasteStacks = Math.min(10, Math.max(0, slot.runeStacks?.legendHaste ?? 10))
+      bonusBasicHaste += hasteStacks * 1.5
     } else if (
       runeName.includes('eyeball collection') ||
       runeName.includes('zombie ward') ||
       runeName.includes('ghost poro')
     ) {
-      if (isApAdaptive) {
-        bonusAp += 30
+      const ebStacks = Math.min(10, Math.max(0, slot.runeStacks?.eyeball ?? 10))
+      if (ebStacks >= 10) {
+        if (isApAdaptive) bonusAp += 30
+        else bonusAd += 18
       } else {
-        bonusAd += 18
+        if (isApAdaptive) bonusAp += ebStacks * 2
+        else bonusAd += ebStacks * 1.2
       }
     } else if (runeName.includes('absolute focus')) {
       const apVal = 1.8 + (lvl - 1) * (16.2 / 17)
@@ -357,14 +370,29 @@ export const calculateStats = (slot: DraftSlot) => {
         bonusAd += adVal
       }
     } else if (runeName.includes('gathering storm')) {
-      const apBonus = lvl >= 16 ? 48 : lvl >= 11 ? 24 : lvl >= 6 ? 8 : 0
+      const gsMin =
+        slot.runeStacks?.gatheringStorm ??
+        (lvl >= 16 ? 30 : lvl >= 11 ? 20 : lvl >= 6 ? 10 : 0)
+      const intervals = Math.floor(gsMin / 10)
+      const apBonus =
+        intervals === 1
+          ? 8
+          : intervals === 2
+            ? 24
+            : intervals === 3
+              ? 48
+              : intervals === 4
+                ? 80
+                : intervals >= 5
+                  ? 120
+                  : 0
       if (isApAdaptive) {
         bonusAp += apBonus
       } else {
         bonusAd += apBonus * 0.6
       }
     } else if (runeName.includes('conqueror')) {
-      const stacks = Math.min(12, Math.max(0, slot.conquerorStacks ?? 12))
+      const stacks = Math.min(12, Math.max(0, slot.runeStacks?.conqueror ?? slot.conquerorStacks ?? 12))
       const adaptivePerStack = 1.8 + (lvl - 1) * (1.8 / 17)
       const totalAdaptive = stacks * adaptivePerStack
       if (isApAdaptive) {
@@ -373,18 +401,26 @@ export const calculateStats = (slot: DraftSlot) => {
         bonusAd += totalAdaptive * 0.6
       }
       if (stacks >= 12) {
-        const isMelee = (stats.attackrange || 125) <= 225
         bonusOmnivamp += isMelee ? 8 : 5
       }
     } else if (runeName.includes('lethal tempo')) {
-      const stacks = Math.min(6, Math.max(0, slot.lethalTempoStacks ?? 6))
+      const stacks = Math.min(6, Math.max(0, slot.runeStacks?.lethalTempo ?? slot.lethalTempoStacks ?? 6))
       const asPerStack = 0.05 + (lvl - 1) * (0.11 / 17)
       bonusAsPercent += stacks * asPerStack
     } else if (runeName.includes('hail of blades') || runeName.includes('hailofblades')) {
-      const isMelee = (stats.attackrange || 125) <= 225
       const isActive = slot.hailOfBladesActive ?? true
       if (isActive) {
         bonusAsPercent += isMelee ? 1.1 : 0.8
+      }
+    } else if (runeName.includes('jack of all trades') || runeName.includes('jackofalltrades')) {
+      const joatStacks = Math.min(10, Math.max(0, slot.runeStacks?.jackOfAllTrades ?? 5))
+      bonusHaste += joatStacks
+      if (joatStacks >= 10) {
+        if (isApAdaptive) bonusAp += 25
+        else bonusAd += 15
+      } else if (joatStacks >= 5) {
+        if (isApAdaptive) bonusAp += 10
+        else bonusAd += 6
       }
     } else if (runeName.includes('celerity')) {
       bonusMsPercent += 0.01
@@ -406,8 +442,8 @@ export const calculateStats = (slot: DraftSlot) => {
 
   for (const item of slot.items || []) {
     if (!item) continue
-    const name = item.name.toLowerCase()
-    const desc = item.description.toLowerCase()
+    const name = (item.name || '').toLowerCase()
+    const desc = (item.description || '').toLowerCase()
     const itemId = String(item.id || '')
 
     // 1. Rabadon's Deathcap: Increases AP by X%

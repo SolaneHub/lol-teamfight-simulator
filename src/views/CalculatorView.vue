@@ -2369,6 +2369,182 @@ const getBadgeDisplay = (badgeText: string): { label: string; iconUrl?: string }
     }
   }
 
+  // 31. Arcane Comet
+  if (clean.includes('Arcane Comet')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/sorcery/arcanecomet/arcanecomet.png`,
+    }
+  }
+
+  // 32. Summon Aery
+  if (clean.includes('Aery')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/sorcery/summonaery/summonaery.png`,
+    }
+  }
+
+  // 33. Phase Rush
+  if (clean.includes('Phase Rush')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/sorcery/phaserush/stormraiderssurgeruneicon2.png`,
+    }
+  }
+
+  // 34. Fleet Footwork
+  if (clean.includes('Fleet')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/precision/fleetfootwork/fleetfootwork.png`,
+    }
+  }
+
+  // 35. Grasp of the Undying
+  if (clean.includes('Grasp')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/resolve/graspoftheundying/graspoftheundying.png`,
+    }
+  }
+
+  // 36. Aftershock
+  if (clean.includes('Aftershock')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/resolve/veteranaftershock/veteranaftershock.png`,
+    }
+  }
+
+  // 37. Guardian
+  if (clean.includes('Guardian') && !clean.includes('Angel')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/resolve/guardian/guardian.png`,
+    }
+  }
+
+  // 38. Glacial Augment
+  if (clean.includes('Glacial')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/inspiration/glacialaugment/glacialaugment.png`,
+    }
+  }
+
+  // 39. Cheap Shot
+  if (clean.includes('Cheap Shot')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/domination/cheapshot/cheapshot.png`,
+    }
+  }
+
+  // 40. Taste of Blood
+  if (clean.includes('Taste of Blood')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/domination/tasteofblood/greenterror_tasteofblood.png`,
+    }
+  }
+
+  // 41. Sudden Impact
+  if (clean.includes('Sudden Impact')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/domination/suddenimpact/suddenimpact.png`,
+    }
+  }
+
+  // 42. Scorch
+  if (clean.includes('Scorch')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/sorcery/scorch/scorch.png`,
+    }
+  }
+
+  // 43. Shield Bash
+  if (clean.includes('Shield Bash')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/resolve/mirrorshell/mirrorshell.png`,
+    }
+  }
+
+  // 44. Bone Plating
+  if (clean.includes('Bone Plating')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/resolve/boneplating/boneplating.png`,
+    }
+  }
+
+  // 45. Second Wind
+  if (clean.includes('Second Wind')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/resolve/secondwind/secondwind.png`,
+    }
+  }
+
+  // 46. Font of Life
+  if (clean.includes('Font of Life')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/resolve/fontoflife/fontoflife.png`,
+    }
+  }
+
+  // 47. Biscuit Delivery
+  if (clean.includes('Biscuit')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/inspiration/biscuitdelivery/biscuitdelivery.png`,
+    }
+  }
+
+  // 48. Triumph
+  if (clean.includes('Triumph')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/precision/triumph.png`,
+    }
+  }
+
+  // 49. Absorb Life
+  if (clean.includes('Absorb Life')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/precision/absorblife/absorblife.png`,
+    }
+  }
+
+  // 50. Presence of Mind
+  if (clean.includes('PoM')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/precision/presenceofmind/presenceofmind.png`,
+    }
+  }
+
+  // 51. Axiom Arcanist
+  if (clean.includes('Axiom Arcanist')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/sorcery/nullifyingorb/axiom_arcanist.png`,
+    }
+  }
+
+  // 52. Conqueror Vamp
+  if (clean.includes('Conq Vamp')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/precision/conqueror/conqueror.png`,
+    }
+  }
+
   const withoutEmoji = clean.replace(/^[^\w\s+()%-&]+/, '').trim()
   return { label: withoutEmoji || clean }
 }

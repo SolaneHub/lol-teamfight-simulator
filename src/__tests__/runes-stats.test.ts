@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { calculateStats } from '../services/draft/draftService'
 import { mapItem, getItemIconUrl } from '../services/items/itemService'
+import { getEquippedStackableRunes, getRuneStackValue } from '../services/runes/runeStackService'
+import { runCombatSimulation } from '../services/combat/combatSimulationService'
 import type { DraftSlot, Champion, Rune } from '../types'
 
 const mockChampionAP: Champion = {
@@ -461,5 +463,292 @@ describe('Domination Tree Runes', () => {
     expect(mapped.stats.FlatPhysicalDamageMod).toBe(80)
     expect(mapped.stats.FlatCritChanceMod).toBe(0.25)
     expect(getItemIconUrl(mapped, '16.17.1')).toContain('3031_marksman_t3_infinityedge.png')
+  })
+})
+
+describe('Stackable Runes Service & Detection', () => {
+  it('detects equipped stackable runes on a slot', () => {
+    const darkHarvest: Rune = { id: 8128, key: 'DarkHarvest', name: 'Dark Harvest', icon: '' }
+    const grasp: Rune = { id: 8437, key: 'GraspOfTheUndying', name: 'Grasp of the Undying', icon: '' }
+    const alacrity: Rune = { id: 9104, key: 'LegendAlacrity', name: 'Legend: Alacrity', icon: '' }
+    const overgrowth: Rune = { id: 8451, key: 'Overgrowth', name: 'Overgrowth', icon: '' }
+
+    const slot = createSlot(mockChampionAD, [darkHarvest, alacrity, overgrowth, grasp])
+    const equipped = getEquippedStackableRunes(slot)
+    const keys = equipped.map((e) => e.key)
+
+    expect(keys).toContain('darkHarvest')
+    expect(keys).toContain('legendAlacrity')
+    expect(keys).toContain('overgrowth')
+    expect(keys).toContain('grasp')
+  })
+
+  it('reads configured stack value with defaults fallback', () => {
+    const slot = createSlot(mockChampionAD, [], 1, {
+      runeStacks: {
+        darkHarvest: 18,
+        grasp: 30,
+      },
+    })
+    expect(getRuneStackValue(slot, 'darkHarvest')).toBe(18)
+    expect(getRuneStackValue(slot, 'grasp')).toBe(30)
+    // Fallback to default
+    expect(getRuneStackValue(slot, 'conqueror')).toBe(12)
+    expect(getRuneStackValue(slot, 'legendAlacrity')).toBe(10)
+  })
+})
+
+describe('Stackable Runes Dynamic Stats Scaling', () => {
+  it('scales Grasp of the Undying HP with runeStacks (melee vs ranged)', () => {
+    const grasp: Rune = { id: 8437, key: 'GraspOfTheUndying', name: 'Grasp of the Undying', icon: '' }
+
+    // Darius is melee (attack range 175 <= 225) -> +7 HP per stack
+    const slotMelee = createSlot(mockChampionAD, [grasp], 1, {
+      runeStacks: { grasp: 10 },
+    })
+    const statsMelee = calculateStats(slotMelee)
+    expect(statsMelee?.hp.bonus).toBe(70)
+
+    // Ahri is ranged (attack range 550 > 225) -> +4 HP per stack
+    const slotRanged = createSlot(mockChampionAP, [grasp], 1, {
+      runeStacks: { grasp: 10 },
+    })
+    const statsRanged = calculateStats(slotRanged)
+    expect(statsRanged?.hp.bonus).toBe(40)
+  })
+
+  it('scales Overgrowth HP and activates +3.5% max HP multiplier at >= 15 stacks', () => {
+    const overgrowth: Rune = { id: 8451, key: 'Overgrowth', name: 'Overgrowth', icon: '' }
+
+    // 10 stacks: +30 flat HP, no % bonus
+    const slot10 = createSlot(mockChampionAD, [overgrowth], 1, {
+      runeStacks: { overgrowth: 10 },
+    })
+    const stats10 = calculateStats(slot10)
+    expect(stats10?.hp.bonus).toBe(30)
+    expect(stats10?.hp.total).toBe(652 + 30)
+
+    // 20 stacks: +60 flat HP, +3.5% max HP bonus
+    const slot20 = createSlot(mockChampionAD, [overgrowth], 1, {
+      runeStacks: { overgrowth: 20 },
+    })
+    const stats20 = calculateStats(slot20)
+    const expected = Math.round((652 + 60) * 1.035)
+    expect(stats20?.hp.total).toBe(expected)
+  })
+
+  it('scales Legend: Alacrity attack speed with runeStacks', () => {
+    const alacrity: Rune = { id: 9104, key: 'LegendAlacrity', name: 'Legend: Alacrity', icon: '' }
+
+    // 0 stacks: base 3% AS
+    const slot0 = createSlot(mockChampionAD, [alacrity], 1, {
+      runeStacks: { legendAlacrity: 0 },
+    })
+    const stats0 = calculateStats(slot0)
+
+    // 10 stacks: 3% + 15% = 18% AS
+    const slot10 = createSlot(mockChampionAD, [alacrity], 1, {
+      runeStacks: { legendAlacrity: 10 },
+    })
+    const stats10 = calculateStats(slot10)
+    expect(stats10!.as.total).toBeGreaterThan(stats0!.as.total)
+    expect(stats10!.as.total).toBeCloseTo(0.738, 2)
+  })
+
+  it('scales Legend: Bloodline lifesteal and grants +85 HP at 15 stacks', () => {
+    const bloodline: Rune = { id: 9103, key: 'LegendBloodline', name: 'Legend: Bloodline', icon: '' }
+
+    const slot5 = createSlot(mockChampionAD, [bloodline], 1, {
+      runeStacks: { legendBloodline: 5 },
+    })
+    const stats5 = calculateStats(slot5)
+    expect(stats5?.lifeSteal.bonus).toBeCloseTo(1.75, 2)
+    expect(stats5?.hp.bonus).toBe(0)
+
+    const slot15 = createSlot(mockChampionAD, [bloodline], 1, {
+      runeStacks: { legendBloodline: 15 },
+    })
+    const stats15 = calculateStats(slot15)
+    expect(stats15?.lifeSteal.bonus).toBeCloseTo(5.25, 2)
+    expect(stats15?.hp.bonus).toBe(85)
+  })
+
+  it('scales Jack of All Trades ability haste and adaptive force milestones', () => {
+    const joat: Rune = { id: 8306, key: 'JackOfAllTrades', name: 'Jack of All Trades', icon: '' }
+
+    // 4 stacks: +4 AH, 0 AP/AD
+    const slot4 = createSlot(mockChampionAP, [joat], 1, {
+      runeStacks: { jackOfAllTrades: 4 },
+    })
+    const stats4 = calculateStats(slot4)
+    expect(stats4?.abilityHaste.total).toBe(4)
+    expect(stats4?.ap.bonus).toBe(0)
+
+    // 5 stacks: +5 AH, +10 AP (Mage adaptive)
+    const slot5 = createSlot(mockChampionAP, [joat], 1, {
+      runeStacks: { jackOfAllTrades: 5 },
+    })
+    const stats5 = calculateStats(slot5)
+    expect(stats5?.abilityHaste.total).toBe(5)
+    expect(stats5?.ap.bonus).toBe(10)
+
+    // 10 stacks: +10 AH, +25 AP
+    const slot10 = createSlot(mockChampionAP, [joat], 1, {
+      runeStacks: { jackOfAllTrades: 10 },
+    })
+    const stats10 = calculateStats(slot10)
+    expect(stats10?.abilityHaste.total).toBe(10)
+    expect(stats10?.ap.bonus).toBe(25)
+  })
+
+  it('scales Gathering Storm adaptive stats across 10-minute intervals', () => {
+    const gatheringStorm: Rune = {
+      id: 8237,
+      key: 'GatheringStorm',
+      name: 'Gathering Storm',
+      icon: '',
+    }
+
+    const slot20 = createSlot(mockChampionAP, [gatheringStorm], 1, {
+      runeStacks: { gatheringStorm: 20 },
+    })
+    const stats20 = calculateStats(slot20)
+    expect(stats20?.ap.bonus).toBe(24)
+
+    const slot40 = createSlot(mockChampionAP, [gatheringStorm], 1, {
+      runeStacks: { gatheringStorm: 40 },
+    })
+    const stats40 = calculateStats(slot40)
+    expect(stats40?.ap.bonus).toBe(80)
+  })
+})
+
+describe('Combat Simulation Rune Triggers & Badges', () => {
+  it('triggers Arcane Comet on ability damage and records badge', () => {
+    const comet: Rune = { id: 8229, key: 'ArcaneComet', name: 'Arcane Comet', icon: '' }
+    const attacker = createSlot(mockChampionAP, [comet], 6, { id: 1, side: 'blue' })
+    const defender = createSlot(mockChampionAD, [], 6, { id: 2, side: 'red' })
+
+    const result = runCombatSimulation({
+      allSlots: [attacker, defender],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [2],
+      actions: [{ actorSlotId: 1, action: 'Q', timestamp: 0.1 }],
+      duration: 2,
+    })
+
+    const cometEvent = result.events.find((e) => e.badges?.some((b) => b.includes('Arcane Comet')))
+    expect(cometEvent).toBeDefined()
+    expect(cometEvent?.badges).toContainEqual(expect.stringContaining('☄️ Arcane Comet'))
+  })
+
+  it('triggers Summon Aery on ability or attack and records badge', () => {
+    const aery: Rune = { id: 8214, key: 'SummonAery', name: 'Summon Aery', icon: '' }
+    const attacker = createSlot(mockChampionAP, [aery], 6, { id: 1, side: 'blue' })
+    const defender = createSlot(mockChampionAD, [], 6, { id: 2, side: 'red' })
+
+    const result = runCombatSimulation({
+      allSlots: [attacker, defender],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [2],
+      actions: [{ actorSlotId: 1, action: 'Q', timestamp: 0.1 }],
+      duration: 2,
+    })
+
+    const aeryEvent = result.events.find((e) => e.badges?.some((b) => b.includes('Aery')))
+    expect(aeryEvent).toBeDefined()
+    expect(aeryEvent?.badges).toContainEqual(expect.stringContaining('🕊️ Aery'))
+  })
+
+  it('triggers Grasp of the Undying on basic attack and records badge with heal', () => {
+    const grasp: Rune = { id: 8437, key: 'GraspOfTheUndying', name: 'Grasp of the Undying', icon: '' }
+    const attacker = createSlot(mockChampionAD, [grasp], 6, { id: 1, side: 'blue' })
+    const defender = createSlot(mockChampionAP, [], 6, { id: 2, side: 'red' })
+
+    const result = runCombatSimulation({
+      allSlots: [attacker, defender],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [2],
+      actions: [{ actorSlotId: 1, action: 'AA', timestamp: 0.1 }],
+      duration: 2,
+    })
+
+    const graspEvent = result.events.find((e) => e.badges?.some((b) => b.includes('Grasp')))
+    expect(graspEvent).toBeDefined()
+    expect(graspEvent?.badges).toContainEqual(expect.stringContaining('✊ Grasp'))
+  })
+
+  it('triggers Fleet Footwork on basic attack and records badge with heal', () => {
+    const fleet: Rune = { id: 8021, key: 'FleetFootwork', name: 'Fleet Footwork', icon: '' }
+    const attacker = createSlot(mockChampionAD, [fleet], 6, { id: 1, side: 'blue' })
+    const defender = createSlot(mockChampionAP, [], 6, { id: 2, side: 'red' })
+
+    const result = runCombatSimulation({
+      allSlots: [attacker, defender],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [2],
+      actions: [{ actorSlotId: 1, action: 'AA', timestamp: 0.1 }],
+      duration: 2,
+    })
+
+    const fleetEvent = result.events.find((e) => e.badges?.some((b) => b.includes('Fleet')))
+    expect(fleetEvent).toBeDefined()
+    expect(fleetEvent?.badges).toContainEqual(expect.stringContaining('⚡ Fleet'))
+  })
+
+  it('triggers Dark Harvest scaling with user-configured stacks and records stack badge', () => {
+    const darkHarvest: Rune = { id: 8128, key: 'DarkHarvest', name: 'Dark Harvest', icon: '' }
+    const bfSword = {
+      id: '1038',
+      name: 'B.F. Sword',
+      stats: { FlatPhysicalDamageMod: 500 },
+      description: '',
+      gold: { total: 1300, base: 1300, purchasable: true, sell: 910 },
+      tags: [],
+    }
+    const attacker = createSlot(mockChampionAD, [darkHarvest], 1, {
+      id: 1,
+      side: 'blue',
+      items: [bfSword],
+      runeStacks: { darkHarvest: 15 },
+    })
+    const defender = createSlot(mockChampionAP, [], 1, { id: 2, side: 'red' })
+
+    // First AA brings defender below 50% HP; second AA procs Dark Harvest
+    const result = runCombatSimulation({
+      allSlots: [attacker, defender],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [2],
+      actions: [
+        { actorSlotId: 1, action: 'AA', timestamp: 0.1 },
+        { actorSlotId: 1, action: 'AA', timestamp: 2.0 },
+      ],
+      duration: 4,
+    })
+
+    const dhEvent = result.events.find((e) => e.badges?.some((b) => b.includes('Dark Harvest')))
+    expect(dhEvent).toBeDefined()
+    expect(dhEvent?.badges).toContainEqual(expect.stringContaining('15x'))
+  })
+
+  it('triggers Bone Plating on defender taking damage and blocks incoming damage', () => {
+    const bonePlating: Rune = { id: 8473, key: 'BonePlating', name: 'Bone Plating', icon: '' }
+    const attacker = createSlot(mockChampionAD, [], 6, { id: 1, side: 'blue' })
+    const defender = createSlot(mockChampionAP, [bonePlating], 6, { id: 2, side: 'red' })
+
+    const result = runCombatSimulation({
+      allSlots: [attacker, defender],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [2],
+      actions: [
+        { actorSlotId: 1, action: 'AA', timestamp: 0.1 },
+        { actorSlotId: 1, action: 'AA', timestamp: 1.0 },
+      ],
+      duration: 3,
+    })
+
+    const bpEvent = result.events.find((e) => e.badges?.some((b) => b.includes('Bone Plating')))
+    expect(bpEvent).toBeDefined()
+    expect(bpEvent?.badges).toContainEqual(expect.stringContaining('🦴 Bone Plating'))
   })
 })

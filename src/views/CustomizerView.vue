@@ -210,6 +210,57 @@
                   </button>
                 </div>
               </div>
+
+              <!-- Stackable Runes Configuration Bar -->
+              <div
+                v-if="equippedStackableRunes.length > 0"
+                class="flex flex-col gap-2 p-3 bg-slate-950/80 border border-amber-500/30 rounded-xl mt-2"
+              >
+                <div class="flex items-center justify-between">
+                  <span
+                    class="text-xs uppercase font-mono font-bold text-amber-400 tracking-wider flex items-center gap-1.5"
+                  >
+                    <span>🔮</span> RUNE STACKS CONFIGURATION
+                  </span>
+                  <span class="text-xs text-slate-500 font-mono">
+                    {{ equippedStackableRunes.length }} Active Stackable {{ equippedStackableRunes.length === 1 ? 'Rune' : 'Runes' }}
+                  </span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  <div
+                    v-for="runeInfo in equippedStackableRunes"
+                    :key="runeInfo.key"
+                    class="flex items-center justify-between p-2 rounded-lg bg-slate-900/90 border border-slate-800 hover:border-amber-500/40 transition-all gap-2"
+                  >
+                    <div class="flex items-center gap-2 min-w-0">
+                      <img
+                        :src="`${base}${runeInfo.icon}`"
+                        :alt="runeInfo.name"
+                        class="w-7 h-7 rounded-full object-contain shrink-0 border border-amber-500/30 p-0.5 bg-slate-950"
+                      />
+                      <div class="flex flex-col min-w-0">
+                        <span class="text-xs font-bold text-white truncate">{{ runeInfo.name }}</span>
+                        <span class="text-[11px] font-mono text-emerald-400 truncate">
+                          {{ runeInfo.description(getCurrentRuneStacks(runeInfo.key), isCurrentSlotMelee) }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-1 shrink-0">
+                      <input
+                        type="number"
+                        :min="runeInfo.min"
+                        :max="runeInfo.max"
+                        :value="getCurrentRuneStacks(runeInfo.key)"
+                        @input="onRuneStackInput(runeInfo.key, $event)"
+                        class="w-14 h-7 text-center font-mono font-bold text-sm bg-slate-950 text-amber-300 border border-amber-500/40 rounded px-1 focus:outline-none focus:border-amber-400"
+                      />
+                      <span v-if="runeInfo.unit" class="text-xs font-mono text-slate-400">{{ runeInfo.unit }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -765,6 +816,10 @@ import {
   formatTooltipTags,
   isChampionImplemented,
 } from '@/services'
+import {
+  getEquippedStackableRunes,
+  getRuneStackValue,
+} from '@/services/runes/runeStackService'
 import type { Champion, ChampionPassive, ChampionSpells, Item, Rune, RuneKeystone } from '@/types'
 import TeamDraftPanel from '@/components/draft/TeamDraftPanel.vue'
 import StatsTable from '@/components/customizer/StatsTable.vue'
@@ -780,6 +835,7 @@ const {
   assignChampion,
   unassignSlot,
   removeRunePage,
+  setRuneStack,
   removeItemFromSlot,
   toggleMasterwork,
   setItemStack,
@@ -789,6 +845,29 @@ const {
 
 const ddragonStore = useDDragonStore()
 const { spellFormulasData, allChampions, isLoading: isLoadingChampions } = storeToRefs(ddragonStore)
+
+const base = import.meta.env.BASE_URL
+
+const isCurrentSlotMelee = computed(() => {
+  const range = activeCustomizerSlot.value?.champion?.stats?.attackrange || 125
+  return range <= 225
+})
+
+const equippedStackableRunes = computed(() => {
+  if (!activeCustomizerSlot.value) return []
+  return getEquippedStackableRunes(activeCustomizerSlot.value)
+})
+
+const getCurrentRuneStacks = (runeKey: string): number => {
+  if (!activeCustomizerSlot.value) return 0
+  return getRuneStackValue(activeCustomizerSlot.value, runeKey)
+}
+
+const onRuneStackInput = (runeKey: string, evt: Event) => {
+  const target = evt.target as HTMLInputElement
+  const val = parseInt(target.value, 10)
+  setRuneStack(runeKey, isNaN(val) ? 0 : val)
+}
 
 const searchQuery = ref('')
 

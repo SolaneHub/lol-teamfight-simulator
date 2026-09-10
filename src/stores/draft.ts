@@ -492,6 +492,18 @@ export const useDraftStore = defineStore('draft', () => {
     activeCustomizerSlot.value.itemStacks[itemIndex] = clamped
   }
 
+  const setRuneStack = (runeKey: string, stacks: number) => {
+    if (!activeCustomizerSlot.value) return
+    if (!activeCustomizerSlot.value.runeStacks) {
+      activeCustomizerSlot.value.runeStacks = {}
+    }
+    const val = Math.max(0, isNaN(stacks) ? 0 : stacks)
+    activeCustomizerSlot.value.runeStacks[runeKey] = val
+    if (runeKey === 'conqueror') activeCustomizerSlot.value.conquerorStacks = val
+    if (runeKey === 'lethalTempo') activeCustomizerSlot.value.lethalTempoStacks = val
+    if (runeKey === 'darkHarvest') activeCustomizerSlot.value.darkHarvestStacks = val
+  }
+
   const selectItemForSlot = (idx: number, item: Item) => {
     if (activeCustomizerSlot.value) {
       activeCustomizerSlot.value.items[idx] = item
@@ -582,6 +594,7 @@ export const useDraftStore = defineStore('draft', () => {
     selectPrimaryRune,
     toggleSecondaryRune,
     removeRunePage,
+    setRuneStack,
 
     // Shards
     setShardOffensive,
