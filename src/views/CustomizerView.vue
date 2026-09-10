@@ -1282,7 +1282,7 @@ const getStatLabel = (statKey: string): string => {
     case 'abilityHaste':
       return 'AH'
     case 'healShieldPower':
-      return 'Heal & Shield Power'
+      return 'H&S Power'
     default:
       return ''
   }
@@ -1304,9 +1304,58 @@ const getStatColorClass = (statKey: string): string => {
       return 'text-teal-300 font-semibold'
     case 'abilityHaste':
       return 'text-teal-300 font-semibold'
+    case 'healShieldPower':
+      return 'text-teal-300 font-semibold'
     default:
       return 'text-slate-300 font-semibold'
   }
+}
+
+const isShieldOrHealFormula = (
+  rawTooltip: string,
+  keyName: string,
+  matchedKey?: string,
+): 'shield' | 'heal' | false => {
+  const k = (matchedKey || keyName).toLowerCase().replace(/[*0-9\s-]/g, '')
+  if (
+    k.includes('duration') ||
+    k.includes('cooldown') ||
+    k.includes('delay') ||
+    k.includes('breakpoint') ||
+    k.includes('reduction') ||
+    k.includes('steal') ||
+    k.includes('damage') ||
+    k.includes('timer') ||
+    k.includes('vamp') ||
+    k.includes('healandshieldpower') ||
+    k.includes('frequency') ||
+    k.includes('seconds') ||
+    k.includes('bonushealth') ||
+    k.includes('cost') ||
+    k.includes('threshold') ||
+    k.includes('speed')
+  ) {
+    return false
+  }
+
+  const escapedKey = keyName.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')
+  const tagShieldRegex = new RegExp(
+    `<shield>[^<]*?\\{\\{\\s*${escapedKey}\\s*\\}\\}[^<]*?<\\/shield>`,
+    'i',
+  )
+  const tagHealingRegex = new RegExp(
+    `<(healing|heal)>[^<]*?\\{\\{\\s*${escapedKey}\\s*\\}\\}[^<]*?<\\/(healing|heal)>`,
+    'i',
+  )
+  if (tagShieldRegex.test(rawTooltip)) return 'shield'
+  if (tagHealingRegex.test(rawTooltip)) return 'heal'
+
+  if (k.includes('shield') || k.includes('shielding')) return 'shield'
+  const withoutHealth = k.replace(/health/g, '')
+  if (withoutHealth.includes('heal') || withoutHealth.includes('healing')) return 'heal'
+  if (/(^|_)hot($|_)/.test(k) || k.startsWith('totalhot') || k.includes('hotheal')) return 'heal'
+
+  return false
 }
 
 const interpolateSpellTooltip = (
@@ -1317,7 +1366,8 @@ const interpolateSpellTooltip = (
 ): string => {
   if (!spell) return ''
   const sp = spell as ChampionSpells
-  let tooltip = sp.tooltip || sp.description || ''
+  const rawTooltip = sp.tooltip || sp.description || ''
+  let tooltip = rawTooltip
 
   // Fallback to description if tooltip is a raw nested localization key
   if (/^\{\{\s*Spell_/i.test(tooltip.trim())) {
@@ -1382,6 +1432,9 @@ const interpolateSpellTooltip = (
     }
 
     let replacementValue: string | null = null
+    let effectType = isShieldOrHealFormula(rawTooltip, cleanName)
+    const hsp = stats?.healShieldPower?.total || 0
+    let hspMult = effectType && hsp > 0 ? 1 + hsp / 100 : 1
 
     // 1. Search in spellFormulas.json config
     if (spellConfig) {
@@ -1409,12 +1462,18 @@ const interpolateSpellTooltip = (
         }
       }
 
+      const matchedType = isShieldOrHealFormula(rawTooltip, cleanName, matchedKey)
+      if (matchedType) {
+        effectType = matchedType
+        hspMult = hsp > 0 ? 1 + hsp / 100 : 1
+      }
+
       if (matchedKey && spellConfig[matchedKey]) {
         const config = spellConfig[matchedKey]
         if (typeof config === 'string' || typeof config === 'number') {
           const num = parseFloat(config.toString())
           const effM = calcEffectiveMultiplier(num)
-          let val = Math.round(num * effM * 100) / 100
+          let val = Math.round(num * effM * (effectType ? hspMult : 1) * 100) / 100
           if (isNegativeMultiplier) val = Math.abs(val)
           replacementValue = val.toString()
         } else if (config && typeof config === 'object') {
@@ -1453,8 +1512,20 @@ const interpolateSpellTooltip = (
           else if (dmgType === 'true') colorClass = 'text-white font-bold'
           else if (dmgType === 'cc' || dmgType === 'status') colorClass = 'text-purple-400'
 
+          if (effectType === 'shield') {
+            colorClass = 'text-slate-100 font-semibold'
+          } else if (effectType === 'heal') {
+            colorClass = 'text-emerald-400 font-semibold'
+          }
+
           if (scalings.length === 0) {
-            replacementValue = `<span class="${colorClass} font-semibold">${base}${suffix}</span>`
+            let finalVal = base
+            let hspDetail = ''
+            if (effectType && hsp > 0 && !isRatio) {
+              finalVal = Math.round(base * hspMult)
+              hspDetail = ` <span class="text-slate-400 font-normal text-base">(${base}${suffix} + <span class="text-teal-300 font-semibold">${hsp}% H&S Power</span>)</span>`
+            }
+            replacementValue = `<span class="${colorClass} font-semibold">${finalVal}${suffix}</span>${hspDetail}`
           } else {
             let scalingBonus = 0
             const scalingDetails: string[] = []
@@ -1485,7 +1556,8 @@ const interpolateSpellTooltip = (
               scalingDetails.push(`<span class="${statColor}">${ratioPct}% ${statLabel}</span>`)
             }
 
-            const rawTotal = baseRaw * effM + scalingBonus
+            const rawTotal =
+              (baseRaw * effM + scalingBonus) * (effectType && !isRatio ? hspMult : 1)
             let totalValue = Math.round(
               rawTotal * (isRatio && Math.abs(baseRaw) < 1.0 && Math.abs(effM) === 1 ? 100 : 1),
             )
@@ -1496,6 +1568,11 @@ const interpolateSpellTooltip = (
               base > 0 ? `<span class="${primaryStatColor}">${base}${suffix}</span>` : ''
             if (scalingDetails.length > 0) {
               detailsText += (detailsText ? ' + ' : '') + scalingDetails.join(' + ')
+            }
+            if (effectType && hsp > 0 && !isRatio) {
+              detailsText +=
+                (detailsText ? ' + ' : '') +
+                `<span class="text-teal-300 font-semibold">${hsp}% H&S Power</span>`
             }
 
             replacementValue = `<span class="${colorClass} font-semibold">${totalValue}${suffix}</span>`
@@ -1574,8 +1651,10 @@ const interpolateSpellTooltip = (
 
           const statValue = getStatValue(stats, stat)
           const bonusVal = statValue * ratioVal
+          const rawCalculated =
+            (baseRaw * multiplier + bonusVal) * (effectType && !isRatio ? hspMult : 1)
           const totalVal = Math.round(
-            (baseRaw * multiplier + bonusVal) *
+            rawCalculated *
               (isRatio && Math.abs(baseRaw) < 1.0 && Math.abs(multiplier) === 1 ? 100 : 1),
           )
           const statLabel = getStatLabel(stat)
@@ -1588,8 +1667,17 @@ const interpolateSpellTooltip = (
               (detailsText ? ' + ' : '') +
               `<span class="${statColor}">${ratioPct}% ${statLabel}</span>`
           }
+          if (effectType && hsp > 0 && !isRatio) {
+            detailsText +=
+              (detailsText ? ' + ' : '') +
+              `<span class="text-teal-300 font-semibold">${hsp}% H&S Power</span>`
+          }
 
-          replacementValue = `<span class="text-cyan-400 font-semibold">${totalVal}${suffix}</span>`
+          let colorClass = 'text-cyan-400 font-semibold'
+          if (effectType === 'shield') colorClass = 'text-slate-100 font-semibold'
+          else if (effectType === 'heal') colorClass = 'text-emerald-400 font-semibold'
+
+          replacementValue = `<span class="${colorClass}">${totalVal}${suffix}</span>`
           if (detailsText) {
             replacementValue += ` <span class="text-slate-400 font-normal text-base">(${detailsText})</span>`
           }
@@ -1736,7 +1824,41 @@ const interpolatePassiveDescription = (
             keyLower.includes('pdamage') ||
             (base > 0 && base < 1))
 
-        const rawVal = base + scalingBonus
+        const rawVal =
+          (base + scalingBonus) *
+          (!isCooldown &&
+          !isRatio &&
+          !keyLower.includes('damage') &&
+          !keyLower.includes('timer') &&
+          !keyLower.includes('vamp') &&
+          !keyLower.includes('delay') &&
+          !keyLower.includes('cooldown') &&
+          (keyLower.includes('shield') ||
+            keyLower.replace(/health/g, '').includes('heal') ||
+            keyLower.replace(/health/g, '').includes('healing') ||
+            keyLower.startsWith('totalhot')) &&
+          (stats?.healShieldPower?.total || 0) > 0
+            ? 1 + (stats?.healShieldPower?.total || 0) / 100
+            : 1)
+
+        const isPassiveShieldOrHeal =
+          !isCooldown &&
+          !isRatio &&
+          !keyLower.includes('damage') &&
+          !keyLower.includes('timer') &&
+          !keyLower.includes('vamp') &&
+          !keyLower.includes('delay') &&
+          !keyLower.includes('cooldown') &&
+          (keyLower.includes('shield') ||
+            keyLower.replace(/health/g, '').includes('heal') ||
+            keyLower.replace(/health/g, '').includes('healing') ||
+            keyLower.startsWith('totalhot'))
+
+        const hsp = stats?.healShieldPower?.total || 0
+        if (isPassiveShieldOrHeal && hsp > 0) {
+          scalingDetails.push(`${hsp}% H&S Power`)
+        }
+
         let displayVal = rawVal
         let unitSuffix = ''
 
@@ -1765,6 +1887,12 @@ const interpolatePassiveDescription = (
         if (dmgType === 'physical') colorClass = 'text-orange-400'
         else if (dmgType === 'true') colorClass = 'text-white font-bold'
         else if (dmgType === 'cc' || dmgType === 'status') colorClass = 'text-purple-400'
+
+        if (isPassiveShieldOrHeal && keyLower.includes('shield')) {
+          colorClass = 'text-slate-100 font-semibold'
+        } else if (isPassiveShieldOrHeal) {
+          colorClass = 'text-emerald-400 font-semibold'
+        }
 
         let valHtml = `<span class="${colorClass} font-semibold">${displayVal}${unitSuffix}</span>`
         const skipRangeKeys = ['damage', 'pdamage', 'cooldown', 'monsterdamagecap']

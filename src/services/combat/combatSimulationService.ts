@@ -302,7 +302,8 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       initialShield += Math.round(hp * 0.18)
     }
     if (initialPassives.hasLocket) {
-      initialShield += Math.round(200 + ((slot.level || 1) - 1) * (160 / 17))
+      const hspMult = 1 + (baseStats?.healShieldPower?.total || 0) / 100
+      initialShield += Math.round((200 + ((slot.level || 1) - 1) * (160 / 17)) * hspMult)
     }
 
     participants[slotId] = {
@@ -603,7 +604,9 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       target.currentHp - effectiveDamage < target.maxHp * 0.3
     ) {
       target.lifelineTriggered = true
-      const shieldMult = targetPassives.hasSpiritVisage ? 1.25 : 1.0
+      const targetLive = getLiveStats(target)
+      const hspMult = 1 + (targetLive.healShieldPower || 0) / 100
+      const shieldMult = (targetPassives.hasSpiritVisage ? 1.25 : 1.0) * hspMult
       let lifelineShield = 0
       let lifelineBadge = ''
 
@@ -678,7 +681,8 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         target.isKo = true
         if (actorPassives.hasCryptbloom) {
           const actorLive = getLiveStats(actor)
-          const novaHeal = Math.round(50 + actorLive.ap * 0.5)
+          const novaHspMult = 1 + (actorLive.healShieldPower || 0) / 100
+          const novaHeal = Math.round((50 + actorLive.ap * 0.5) * novaHspMult)
           const allies = Object.values(participants).filter((p) => p.side === actor.side && !p.isKo)
           allies.forEach((ally) => {
             const healMult =
@@ -701,7 +705,9 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         }
       }
     } else if (target.currentHp / target.maxHp < 0.3 && !target.lifelineTriggered) {
-      const shieldMult = targetPassives.hasSpiritVisage ? 1.25 : 1.0
+      const targetLive = getLiveStats(target)
+      const hspMult = 1 + (targetLive.healShieldPower || 0) / 100
+      const shieldMult = (targetPassives.hasSpiritVisage ? 1.25 : 1.0) * hspMult
       if (targetPassives.hasSeraphs) {
         target.lifelineTriggered = true
         const lifelineShield = Math.round(
@@ -1196,6 +1202,7 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
               actor.slot.champion?.tags?.includes('Mage')
                 ? 'AP'
                 : 'AD',
+            healShieldPower: actorStats.healShieldPower || 0,
           },
           defender: {
             currentHp: target.currentHp,
@@ -1230,6 +1237,11 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         if (spellRes.isCutDownProc) badges.push('🩸 Cut Down (+8%)')
         if (spellRes.lastStandBonusPct && spellRes.lastStandBonusPct > 0)
           badges.push(`🛡️ Last Stand (+${spellRes.lastStandBonusPct}%)`)
+
+        if (spellRes.isUtilityOrShield && spellRes.shieldAmount && spellRes.shieldAmount > 0) {
+          actor.currentShield += spellRes.shieldAmount
+          badges.push(`🛡️ Shield (+${spellRes.shieldAmount})`)
+        }
 
         let finalHitDmg = Math.round(spellRes.rawDmg * spellRes.hitMult)
 
@@ -1371,7 +1383,8 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         // Sundered Sky Critical Strike & Heal
         if (isSunderedSkyReady) {
           actor.sunderedSkyCooldowns[target.slotId] = currentTime + 6.0
-          const healMult = targetPassives.hasSpiritVisage ? 1.25 : 1.0
+          const hspMult = 1 + (actorStats.healShieldPower || 0) / 100
+          const healMult = (actorStats.itemPassives.hasSpiritVisage ? 1.25 : 1.0) * hspMult
           const healAmt = Math.round(
             (actorStats.baseAd * 1.4 + (actor.maxHp - actor.currentHp) * 0.06) * healMult,
           )
@@ -1492,7 +1505,8 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
                 finalHitDmg += eclDmg
                 const bonusAd = Math.max(0, actorStats.ad - actorStats.baseAd)
                 const shieldRaw = isMelee ? 160 + bonusAd * 0.4 : 80 + bonusAd * 0.2
-                const shieldMult = actorStats.itemPassives.hasSpiritVisage ? 1.25 : 1.0
+                const hspMult = 1 + (actorStats.healShieldPower || 0) / 100
+                const shieldMult = (actorStats.itemPassives.hasSpiritVisage ? 1.25 : 1.0) * hspMult
                 const eclShield = Math.round(shieldRaw * shieldMult)
                 actor.currentShield += eclShield
                 badges.push(`Eclipse (+${eclShield})`)
@@ -1646,7 +1660,8 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
           const sameSide = Object.values(participants).filter(
             (p) => p.side === actor.side && !p.isKo,
           )
-          const rHeal = Math.round(200 + (actor.level - 1) * (200 / 17))
+          const hspMult = 1 + (actorStats.healShieldPower || 0) / 100
+          const rHeal = Math.round((200 + (actor.level - 1) * (200 / 17)) * hspMult)
           sameSide.forEach((ally) => {
             ally.currentHp = Math.min(ally.maxHp, ally.currentHp + rHeal)
           })
@@ -1665,7 +1680,10 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
             (a, b) => a.currentHp / a.maxHp - b.currentHp / b.maxHp,
           )[0]
           if (lowestAlly) {
-            const mHeal = Math.round(100 + (actor.level - 1) * (100 / 17) + lowestAlly.maxHp * 0.1)
+            const hspMult = 1 + (actorStats.healShieldPower || 0) / 100
+            const mHeal = Math.round(
+              (100 + (actor.level - 1) * (100 / 17) + lowestAlly.maxHp * 0.1) * hspMult,
+            )
             lowestAlly.currentHp = Math.min(lowestAlly.maxHp, lowestAlly.currentHp + mHeal)
             lowestAlly.grievousWoundsDuration = 0
             badges.push(`Mikael's Cleanse (+${mHeal})`)
@@ -1681,7 +1699,8 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
 
         // Dream Maker
         if (isAbility && actorStats.itemPassives.hasDreamMaker) {
-          const bubbleShield = Math.round(75 + (actor.level - 1) * (180 / 17))
+          const hspMult = 1 + (actorStats.healShieldPower || 0) / 100
+          const bubbleShield = Math.round((75 + (actor.level - 1) * (180 / 17)) * hspMult)
           actor.currentShield += bubbleShield
           badges.push(`Dream Maker (+${bubbleShield} Shield)`)
         }
@@ -1778,6 +1797,7 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
                 magicPenPercent: actorStats.magicPenPercent,
                 magicPenFlat: actorStats.magicPenFlat,
                 adaptiveType: 'AP',
+                healShieldPower: actorStats.healShieldPower || 0,
               },
               defender: {
                 currentHp: remainingHpAfterHit1,
@@ -2384,7 +2404,8 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
           )
           totalHeal += Math.round(despairDmg * 2.5)
         })
-        const healMult = stats.itemPassives.hasSpiritVisage ? 1.25 : 1.0
+        const hspMult = 1 + (stats.healShieldPower || 0) / 100
+        const healMult = (stats.itemPassives.hasSpiritVisage ? 1.25 : 1.0) * hspMult
         const finalHeal = Math.round(totalHeal * healMult)
         actor.currentHp = Math.min(actor.maxHp, actor.currentHp + finalHeal)
       }

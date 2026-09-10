@@ -191,4 +191,29 @@ describe('Universal Spell Calculator Service', () => {
     expect(resQ.rawDmg).not.toBe(resW.rawDmg)
     expect(resR.rawDmg).toBeGreaterThan(resQ.rawDmg)
   })
+
+  it('correctly amplifies utility and shield spells with healShieldPower', () => {
+    const baseW = calculateSpellDamage({
+      champion: jarvanChamp,
+      action: 'W',
+      spellRanks: { q: 1, w: 1, e: 1, r: 1 },
+      attacker: dummyAttacker,
+      defender: dummyDefender,
+    })
+
+    const boostedW = calculateSpellDamage({
+      champion: jarvanChamp,
+      action: 'W',
+      spellRanks: { q: 1, w: 1, e: 1, r: 1 },
+      attacker: {
+        ...dummyAttacker,
+        healShieldPower: 20,
+      },
+      defender: dummyDefender,
+    })
+
+    expect(baseW.isUtilityOrShield).toBe(true)
+    expect(baseW.shieldAmount).toBe(75)
+    expect(boostedW.shieldAmount).toBe(90)
+  })
 })

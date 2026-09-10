@@ -1240,4 +1240,70 @@ describe('Combat Simulation Engine (DPS, DoT, Two-way Trading)', () => {
     expect(executedActions.some((e) => e.timestamp === 45.0)).toBe(true)
     expect(resExtended.duration).toBeGreaterThanOrEqual(45.0)
   })
+
+  it('correctly uses Heal and Shield Power to amplify shields and heals', () => {
+    const baseRedemptionItem = {
+      id: '3107',
+      name: 'Redemption',
+      description: '<attention>+10%</attention> Heal and Shield Power',
+    }
+    const bonusHspItem = {
+      id: '3114',
+      name: 'Forbidden Idol',
+      description: '<attention>+8%</attention> Heal and Shield Power',
+    }
+
+    // Baseline: Darius without HSP items
+    const baseActor: DraftSlot = {
+      ...blueDariusSlot,
+      id: 1,
+      items: [baseRedemptionItem, null, null, null, null, null],
+    }
+    const target: DraftSlot = {
+      ...redGarenSlot,
+      id: 6,
+    }
+
+    const resBase = runCombatSimulation({
+      allSlots: [baseActor, target],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [6],
+      actions: [{ id: 'a1', actorSlotId: 1, action: 'Q', targetSlotIds: [6], timestamp: 0.0 }],
+      duration: 1.0,
+      enableAutoAttacks: false,
+      attackerBuffs: defaultBuffs,
+      defenderBuffs: defaultBuffs,
+    })
+
+    // Boosted: Darius with extra Forbidden Idol
+    const boostedActor: DraftSlot = {
+      ...blueDariusSlot,
+      id: 1,
+      items: [baseRedemptionItem, bonusHspItem, null, null, null, null],
+    }
+
+    const resBoosted = runCombatSimulation({
+      allSlots: [boostedActor, target],
+      activeBlueSlotIds: [1],
+      activeRedSlotIds: [6],
+      actions: [{ id: 'a1', actorSlotId: 1, action: 'Q', targetSlotIds: [6], timestamp: 0.0 }],
+      duration: 1.0,
+      enableAutoAttacks: false,
+      attackerBuffs: defaultBuffs,
+      defenderBuffs: defaultBuffs,
+    })
+
+    const baseEvent = resBase.events.find((e) => e.badges?.some((b) => b.includes('Redemption')))
+    const boostedEvent = resBoosted.events.find((e) =>
+      e.badges?.some((b) => b.includes('Redemption')),
+    )
+
+    expect(baseEvent).toBeDefined()
+    expect(boostedEvent).toBeDefined()
+    // At level 11, base heal is 200 + 10 * (200 / 17) = 317.65
+    // With 10% HSP, heal is 317.65 * 1.10 = 349
+    // With 18% HSP, heal is 317.65 * 1.18 = 375
+    expect(baseEvent?.badges?.[0]).toContain('+349 Heal')
+    expect(boostedEvent?.badges?.[0]).toContain('+375 Heal')
+  })
 })

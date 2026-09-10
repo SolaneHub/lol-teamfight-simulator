@@ -392,6 +392,8 @@ export const calculateStats = (slot: DraftSlot) => {
       bonusMsFlat += 10
     } else if (runeName.includes('transcendence') && lvl >= 8) {
       bonusHaste += 10
+    } else if (runeName.includes('revitalize')) {
+      bonusHealShieldPower += 5
     }
   }
 

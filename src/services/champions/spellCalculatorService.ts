@@ -18,6 +18,7 @@ export interface SpellDamageInput {
     magicPenPercent: number
     magicPenFlat: number
     adaptiveType: 'AD' | 'AP'
+    healShieldPower?: number
   }
   defender: {
     currentHp: number
@@ -232,10 +233,11 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
     if ((tooltip.includes('shield') || tooltip.includes('heal')) && !tooltip.includes('damage')) {
       isUtilityOrShield = true
       rawDmg = 0
+      const hspMult = 1 + (attacker.healShieldPower || 0) / 100
       if (champion?.id === 'Seraphine' && action === 'W') {
-        shieldAmount = Math.round(60 + (wRank - 1) * 20 + attAp * 0.2)
+        shieldAmount = Math.round((60 + (wRank - 1) * 20 + attAp * 0.2) * hspMult)
       } else if (champion?.id === 'JarvanIV' && action === 'W') {
-        shieldAmount = Math.round(60 + (wRank - 1) * 20 + defMaxHp * 0.015)
+        shieldAmount = Math.round((60 + (wRank - 1) * 20 + defMaxHp * 0.015) * hspMult)
       }
     } else {
       let baseDmg = 0
