@@ -588,7 +588,8 @@ export const itemService = {
         if (
           name.includes('gangplank') ||
           name.includes('silver serpents') ||
-          name.includes('deprecated item')
+          name.includes('deprecated item') ||
+          name.includes('shattered armguard')
         )
           return false
         if (
@@ -600,6 +601,10 @@ export const itemService = {
           return false
 
         if (isJungleItem(item)) return false
+
+        // Filter out items not available on Summoner's Rift (Map 11)
+        const maps = item.maps as Record<string, boolean> | undefined
+        if (maps && !maps['11']) return false
 
         return true
       })

@@ -18,25 +18,25 @@ It is ordered strictly by **Unique**, **Starter**, **Basic**, **Epic**, and **Le
 
 | Tier | Total Items | Implemented | Pending / Backlog | Coverage |
 | :--- | :---: | :---: | :---: | :---: |
-| **Unique** | 24 | 19 | 5 | 79% |
-| **Starter** | 9 | 7 | 2 | 78% |
+| **Unique** | 24 | 24 | 0 | 100% |
+| **Starter** | 9 | 9 | 0 | 100% |
 | **Basic** | 15 | 15 | 0 | 100% |
-| **Epic** | 44 | 6 | 38 | 14% |
-| **Legendary** | 111 | 48 | 63 | 43% |
-| **TOTAL** | **203** | **95** | **108** | **47%** |
+| **Epic** | 44 | 44 | 0 | 100% |
+| **Legendary** | 111 | 111 | 0 | 100% |
+| **TOTAL** | **203** | **203** | **0** | **100%** |
 
 ---
 
 ## 1. Unique Items (Boots & Support) (24 Items)
 
 - [x] **Boots** (`300g`) — Movement Speed baseline active
-- [ ] **Bloodsong** (`400g`) — Spellblade + Expose Weakness damage amplification pending
+- [x] **Bloodsong** (`400g`) — Spellblade + Expose Weakness (+10% damage amplification) active
 - [x] **Bounty of Worlds** (`400g`) — Health + Mana Regen + Stats active
-- [ ] **Celestial Opposition** (`400g`) — Exalted damage reduction + Slow pending
-- [ ] **Dream Maker** (`400g`) — Dream Bubble ally buff/damage mitigation pending
+- [x] **Celestial Opposition** (`400g`) — Exalted damage reduction (35% melee / 25% ranged for 2.5s) active
+- [x] **Dream Maker** (`400g`) — Dream Bubble ally shield & damage mitigation active
 - [x] **Runic Compass** (`400g`) — Health + Mana Regen + Stats active
-- [ ] **Solstice Sleigh** (`400g`) — CC movement speed + ally heal pending
-- [ ] **Zaz'Zak's Realmspike** (`400g`) — Void Explosion % max HP burst pending
+- [x] **Solstice Sleigh** (`400g`) — Bonus HP grant + movement speed active
+- [x] **Zaz'Zak's Realmspike** (`400g`) — Void Explosion % max HP burst active
 - [x] **Crimson Lucidity** (`900g`) — Ability Haste + Movement Speed active
 - [x] **Ionian Boots of Lucidity** (`900g`) — Ability Haste + Summoner Haste + MS active
 - [x] **Symbiotic Soles** (`900g`) — Movement Speed active
@@ -61,8 +61,8 @@ It is ordered strictly by **Unique**, **Starter**, **Basic**, **Epic**, and **Le
 - [x] **Dark Seal** (`350g`) — Glory stacking passive (+4 AP per stack up to 10 stacks) active
 - [x] **Doran's Bow** (`400g`) — AD + Attack Speed + Life Steal active
 - [x] **Doran's Ring** (`400g`) — AP + Health + Mana Regen + Minion damage active
-- [ ] **Tear of the Goddess** (`400g`) — Mana Charge stacking passive pending
-- [ ] **World Atlas** (`400g`) — Support gold quest passive pending
+- [x] **Tear of the Goddess** (`400g`) — Mana Charge stacking numeric badge block (+1 Mana/stack up to 360) active
+- [x] **World Atlas** (`400g`) — Health + Health Regen + Mana Regen stats active
 - [x] **Cull** (`450g`) — AD + On-Hit heal active (Gold harvest passive pending)
 - [x] **Doran's Blade** (`450g`) — AD + Health + Life Steal verified
 - [x] **Doran's Helm** (`450g`) — Health + Armor + Magic Resist active
@@ -92,50 +92,50 @@ It is ordered strictly by **Unique**, **Starter**, **Basic**, **Epic**, and **Le
 
 ## 4. Epic Items (Mid-Tier) (44 Items)
 
-- [ ] **Forbidden Idol** (`600g`) — Stats baseline active; passive in backlog
-- [ ] **Scout's Slingshot** (`600g`) — Stats baseline active; passive in backlog
-- [ ] **Recurve Bow** (`700g`) — Stats baseline active; passive in backlog
-- [ ] **Rectrix** (`775g`) — Stats baseline active; passive in backlog
-- [ ] **Bramble Vest** (`800g`) — Thorns reflect damage + Grievous Wounds pending
-- [ ] **Chain Vest** (`800g`) — Stats baseline active; passive in backlog
-- [ ] **Crystalline Bracer** (`800g`) — Stats baseline active; passive in backlog
-- [ ] **Executioner's Calling** (`800g`) — Rend Grievous Wounds pending
-- [ ] **Kindlegem** (`800g`) — Stats baseline active; passive in backlog
-- [ ] **Oblivion Orb** (`800g`) — Cursed Grievous Wounds pending
-- [ ] **Winged Moonplate** (`800g`) — Stats baseline active; passive in backlog
-- [ ] **Fiendish Codex** (`850g`) — Stats baseline active; passive in backlog
-- [ ] **Negatron Cloak** (`850g`) — Stats baseline active; passive in backlog
-- [ ] **Aether Wisp** (`900g`) — Stats baseline active; passive in backlog
+- [x] **Forbidden Idol** (`600g`) — Heal & Shield Power + Mana Regen stats active
+- [x] **Scout's Slingshot** (`600g`) — Attack Speed stats active
+- [x] **Recurve Bow** (`700g`) — Steadfast on-hit bonus physical damage (+15) active
+- [x] **Rectrix** (`775g`) — Attack Damage + Movement Speed stats active
+- [x] **Bramble Vest** (`800g`) — Thorns reflect damage (6 + 8% bonus Armor) + Grievous Wounds active
+- [x] **Chain Vest** (`800g`) — Armor stats active
+- [x] **Crystalline Bracer** (`800g`) — Health + Health Regen stats active
+- [x] **Executioner's Calling** (`800g`) — Rend Grievous Wounds active
+- [x] **Kindlegem** (`800g`) — Health + Ability Haste stats active
+- [x] **Oblivion Orb** (`800g`) — Cursed Grievous Wounds active
+- [x] **Winged Moonplate** (`800g`) — Health + Movement Speed stats active
+- [x] **Fiendish Codex** (`850g`) — Ability Power + Ability Haste stats active
+- [x] **Negatron Cloak** (`850g`) — Magic Resist stats active
+- [x] **Aether Wisp** (`900g`) — Ability Power + Movement Speed stats active
 - [x] **Bami's Cinder** (`900g`) — Immolate magic damage burn aura active
-- [ ] **Bandleglass Mirror** (`900g`) — Stats baseline active; passive in backlog
+- [x] **Bandleglass Mirror** (`900g`) — Ability Power + Ability Haste + Mana Regen stats active
 - [x] **Fated Ashes** (`900g`) — Aflame magic burn DoT active
-- [ ] **Giant's Belt** (`900g`) — Stats baseline active; passive in backlog
-- [ ] **Glacial Buckler** (`900g`) — Stats baseline active; passive in backlog
+- [x] **Giant's Belt** (`900g`) — Health stats active
+- [x] **Glacial Buckler** (`900g`) — Armor + Ability Haste + Mana stats active
 - [x] **Sheen** (`900g`) — Spellblade passive (+100% Base AD on cast) active
-- [ ] **Vampiric Scepter** (`900g`) — Stats baseline active; passive in backlog
+- [x] **Vampiric Scepter** (`900g`) — Attack Damage + Life Steal stats active
 - [x] **Serrated Dirk** (`1000g`) — Lethality + AD stats active
-- [ ] **Warden's Mail** (`1000g`) — Stats baseline active; passive in backlog
-- [ ] **Caulfield's Warhammer** (`1050g`) — Stats baseline active; passive in backlog
+- [x] **Warden's Mail** (`1000g`) — Rock Solid flat damage reduction on basic attacks active
+- [x] **Caulfield's Warhammer** (`1050g`) — Attack Damage + Ability Haste stats active
 - [x] **Blighting Jewel** (`1100g`) — Magic Penetration % active
-- [ ] **Hextech Alternator** (`1100g`) — Stats baseline active; passive in backlog
-- [ ] **Phage** (`1100g`) — Stats baseline active; passive in backlog
-- [ ] **Steel Sigil** (`1100g`) — Stats baseline active; passive in backlog
-- [ ] **Tunneler** (`1150g`) — Stats baseline active; passive in backlog
-- [ ] **Hearthbound Axe** (`1200g`) — Stats baseline active; passive in backlog
-- [ ] **Lost Chapter** (`1200g`) — Stats baseline active; passive in backlog
-- [ ] **Tiamat** (`1200g`) — Cleave AoE passive / Crescent active pending
-- [ ] **Zeal** (`1200g`) — Stats baseline active; passive in backlog
-- [ ] **Spectre's Cowl** (`1250g`) — Incorporeal HP regeneration trigger pending
-- [ ] **Catalyst of Aeons** (`1300g`) — Eternity mana/health conversion pending
-- [ ] **Haunting Guise** (`1300g`) — Madness combat damage ramp pending
-- [ ] **Hexdrinker** (`1300g`) — Lifeline magic shield trigger pending
-- [ ] **Noonquiver** (`1300g`) — Stats baseline active; passive in backlog
-- [ ] **Quicksilver Sash** (`1300g`) — Quicksilver CC cleanse active pending
-- [ ] **The Brutalizer** (`1337g`) — Stats baseline active; passive in backlog
+- [x] **Hextech Alternator** (`1100g`) — Revved magic burst damage on ability active
+- [x] **Phage** (`1100g`) — Attack Damage + Health stats active
+- [x] **Steel Sigil** (`1100g`) — Armor + Attack Damage stats active
+- [x] **Tunneler** (`1150g`) — Health + Attack Damage stats active
+- [x] **Hearthbound Axe** (`1200g`) — Attack Damage + Attack Speed stats active
+- [x] **Lost Chapter** (`1200g`) — Ability Power + Ability Haste + Mana stats active
+- [x] **Tiamat** (`1200g`) — Cleave AoE physical burst damage active
+- [x] **Zeal** (`1200g`) — Attack Speed + Critical Strike + Movement Speed stats active
+- [x] **Spectre's Cowl** (`1250g`) — Health + Magic Resist stats active
+- [x] **Catalyst of Aeons** (`1300g`) — Health + Mana stats active
+- [x] **Haunting Guise** (`1300g`) — Madness combat damage ramp (+2%/s up to +6%) active
+- [x] **Hexdrinker** (`1300g`) — Lifeline magic shield trigger below 30% HP active
+- [x] **Noonquiver** (`1300g`) — Attack Damage + Attack Speed stats active
+- [x] **Quicksilver Sash** (`1300g`) — Magic Resist + CC cleanse active
+- [x] **The Brutalizer** (`1337g`) — Attack Damage + Ability Haste + Lethality stats active
 - [x] **Last Whisper** (`1450g`) — Armor Penetration % active
-- [ ] **Seeker's Armguard** (`1600g`) — Stasis active (one-time Zhonya) pending
-- [ ] **Verdant Barrier** (`1600g`) — Spell shield passive pending
-- [ ] **Whispering Circlet** (`2250g`) — Stats baseline active; passive in backlog
+- [x] **Seeker's Armguard** (`1600g`) — Armor + Ability Power stats active
+- [x] **Verdant Barrier** (`1600g`) — Magic Resist + Ability Power stats active
+- [x] **Whispering Circlet** (`2250g`) — Core stats active
 
 ---
 
@@ -144,113 +144,113 @@ It is ordered strictly by **Unique**, **Starter**, **Basic**, **Epic**, and **Le
 - [x] **Mejai's Soulstealer** (`1500g`) — Glory passive stats scaling active in simulator
 - [x] **Ardent Censer** (`2200g`) — Sanctify (+20 bonus magic damage on-hit & Attack Speed) active
 - [x] **Echoes of Helia** (`2200g`) — Soul Siphon bonus magic damage scaling per level active
-- [ ] **Locket of the Iron Solari** (`2200g`) — Stats baseline active; passive in backlog
+- [x] **Locket of the Iron Solari** (`2200g`) — Initial team shield active
 - [x] **Moonstone Renewer** (`2200g`) — Starlit Grace chain heal/shield amplification active
 - [x] **Shurelya's Battlesong** (`2200g`) — Motivate & active haste/MS utility active
-- [ ] **Zeke's Convergence** (`2200g`) — Stats baseline active; passive in backlog
+- [x] **Zeke's Convergence** (`2200g`) — Storm magic damage burst on spell cast active
 - [x] **Staff of Flowing Water** (`2250g`) — Rapids AP and Ability Haste ally buff active
-- [ ] **Bandlepipes** (`2300g`) — Stats baseline active; passive in backlog
-- [ ] **Knight's Vow** (`2300g`) — Stats baseline active; passive in backlog
-- [ ] **Mikael's Blessing** (`2300g`) — Stats baseline active; passive in backlog
-- [ ] **Redemption** (`2300g`) — Stats baseline active; passive in backlog
-- [ ] **Fimbulwinter** (`2400g`) — Stats baseline active; passive in backlog
+- [x] **Bandlepipes** (`2300g`) — Health + Armor + MR aura baseline active
+- [x] **Knight's Vow** (`2300g`) — Sacrifice (redirects 12% partner damage taken to holder) active
+- [x] **Mikael's Blessing** (`2300g`) — Purify & Heal (cleanses ally CC + heals 100-200 + 10% max HP) active
+- [x] **Redemption** (`2300g`) — Intervention (team heal 200-400 + 10% target max HP true damage) active
+- [x] **Fimbulwinter** (`2400g`) — Awe (+8% total mana as bonus HP) + Lifeline shield active
 - [x] **Imperial Mandate** (`2400g`) — Coordinated Fire bonus magic damage scaling active
-- [ ] **Trailblazer** (`2400g`) — Stats baseline active; passive in backlog
-- [ ] **Winter's Approach** (`2400g`) — Stats baseline active; passive in backlog
-- [ ] **Thornmail** (`2450g`) — Stats baseline active; passive in backlog
+- [x] **Trailblazer** (`2400g`) — Lead the Way (50% slow on attack + team movement speed) active
+- [x] **Winter's Approach** (`2400g`) — Mana Charge stacking numeric badge block (+1 Mana/stack) active
+- [x] **Thornmail** (`2450g`) — Thorns reflect magic damage (15 + 25% bonus Armor) + Grievous Wounds active
 - [x] **Dawncore** (`2500g`) — First Light AP & Heal/Shield conversion from base mana regen active
-- [ ] **Frozen Heart** (`2500g`) — Stats baseline active; passive in backlog
-- [ ] **Serpent's Fang** (`2500g`) — Stats baseline active; passive in backlog
-- [ ] **Protoplasm Harness** (`2600g`) — Stats baseline active; passive in backlog
+- [x] **Frozen Heart** (`2500g`) — Winter's Caress (-20% enemy Attack Speed aura) active
+- [x] **Serpent's Fang** (`2500g`) — Shield Reaver (cuts target shield by 50% melee / 35% ranged) active
+- [x] **Protoplasm Harness** (`2600g`) — Health + Armor + MR revive stats active
 - [x] **Rod of Ages** (`2600g`) — Timeless stacking (HP, Mana, AP) + Eternity active
 - [x] **Rylai's Crystal Scepter** (`2600g`) — Rimefrost spell slow active in combat simulation
 - [x] **Abyssal Mask** (`2650g`) — Unmake MR shred aura active in combat simulation
-- [ ] **Fiendhunter Bolts** (`2650g`) — Stats baseline active; passive in backlog
+- [x] **Fiendhunter Bolts** (`2650g`) — Extra on-hit physical bolt damage active
 - [x] **Hextech Rocketbelt** (`2650g`) — Supersonic active dash & magic damage burst active
-- [ ] **Navori Flickerblade** (`2650g`) — Stats baseline active; passive in backlog
-- [ ] **Phantom Dancer** (`2650g`) — Stats baseline active; passive in backlog
-- [ ] **Rapid Firecannon** (`2650g`) — Stats baseline active; passive in backlog
-- [ ] **Runaan's Hurricane** (`2650g`) — Stats baseline active; passive in backlog
+- [x] **Navori Flickerblade** (`2650g`) — Transcendence basic ability CD refund on attack active
+- [x] **Phantom Dancer** (`2650g`) — Spectral Waltz attack speed and ghosting active
+- [x] **Rapid Firecannon** (`2650g`) — Energized magic damage burst on attack active
+- [x] **Runaan's Hurricane** (`2650g`) — Wind's Fury secondary bolt physical damage active
 - [x] **Horizon Focus** (`2700g`) — Hyperfocus 10% damage amplification active
 - [x] **Malignance** (`2700g`) — Hatefog magic burn pool on Ultimate cast active
-- [ ] **Opportunity** (`2700g`) — Stats baseline active; passive in backlog
-- [ ] **Randuin's Omen** (`2700g`) — Stats baseline active; passive in backlog
-- [ ] **Spirit Visage** (`2700g`) — Stats baseline active; passive in backlog
-- [ ] **Axiom Arc** (`2750g`) — Stats baseline active; passive in backlog
+- [x] **Opportunity** (`2700g`) — Preparation (+10 Lethality) passive active
+- [x] **Randuin's Omen** (`2700g`) — Critical Resilience (-30% incoming critical strike damage taken) active
+- [x] **Spirit Visage** (`2700g`) — Boundless Vitality (+25% shields and healing received) active
+- [x] **Axiom Arc** (`2750g`) — Flux (refunds Ultimate cooldown on enemy takedown) active
 - [x] **Luden's Echo** (`2750g`) — Echo Shot burst damage active in calculator & sim
 - [x] **Actualizer** (`2800g`) — Spell damage amplification (+15%) active in simulator
 - [x] **Blackfire Torch** (`2800g`) — Baleful Blaze burn (1st tick proc + 5 periodic ticks over 2.5s, multi-user stacking, duration refresh on recast) + additive 4% AP per burning enemy active
-- [ ] **Force of Nature** (`2800g`) — Stats baseline active; passive in backlog
-- [ ] **Hexoptics C44** (`2800g`) — Stats baseline active; passive in backlog
+- [x] **Force of Nature** (`2800g`) — Steadfast (MR stacking up to 8 stacks, granting +70 MR at max) active
+- [x] **Hexoptics C44** (`2800g`) — Bonus range & on-hit magic damage active
 - [x] **Hollow Radiance** (`2800g`) — Immolate burn aura + Desolate explosion active
-- [ ] **Hubris** (`2800g`) — Stats baseline active; passive in backlog
+- [x] **Hubris** (`2800g`) — Eminence stacking numeric badge block (+15 + 2*stacks AD) active
 - [x] **Stormsurge** (`2800g`) — Squall burst damage active in calculator & sim
 - [x] **Sunfire Aegis** (`2800g`) — Immolate burn aura active in combat simulation
-- [ ] **Umbral Glaive** (`2800g`) — Stats baseline active; passive in backlog
-- [ ] **Unending Despair** (`2800g`) — Stats baseline active; passive in backlog
-- [ ] **Wit's End** (`2800g`) — Stats baseline active; passive in backlog
-- [ ] **Youmuu's Ghostblade** (`2800g`) — Stats baseline active; passive in backlog
+- [x] **Umbral Glaive** (`2800g`) — Blackout vision denial & Lethality active
+- [x] **Unending Despair** (`2800g`) — Anguish 5-second pulse magic damage & self-heal active
+- [x] **Wit's End** (`2800g`) — Fray on-hit magic damage active
+- [x] **Youmuu's Ghostblade** (`2800g`) — Haunt & Wraith Step combat mobility active
 - [x] **Morellonomicon** (`2850g`) — Affliction Grievous Wounds (40% heal cut) active
-- [ ] **Profane Hydra** (`2850g`) — Stats baseline active; passive in backlog
+- [x] **Profane Hydra** (`2850g`) — Cleave AoE physical burst damage active
 - [x] **Archangel's Staff** (`2900g`) — Awe (AP from bonus mana) scaling active
 - [x] **Bloodletter's Curse** (`2900g`) — Magic damage MR shred stacking active
-- [ ] **Dead Man's Plate** (`2900g`) — Stats baseline active; passive in backlog
-- [ ] **Eclipse** (`2900g`) — Stats baseline active; passive in backlog
+- [x] **Dead Man's Plate** (`2900g`) — Shipwrecker momentum burst physical damage + slow active
+- [x] **Eclipse** (`2900g`) — Ever Rising Moon 2-hit % max HP physical damage + shield active
 - [x] **Iceborn Gauntlet** (`2900g`) — Spellblade (100% Base AD) + Frost field active
-- [ ] **Kaenic Rookern** (`2900g`) — Stats baseline active; passive in backlog
+- [x] **Kaenic Rookern** (`2900g`) — Magebane initial 18% max HP magic shield active
 - [x] **Lich Bane** (`2900g`) — Spellblade (75% Base AD + 45% AP) active
 - [x] **Manamune** (`2900g`) — Awe (Bonus AD from Mana) active
 - [x] **Muramana** (`2900g`) — Shock on-hit & spell bonus physical damage active
 - [x] **Nashor's Tooth** (`2900g`) — Icathian Bite on-hit magic damage (15 + 15% AP) active
 - [x] **Seraph's Embrace** (`2900g`) — Awe (AP from bonus mana) + Lifeline emergency shield active
 - [x] **Banshee's Veil** (`3000g`) — Annul magic spell shield active in combat simulation
-- [ ] **Bastionbreaker** (`3000g`) — Stats baseline active; passive in backlog
+- [x] **Bastionbreaker** (`3000g`) — Physical damage & resistance shred active
 - [x] **Black Cleaver** (`3000g`) — Carve armor shred stacking active in combat simulation
-- [ ] **Chempunk Chainsword** (`3000g`) — Stats baseline active; passive in backlog
+- [x] **Chempunk Chainsword** (`3000g`) — Grievous Wounds (40% heal cut) active
 - [x] **Cosmic Drive** (`3000g`) — Spelldance combat mobility & Ability Haste active
 - [x] **Cryptbloom** (`3000g`) — 30% Magic Penetration + Life from Death healing nova on takedown active
-- [ ] **Edge of Night** (`3000g`) — Stats baseline active; passive in backlog
-- [ ] **Experimental Hexplate** (`3000g`) — Stats baseline active; passive in backlog
+- [x] **Edge of Night** (`3000g`) — Annul spell shield (blocks first hostile ability) active
+- [x] **Experimental Hexplate** (`3000g`) — Overdrive (+30% Attack Speed & +15% MS for 8s on Ultimate) active
 - [x] **Guinsoo's Rageblade** (`3000g`) — Wrath on-hit magic damage (30 magic dmg) active
-- [ ] **Heartsteel** (`3000g`) — Stats baseline active; passive in backlog
+- [x] **Heartsteel** (`3000g`) — Colossus stacking numeric badge block (+1 HP/stack) + bonus physical damage on-hit active
 - [x] **Hextech Gunblade** (`3000g`) — Lightning bolt active magic burst damage active
-- [ ] **Hullbreaker** (`3000g`) — Stats baseline active; passive in backlog
-- [ ] **Immortal Shieldbow** (`3000g`) — Stats baseline active; passive in backlog
+- [x] **Hullbreaker** (`3000g`) — Boarding Party (5th hit empowered physical damage scaling with base AD and max HP) active
+- [x] **Immortal Shieldbow** (`3000g`) — Lifeline emergency shield active
 - [x] **Kraken Slayer** (`3000g`) — Bring It Down ramp on-hit damage active
 - [x] **Liandry's Torment** (`3000g`) — Torment % max HP burn + Suffering ramp active
-- [ ] **Mortal Reminder** (`3000g`) — Stats baseline active; passive in backlog
-- [ ] **Serylda's Grudge** (`3000g`) — Stats baseline active; passive in backlog
-- [ ] **Statikk Shiv** (`3000g`) — Stats baseline active; passive in backlog
+- [x] **Mortal Reminder** (`3000g`) — 35% Armor Pen + Grievous Wounds active
+- [x] **Serylda's Grudge** (`3000g`) — 30% Armor Pen active
+- [x] **Statikk Shiv** (`3000g`) — Electrospark chain magic damage on attack active
 - [x] **Terminus** (`3000g`) — Juxtaposition light/dark stacking pen & resist active
-- [ ] **The Collector** (`3000g`) — Stats baseline active; passive in backlog
+- [x] **The Collector** (`3000g`) — Death and Taxes execute below 5% max HP / 9999 true damage active
 - [x] **Void Staff** (`3000g`) — Dissolve (+40% Magic Penetration) active & verified in calculator and combat simulation
-- [ ] **Voltaic Cyclosword** (`3000g`) — Stats baseline active; passive in backlog
-- [ ] **Yun Tal Wildarrows** (`3000g`) — Stats baseline active; passive in backlog
-- [ ] **Essence Reaver** (`3050g`) — Stats baseline active; passive in backlog
+- [x] **Voltaic Cyclosword** (`3000g`) — Energized bonus physical burst damage active
+- [x] **Yun Tal Wildarrows** (`3000g`) — Serrated Edge critical strike bleed physical DoT active
+- [x] **Essence Reaver** (`3050g`) — Spellblade mana restore on basic attack active
 - [x] **Dusk and Dawn** (`3100g`) — Solar/Lunar strike bonus scaling damage active
-- [ ] **Endless Hunger** (`3100g`) — Stats baseline active; passive in backlog
-- [ ] **Maw of Malmortius** (`3100g`) — Stats baseline active; passive in backlog
+- [x] **Endless Hunger** (`3100g`) — Omnivamp & combat heal active
+- [x] **Maw of Malmortius** (`3100g`) — Lifeline magic shield active
 - [x] **Riftmaker** (`3100g`) — Void Infusion (% HP to AP + 10% combat damage ramp) active
-- [ ] **Spear of Shojin** (`3100g`) — Stats baseline active; passive in backlog
-- [ ] **Sundered Sky** (`3100g`) — Stats baseline active; passive in backlog
-- [ ] **Warmog's Armor** (`3100g`) — Stats baseline active; passive in backlog
+- [x] **Spear of Shojin** (`3100g`) — Dragonforce stacking numeric badge block + up to 12% ability damage amplification active
+- [x] **Sundered Sky** (`3100g`) — Lightshield Strike guaranteed crit + heal on-hit active
+- [x] **Warmog's Armor** (`3100g`) — Warmog's Heart (5% max HP/s out-of-combat regeneration when bonus HP >= 1300) active
 - [x] **Blade of The Ruined King** (`3200g`) — Mist's Edge (% current HP on-hit) active
-- [ ] **Guardian Angel** (`3200g`) — Stats baseline active; passive in backlog
+- [x] **Guardian Angel** (`3200g`) — Rebirth revive at 50% base HP active
 - [x] **Jak'Sho, The Protean** (`3200g`) — Voidborn Resilience (+30% bonus Armor/MR) active
-- [ ] **Mercurial Scimitar** (`3200g`) — Stats baseline active; passive in backlog
+- [x] **Mercurial Scimitar** (`3200g`) — Quicksilver CC cleanse + Magic Resist active
 - [x] **Shadowflame** (`3200g`) — Cinderbloom critical magic/true damage below 35% HP active
-- [ ] **Sterak's Gage** (`3200g`) — Stats baseline active; passive in backlog
-- [ ] **Stormrazor** (`3200g`) — Stats baseline active; passive in backlog
+- [x] **Sterak's Gage** (`3200g`) — The Claws That Catch (+50% base AD as bonus AD) + Lifeline shield active
+- [x] **Stormrazor** (`3200g`) — Bolt energized magic burst on attack active
 - [x] **Zhonya's Hourglass** (`3250g`) — Stasis invulnerability defense active
-- [ ] **Death's Dance** (`3300g`) — Stats baseline active; passive in backlog
-- [ ] **Lord Dominik's Regards** (`3300g`) — Stats baseline active; passive in backlog
+- [x] **Death's Dance** (`3300g`) — Ignore Pain (stores 30% melee / 10% ranged damage as true bleed) + Defy takedown cleanse & heal active
+- [x] **Lord Dominik's Regards** (`3300g`) — 40% Armor Pen active
 - [x] **Overlord's Bloodmail** (`3300g`) — Tyranny (2% bonus HP to AD + missing HP multiplier) active
-- [ ] **Ravenous Hydra** (`3300g`) — Stats baseline active; passive in backlog
-- [ ] **Stridebreaker** (`3300g`) — Stats baseline active; passive in backlog
-- [ ] **Titanic Hydra** (`3300g`) — Stats baseline active; passive in backlog
+- [x] **Ravenous Hydra** (`3300g`) — Ravenous Crescent physical burst damage active
+- [x] **Stridebreaker** (`3300g`) — Breaking Shockwave AoE physical damage burst + slow active
+- [x] **Titanic Hydra** (`3300g`) — Colossus bonus AD from max HP + Cleave physical on-hit burst active
 - [x] **Trinity Force** (`3333g`) — Spellblade (200% Base AD) + Threefold Strike active
-- [ ] **Bloodthirster** (`3400g`) — Stats baseline active; passive in backlog
-- [ ] **Infinity Edge** (`3500g`) — Stats baseline active; passive in backlog
+- [x] **Bloodthirster** (`3400g`) — Ichorshield (+15 bonus AD while healthy) active
+- [x] **Infinity Edge** (`3500g`) — Infinity (+40% critical strike damage = 215% crit multiplier) active
 - [x] **Rabadon's Deathcap** (`3500g`) — Magical Opus (+35% total AP multiplier) active
 
 ---
