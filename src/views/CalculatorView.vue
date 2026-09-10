@@ -238,28 +238,28 @@
             </div>
 
             <!-- Damage Breakdown Badges -->
-            <div class="flex items-center gap-1.5 flex-wrap text-base font-bold pt-1">
+            <div class="flex items-center gap-1.5 flex-wrap text-base font-bold font-mono pt-1">
               <span
                 v-if="getChampionEndState(slot.id).damageDealtByType.physical > 0"
-                class="bg-orange-950/80 text-orange-400 border border-orange-800/60 px-2 py-0.5 rounded-md"
+                class="bg-orange-950/80 text-orange-400 border border-orange-800/60 shadow-sm shadow-orange-950/50 px-2.5 py-0.5 rounded-lg inline-flex items-center gap-1"
               >
                 {{ getChampionEndState(slot.id).damageDealtByType.physical }} Phys
               </span>
               <span
                 v-if="getChampionEndState(slot.id).damageDealtByType.magic > 0"
-                class="bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 px-2 py-0.5 rounded-md"
+                class="bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 shadow-sm shadow-cyan-950/50 px-2.5 py-0.5 rounded-lg inline-flex items-center gap-1"
               >
                 {{ getChampionEndState(slot.id).damageDealtByType.magic }} Mag
               </span>
               <span
                 v-if="getChampionEndState(slot.id).damageDealtByType.true > 0"
-                class="bg-slate-900 text-slate-200 border border-slate-700 px-2 py-0.5 rounded-md"
+                class="bg-slate-950/90 text-slate-100 border border-slate-600/70 shadow-sm shadow-slate-500/20 px-2.5 py-0.5 rounded-lg inline-flex items-center gap-1"
               >
                 {{ getChampionEndState(slot.id).damageDealtByType.true }} True
               </span>
               <span
                 v-if="getChampionEndState(slot.id).damageDealtByType.dot > 0"
-                class="bg-purple-950/80 text-purple-300 border border-purple-800/60 px-2 py-0.5 rounded-md"
+                class="bg-purple-950/80 text-purple-300 border border-purple-800/60 shadow-sm shadow-purple-950/50 px-2.5 py-0.5 rounded-lg inline-flex items-center gap-1"
               >
                 🔥 {{ getChampionEndState(slot.id).damageDealtByType.dot }} DoT
               </span>
@@ -274,9 +274,16 @@
             <span
               v-for="dot in getChampionEndState(slot.id).activeDoTs"
               :key="dot.id"
-              class="bg-rose-950/90 text-rose-300 border border-rose-800/60 px-2.5 py-1 rounded-lg font-semibold animate-pulse"
+              class="bg-rose-950/80 text-rose-300 border border-rose-700/60 shadow-sm shadow-rose-950/50 px-2.5 py-0.5 rounded-lg font-mono font-bold inline-flex items-center gap-1.5 animate-pulse"
             >
-              🩸 {{ dot.name }} ({{ dot.remainingDuration.toFixed(1) }}s)
+              <img
+                v-if="getDoTIconUrl(dot)"
+                :src="getDoTIconUrl(dot)!"
+                :alt="dot.name"
+                class="w-4 h-4 rounded object-cover shrink-0 border border-rose-500/40"
+              />
+              <span v-else>🩸</span>
+              <span>{{ dot.name }} ({{ dot.remainingDuration.toFixed(1) }}s)</span>
             </span>
           </div>
 
@@ -995,47 +1002,47 @@
             </div>
 
             <!-- Event Filters -->
-            <div class="flex items-center gap-2 text-base flex-wrap">
+            <div class="flex items-center gap-2 text-base font-mono flex-wrap">
               <button
                 @click="eventFilter = 'all'"
-                class="px-3 py-1 rounded-lg border cursor-pointer font-bold transition-all text-base"
+                class="px-3 py-1 rounded-lg border cursor-pointer font-bold transition-all text-base shadow-sm"
                 :class="
                   eventFilter === 'all'
-                    ? 'bg-amber-500 text-slate-950 border-amber-400'
-                    : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-amber-950/40'
+                    : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white hover:border-slate-700'
                 "
               >
                 All ({{ combatResults.events.length }})
               </button>
               <button
                 @click="eventFilter = 'blue'"
-                class="px-3 py-1 rounded-lg border cursor-pointer font-bold transition-all text-base"
+                class="px-3 py-1 rounded-lg border cursor-pointer font-bold transition-all text-base shadow-sm"
                 :class="
                   eventFilter === 'blue'
-                    ? 'bg-cyan-600 text-white border-cyan-400'
-                    : 'bg-slate-950 text-cyan-400 border-slate-800 hover:text-white'
+                    ? 'bg-cyan-950/80 text-cyan-300 border-cyan-500 shadow-cyan-950/40'
+                    : 'bg-slate-950 text-cyan-400/80 border-slate-800 hover:text-cyan-300 hover:border-cyan-800'
                 "
               >
                 🟦 Blue
               </button>
               <button
                 @click="eventFilter = 'red'"
-                class="px-3 py-1 rounded-lg border cursor-pointer font-bold transition-all text-base"
+                class="px-3 py-1 rounded-lg border cursor-pointer font-bold transition-all text-base shadow-sm"
                 :class="
                   eventFilter === 'red'
-                    ? 'bg-rose-600 text-white border-rose-400'
-                    : 'bg-slate-950 text-rose-400 border-slate-800 hover:text-white'
+                    ? 'bg-rose-950/80 text-rose-300 border-rose-500 shadow-rose-950/40'
+                    : 'bg-slate-950 text-rose-400/80 border-slate-800 hover:text-rose-300 hover:border-rose-800'
                 "
               >
                 🟥 Red
               </button>
               <button
                 @click="eventFilter = 'dot'"
-                class="px-3 py-1 rounded-lg border cursor-pointer font-bold transition-all text-base"
+                class="px-3 py-1 rounded-lg border cursor-pointer font-bold transition-all text-base shadow-sm"
                 :class="
                   eventFilter === 'dot'
-                    ? 'bg-purple-600 text-white border-purple-400'
-                    : 'bg-slate-950 text-purple-300 border-slate-800 hover:text-white'
+                    ? 'bg-purple-950/80 text-purple-300 border-purple-500 shadow-purple-950/40'
+                    : 'bg-slate-950 text-purple-300/80 border-slate-800 hover:text-purple-300 hover:border-purple-800'
                 "
               >
                 🔥 DoTs
@@ -1076,20 +1083,25 @@
                   {{ evt.actorName }}
                 </span>
                 <span
-                  class="px-2 py-0.5 rounded-lg text-base font-bold border"
+                  class="px-2.5 py-0.5 rounded-lg text-base font-bold font-mono border shadow-sm"
                   :class="
                     evt.isDot
-                      ? 'bg-purple-950 text-purple-300 border-purple-700/60'
-                      : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                      ? 'bg-purple-950/80 text-purple-300 border-purple-700/60 shadow-purple-950/40'
+                      : 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-amber-950/30'
                   "
                 >
                   {{ evt.action }}
                 </span>
                 <span
                   v-if="evt.badges?.includes('🎶 Echo') && !evt.action.includes('Echo')"
-                  class="px-2 py-0.5 rounded-lg text-base font-bold border bg-pink-950/80 text-pink-300 border-pink-700/60 shadow-sm"
+                  class="px-2.5 py-0.5 rounded-lg text-base font-bold font-mono border bg-pink-950/80 text-pink-300 border-pink-700/60 shadow-sm shadow-pink-950/40 inline-flex items-center gap-1.5"
                 >
-                  🎶 Echo
+                  <img
+                    :src="getBadgeDisplay('🎶 Echo').iconUrl"
+                    alt="Echo"
+                    class="w-4 h-4 rounded object-cover shrink-0 border border-pink-500/40"
+                  />
+                  <span>Echo</span>
                 </span>
                 <span class="text-slate-500 text-base font-bold">➔</span>
                 <span
@@ -1106,22 +1118,28 @@
                   <span
                     v-for="(badge, bIdx) in (evt.badges || []).filter((b) => b !== '🎶 Echo')"
                     :key="bIdx"
-                    class="text-base bg-slate-900 text-amber-300 px-2 py-0.5 rounded-lg border border-slate-800"
+                    class="text-base bg-amber-950/60 text-amber-300 border border-amber-800/50 px-2 py-0.5 rounded-lg font-mono font-bold shadow-sm shadow-amber-950/30 inline-flex items-center gap-1.5"
                   >
-                    {{ badge }}
+                    <img
+                      v-if="getBadgeDisplay(badge).iconUrl"
+                      :src="getBadgeDisplay(badge).iconUrl"
+                      :alt="getBadgeDisplay(badge).label"
+                      class="w-4 h-4 rounded object-cover shrink-0 border border-amber-500/40"
+                    />
+                    <span>{{ getBadgeDisplay(badge).label }}</span>
                   </span>
                 </div>
                 <!-- Combined Shield & Heal for W cast -->
                 <template v-if="evt.shieldAmount !== undefined || evt.healAmount !== undefined">
                   <span
                     v-if="evt.shieldAmount && evt.shieldAmount > 0"
-                    class="text-base font-extrabold px-2.5 py-0.5 rounded-lg border bg-slate-800 text-white border-slate-400 shadow-sm"
+                    class="text-base font-extrabold font-mono px-2.5 py-0.5 rounded-lg border bg-sky-950/80 text-sky-200 border-sky-600/60 shadow-sm shadow-sky-950/40"
                   >
                     +{{ evt.shieldAmount }} SHIELD
                   </span>
                   <span
                     v-if="evt.healAmount && evt.healAmount > 0"
-                    class="text-base font-extrabold px-2.5 py-0.5 rounded-lg border bg-emerald-950/80 text-emerald-400 border-emerald-800/60 shadow-sm"
+                    class="text-base font-extrabold font-mono px-2.5 py-0.5 rounded-lg border bg-emerald-950/80 text-emerald-300 border-emerald-700/60 shadow-sm shadow-emerald-950/40"
                   >
                     +{{ evt.healAmount }} HP
                   </span>
@@ -1130,17 +1148,17 @@
                 <!-- Standard badge for damage or standalone events -->
                 <span
                   v-else
-                  class="text-base font-extrabold px-2.5 py-0.5 rounded-lg border"
+                  class="text-base font-extrabold font-mono px-2.5 py-0.5 rounded-lg border shadow-sm"
                   :class="
                     evt.dmgType === 'physical'
-                      ? 'bg-orange-950/80 text-orange-400 border-orange-800/60'
+                      ? 'bg-orange-950/80 text-orange-400 border-orange-800/60 shadow-orange-950/40'
                       : evt.dmgType === 'magic'
-                        ? 'bg-cyan-950/80 text-cyan-400 border-cyan-800/60'
+                        ? 'bg-cyan-950/80 text-cyan-300 border-cyan-800/60 shadow-cyan-950/40'
                         : evt.dmgType === 'shield'
-                          ? 'bg-slate-800 text-white border-slate-400 shadow-sm'
+                          ? 'bg-sky-950/80 text-sky-200 border-sky-600/60 shadow-sky-950/40'
                           : evt.dmgType === 'heal'
-                            ? 'bg-emerald-950/80 text-emerald-400 border-emerald-800/60 shadow-sm'
-                            : 'bg-slate-900 text-slate-100 border-slate-700'
+                            ? 'bg-emerald-950/80 text-emerald-300 border-emerald-700/60 shadow-emerald-950/40'
+                            : 'bg-slate-950/90 text-slate-100 border-slate-600/70 shadow-slate-500/10'
                   "
                 >
                   <template v-if="evt.dmgType === 'shield'"> +{{ evt.amount }} SHIELD </template>
@@ -1161,7 +1179,7 @@
                 </span>
                 <span
                   v-if="evt.isKo"
-                  class="text-base bg-rose-600 text-slate-950 font-extrabold px-2 py-0.5 rounded-lg animate-pulse"
+                  class="text-base bg-rose-950/90 text-rose-300 border border-rose-600/70 font-extrabold font-mono px-2.5 py-0.5 rounded-lg shadow-sm shadow-rose-950/40 animate-pulse"
                 >
                   ☠️ K.O.
                 </span>
@@ -1379,28 +1397,28 @@
             </div>
 
             <!-- Damage Breakdown Badges -->
-            <div class="flex items-center gap-1.5 flex-wrap text-base font-bold pt-1">
+            <div class="flex items-center gap-1.5 flex-wrap text-base font-bold font-mono pt-1">
               <span
                 v-if="getChampionEndState(slot.id).damageDealtByType.physical > 0"
-                class="bg-orange-950/80 text-orange-400 border border-orange-800/60 px-2 py-0.5 rounded-md"
+                class="bg-orange-950/80 text-orange-400 border border-orange-800/60 shadow-sm shadow-orange-950/50 px-2.5 py-0.5 rounded-lg inline-flex items-center gap-1"
               >
                 {{ getChampionEndState(slot.id).damageDealtByType.physical }} Phys
               </span>
               <span
                 v-if="getChampionEndState(slot.id).damageDealtByType.magic > 0"
-                class="bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 px-2 py-0.5 rounded-md"
+                class="bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 shadow-sm shadow-cyan-950/50 px-2.5 py-0.5 rounded-lg inline-flex items-center gap-1"
               >
                 {{ getChampionEndState(slot.id).damageDealtByType.magic }} Mag
               </span>
               <span
                 v-if="getChampionEndState(slot.id).damageDealtByType.true > 0"
-                class="bg-slate-900 text-slate-200 border border-slate-700 px-2 py-0.5 rounded-md"
+                class="bg-slate-950/90 text-slate-100 border border-slate-600/70 shadow-sm shadow-slate-500/20 px-2.5 py-0.5 rounded-lg inline-flex items-center gap-1"
               >
                 {{ getChampionEndState(slot.id).damageDealtByType.true }} True
               </span>
               <span
                 v-if="getChampionEndState(slot.id).damageDealtByType.dot > 0"
-                class="bg-purple-950/80 text-purple-300 border border-purple-800/60 px-2 py-0.5 rounded-md"
+                class="bg-purple-950/80 text-purple-300 border border-purple-800/60 shadow-sm shadow-purple-950/50 px-2.5 py-0.5 rounded-lg inline-flex items-center gap-1"
               >
                 🔥 {{ getChampionEndState(slot.id).damageDealtByType.dot }} DoT
               </span>
@@ -1415,9 +1433,16 @@
             <span
               v-for="dot in getChampionEndState(slot.id).activeDoTs"
               :key="dot.id"
-              class="bg-rose-950/90 text-rose-300 border border-rose-800/60 px-2.5 py-1 rounded-lg font-semibold animate-pulse"
+              class="bg-rose-950/80 text-rose-300 border border-rose-700/60 shadow-sm shadow-rose-950/50 px-2.5 py-0.5 rounded-lg font-mono font-bold inline-flex items-center gap-1.5 animate-pulse"
             >
-              🩸 {{ dot.name }} ({{ dot.remainingDuration.toFixed(1) }}s)
+              <img
+                v-if="getDoTIconUrl(dot)"
+                :src="getDoTIconUrl(dot)!"
+                :alt="dot.name"
+                class="w-4 h-4 rounded object-cover shrink-0 border border-rose-500/40"
+              />
+              <span v-else>🩸</span>
+              <span>{{ dot.name }} ({{ dot.remainingDuration.toFixed(1) }}s)</span>
             </span>
           </div>
 
@@ -1498,10 +1523,12 @@ import {
 } from '@/services'
 import type { DraftSlot } from '@/types'
 import { useCalculatorStore } from '@/stores/calculator'
+import { useDDragonStore } from '@/stores/ddragon'
 
 const router = useRouter()
 const draftStore = useDraftStore()
 const calculatorStore = useCalculatorStore()
+const ddragonStore = useDDragonStore()
 
 const { blueDraft, redDraft } = storeToRefs(draftStore)
 const { selectCustomizerSlot } = draftStore
@@ -1608,6 +1635,279 @@ const getSpellBadgeInfo = (act: 'Q' | 'W' | 'E' | 'R' | 'AA' | 'P') => {
   if (act === 'P') return 'Innate'
   const cd = getSpellCd(act)
   return `${cd}s CD`
+}
+
+const getBadgeDisplay = (badgeText: string): { label: string; iconUrl?: string } => {
+  const clean = badgeText.trim()
+  const base = import.meta.env.BASE_URL
+
+  // 1. Seraph's Embrace / Lifeline
+  if (clean.includes('Lifeline')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3048_mage_t3_seraphsembrace.png`,
+    }
+  }
+
+  // 2. Cryptbloom Nova
+  if (clean.includes('Cryptbloom')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3137_cryptbloom.png`,
+    }
+  }
+
+  // 3. Banshee's Veil
+  if (clean.includes('Banshee')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3102_mage_t3_bansheesveil.png`,
+    }
+  }
+
+  // 4. Blade of the Ruined King (Bork)
+  if (clean.includes('Bork')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3153_fighter_t3_bladeoftheruinedking.png`,
+    }
+  }
+
+  // 5. Muramana
+  if (clean.includes('Muramana')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3042_marksman_t3_muramana.png`,
+    }
+  }
+
+  // 6. Luden's Companion / Tempest
+  if (clean.includes("Luden's") || clean.includes('Ludens')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6655_mage_t4_ludenstempest.png`,
+    }
+  }
+
+  // 7. Nashor's Tooth
+  if (clean.includes('Nashor')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3115_mage_t3_nashorstooth.png`,
+    }
+  }
+
+  // 8. Guinsoo's Rageblade
+  if (clean.includes('Guinsoo')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3124_marksman_t3_guinsoosrageblade.png`,
+    }
+  }
+
+  // 9. Hextech Gunblade
+  if (clean.includes('Gunblade')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3146_hextechgunblade.png`,
+    }
+  }
+
+  // 10. Hextech Rocketbelt
+  if (clean.includes('Rocketbelt')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3152_mage_t4_hextechrocketbelt.png`,
+    }
+  }
+
+  // 11. Dusk and Dawn
+  if (clean.includes('Dusk & Dawn') || clean.includes('Dusk and Dawn')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6691_assassin_t4_duskbladeofdraktharr.png`,
+    }
+  }
+
+  // 12. Imperial Mandate
+  if (clean.includes('Mandate')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/4005_enchanter_t4_imperialmandate.png`,
+    }
+  }
+
+  // 13. Ardent Censer
+  if (clean.includes('Ardent')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3504_enchanter_t3_ardentcenser.png`,
+    }
+  }
+
+  // 14. Echoes of Helia
+  if (clean.includes('Helia')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6620_echoes_of_helia.png`,
+    }
+  }
+
+  // 15. Horizon Focus
+  if (clean.includes('Horizon')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/4628_mage_t3_horizonfocus.png`,
+    }
+  }
+
+  // 16. Malignance / Actualizer
+  if (clean.includes('Actualizer') || clean.includes('Malignance')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3118_malignance.png`,
+    }
+  }
+
+  // 17. Rylai's Crystal Scepter
+  if (clean.includes('Rylai')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3116_mage_t3_rylajscrystalscepter.png`,
+    }
+  }
+
+  // 18. Black Cleaver
+  if (clean.includes('BC ')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3071_fighter_t3_blackcleaver.png`,
+    }
+  }
+
+  // 19. Vile Decay (Sunfire / Hollow / Abyssal)
+  if (clean.includes('VD ')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3068_tank_t4_sunfireaegis.png`,
+    }
+  }
+
+  // 20. Grievous Wounds
+  if (clean.includes('Grievous Wounds')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/3916_mage_t2_oblivionorb.png`,
+    }
+  }
+
+  // 21. The Collector execute
+  if (clean.includes('Execute')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/items/icons/6676_marksman_t3_thecollector.png`,
+    }
+  }
+
+  // Runes
+  // 22. Press the Attack
+  if (clean.includes('PtA')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/precision/presstheattack/presstheattack.png`,
+    }
+  }
+
+  // 23. Electrocute
+  if (clean.includes('Electrocute')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/domination/electrocute/electrocute.png`,
+    }
+  }
+
+  // 24. Dark Harvest
+  if (clean.includes('Dark Harvest')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/domination/darkharvest/darkharvest.png`,
+    }
+  }
+
+  // 25. Lethal Tempo
+  if (clean.includes('LT Max')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/precision/lethaltempo/lethaltempotemp.png`,
+    }
+  }
+
+  // 26. Coup de Grace
+  if (clean.includes('CdG')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/precision/coupdegrace/coupdegrace.png`,
+    }
+  }
+
+  // 27. Cut Down
+  if (clean.includes('Cut Down')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/precision/cutdown/cutdown.png`,
+    }
+  }
+
+  // 28. Last Stand
+  if (clean.includes('Last Stand')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/sorcery/laststand/laststand.png`,
+    }
+  }
+
+  // 29. Deathfire Touch
+  if (clean.includes('DFT')) {
+    return {
+      label: clean.replace(/^[^\w\s+()%-&]+/, '').trim(),
+      iconUrl: `${base}cdragon/runes/images/styles/sorcery/deathfiretouch/deathfire_touch_keystone.png`,
+    }
+  }
+
+  // 30. Seraphine Echo
+  if (clean.includes('Echo')) {
+    const patch = ddragonStore.latestPatchVersion || '16.18.1'
+    return {
+      label: 'Echo',
+      iconUrl: `https://ddragon.leagueoflegends.com/cdn/${patch}/img/passive/Seraphine_Passive.png`,
+    }
+  }
+
+  const withoutEmoji = clean.replace(/^[^\w\s+()%-&]+/, '').trim()
+  return { label: withoutEmoji || clean }
+}
+
+const getDoTIconUrl = (dot: { type?: string; name: string }): string | null => {
+  const base = import.meta.env.BASE_URL
+  const type = dot.type?.toLowerCase() || ''
+  const name = dot.name?.toLowerCase() || ''
+
+  if (type === 'blackfire' || name.includes('baleful') || name.includes('blackfire')) {
+    return `${base}cdragon/items/icons/2503_blackfiretorch64.png`
+  }
+  if (type === 'liandry' || name.includes('torment') || name.includes('liandry')) {
+    return `${base}cdragon/items/icons/6653_mage_t4_liandrysanguish.png`
+  }
+  if (type === 'sunfire' || name.includes('sunfire')) {
+    return `${base}cdragon/items/icons/3068_tank_t4_sunfireaegis.png`
+  }
+  if (type === 'hollow' || name.includes('hollow')) {
+    return `${base}cdragon/items/icons/6664_hollowradiance.png`
+  }
+  if (type === 'dft' || name.includes('deathfire')) {
+    return `${base}cdragon/runes/images/styles/sorcery/deathfiretouch/deathfire_touch_keystone.png`
+  }
+  return null
 }
 
 const getShortAbilityName = (act: 'P' | 'Q' | 'W' | 'E' | 'R' | 'AA') => {

@@ -178,6 +178,8 @@ const statFilters = [
   { label: 'All Stats', value: 'All' },
   { label: 'Attack Damage', value: 'Damage' },
   { label: 'Ability Power', value: 'SpellDamage' },
+  { label: 'Magic Penetration', value: 'MagicPenetration' },
+  { label: 'Armor Penetration', value: 'ArmorPenetration' },
   { label: 'Health', value: 'Health' },
   { label: 'Armor', value: 'Armor' },
   { label: 'Magic Resist', value: 'SpellBlock' },
@@ -282,6 +284,21 @@ const filteredPickerItems = computed(() => {
           return item.stats.FlatPhysicalDamageMod || tags.includes('Damage')
         case 'SpellDamage':
           return item.stats.FlatMagicDamageMod || tags.includes('SpellDamage')
+        case 'MagicPenetration':
+          return (
+            (item.stats.rPercentMagicPenetrationMod ?? 0) > 0 ||
+            (item.stats.rFlatMagicPenetrationMod ?? 0) > 0 ||
+            tags.includes('MagicPenetration') ||
+            desc.includes('magic penetration')
+          )
+        case 'ArmorPenetration':
+          return (
+            (item.stats.rPercentArmorPenetrationMod ?? 0) > 0 ||
+            (item.stats.rFlatArmorPenetrationMod ?? 0) > 0 ||
+            tags.includes('ArmorPenetration') ||
+            desc.includes('armor penetration') ||
+            desc.includes('lethality')
+          )
         case 'Health':
           return item.stats.FlatHPPoolMod || tags.includes('Health')
         case 'Armor':
@@ -308,8 +325,11 @@ const filteredPickerItems = computed(() => {
   return list.filter((item) => {
     const matchesName = item.name.toLowerCase().includes(q)
     const matchesColloq = item.colloq.toLowerCase().includes(q)
-    const matchesTags = item.tags.some((tag) => tag.toLowerCase() === q)
-    return matchesName || matchesColloq || matchesTags
+    const matchesTags = item.tags.some((tag) => tag.toLowerCase().includes(q))
+    const matchesDesc = item.description.toLowerCase().includes(q)
+    const matchesItalianVoid =
+      (q.includes('vuoto') || q.includes('bastone')) && item.name.toLowerCase().includes('void')
+    return matchesName || matchesColloq || matchesTags || matchesDesc || matchesItalianVoid
   })
 })
 

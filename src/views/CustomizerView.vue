@@ -252,25 +252,25 @@
                     class="w-full h-full object-cover shrink-0"
                   />
 
-                  <!-- Dark Seal / Mejai Stacks Input Badge -->
+                  <!-- Stacks Input Badge on tile (Ornn style, top-left, editable number only, Arcane Purple theme) -->
                   <div
                     v-if="isStackableItem(item)"
-                    class="absolute bottom-1 left-1 h-7 px-1.5 rounded-md font-bold font-mono text-base backdrop-blur-md z-10 flex items-center gap-1 border bg-slate-950/85 border-cyan-500/80 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                    class="absolute top-1 left-1 h-7 min-w-7 px-1.5 rounded-md font-bold font-mono text-base backdrop-blur-md transition-all z-10 flex items-center justify-center border bg-slate-950/90 text-purple-200 border-purple-400 shadow-[0_2px_8px_rgba(0,0,0,0.8),0_0_10px_rgba(168,85,247,0.4)]"
+                    :title="`${getStackLabelForItem(item)}: ${getItemStacks(idx, item)} / ${getMaxStacksForItem(item)}${getStackEffectDescription(item, getItemStacks(idx, item)) ? ' (' + getStackEffectDescription(item, getItemStacks(idx, item)) + ')' : ''}`"
                     @click.stop
                   >
-                    <span class="text-xs">⚡</span>
                     <input
                       type="number"
                       :min="0"
                       :max="getMaxStacksForItem(item)"
                       :value="getItemStacks(idx, item)"
                       @input="handleItemStackInput(idx, $event)"
+                      @blur="handleItemStackBlur(idx, $event)"
+                      @focus="($event.target as HTMLInputElement)?.select()"
+                      @keydown.stop
                       @click.stop
-                      class="w-7 bg-transparent text-center font-bold font-mono text-cyan-300 focus:outline-none focus:bg-cyan-950/50 rounded border-b border-cyan-400/50 text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      class="w-7 bg-transparent text-center font-bold font-mono text-purple-200 focus:outline-none text-base p-0 cursor-text [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
-                    <span class="text-[10px] text-cyan-400/80 font-mono font-normal"
-                      >/{{ getMaxStacksForItem(item) }}</span
-                    >
                   </div>
 
                   <!-- Ornn Masterwork Badge & Toggle Button -->
@@ -920,13 +920,95 @@ const isMasterwork = (idx: number): boolean => {
 const isStackableItem = (item: Item | null): boolean => {
   if (!item) return false
   const name = item.name.toLowerCase()
-  return name.includes('dark seal') || name.includes('mejai')
+  const itemId = String(item.id || '')
+  return (
+    name.includes('dark seal') ||
+    name.includes('sigillo oscuro') ||
+    itemId === '1082' ||
+    itemId === '221082' ||
+    name.includes('mejai') ||
+    itemId === '3041' ||
+    itemId === '223041' ||
+    name.includes('rod of ages') ||
+    name.includes('bastone delle ere') ||
+    itemId === '6657' ||
+    itemId === '226657'
+  )
 }
 
 const getMaxStacksForItem = (item: Item | null): number => {
   if (!item) return 0
   const name = item.name.toLowerCase()
-  return name.includes('mejai') ? 25 : name.includes('dark seal') ? 10 : 0
+  const itemId = String(item.id || '')
+  if (name.includes('mejai') || itemId === '3041' || itemId === '223041') {
+    return 25
+  }
+  if (
+    name.includes('dark seal') ||
+    name.includes('sigillo oscuro') ||
+    itemId === '1082' ||
+    itemId === '221082' ||
+    name.includes('rod of ages') ||
+    name.includes('bastone delle ere') ||
+    itemId === '6657' ||
+    itemId === '226657'
+  ) {
+    return 10
+  }
+  return 0
+}
+
+const getStackLabelForItem = (item: Item | null): string => {
+  if (!item) return 'Stacks'
+  const name = item.name.toLowerCase()
+  const itemId = String(item.id || '')
+  if (
+    name.includes('rod of ages') ||
+    name.includes('bastone delle ere') ||
+    itemId === '6657' ||
+    itemId === '226657'
+  ) {
+    return 'Timeless (Max 10)'
+  }
+  if (name.includes('mejai') || itemId === '3041' || itemId === '223041') {
+    return 'Glory (Max 25)'
+  }
+  if (
+    name.includes('dark seal') ||
+    name.includes('sigillo oscuro') ||
+    itemId === '1082' ||
+    itemId === '221082'
+  ) {
+    return 'Glory (Max 10)'
+  }
+  return 'Stacks'
+}
+
+const getStackEffectDescription = (item: Item | null, stacks: number): string => {
+  if (!item) return ''
+  const name = item.name.toLowerCase()
+  const itemId = String(item.id || '')
+  if (
+    name.includes('rod of ages') ||
+    name.includes('bastone delle ere') ||
+    itemId === '6657' ||
+    itemId === '226657'
+  ) {
+    return `+${stacks * 10} HP, +${stacks * 30} MP, +${stacks * 3} AP`
+  }
+  if (name.includes('mejai') || itemId === '3041' || itemId === '223041') {
+    const msBonus = stacks >= 10 ? ' (+10% Move Speed)' : ''
+    return `+${stacks * 5} AP${msBonus}`
+  }
+  if (
+    name.includes('dark seal') ||
+    name.includes('sigillo oscuro') ||
+    itemId === '1082' ||
+    itemId === '221082'
+  ) {
+    return `+${stacks * 4} AP`
+  }
+  return ''
 }
 
 const getItemStacks = (idx: number, item: Item): number => {
@@ -938,8 +1020,31 @@ const getItemStacks = (idx: number, item: Item): number => {
 
 const handleItemStackInput = (idx: number, event: Event) => {
   const target = event.target as HTMLInputElement
-  const val = parseInt(target.value, 10)
-  setItemStack(idx, isNaN(val) ? 0 : val)
+  const item = activeCustomizerSlot.value?.items[idx]
+  if (!item) return
+  const max = getMaxStacksForItem(item)
+  if (target.value === '') {
+    setItemStack(idx, 0)
+    return
+  }
+  let val = parseInt(target.value, 10)
+  if (isNaN(val)) val = 0
+  if (val > max) {
+    val = max
+    target.value = String(max)
+  } else if (val < 0) {
+    val = 0
+    target.value = '0'
+  }
+  setItemStack(idx, val)
+}
+
+const handleItemStackBlur = (idx: number, event: Event) => {
+  const target = event.target as HTMLInputElement
+  const item = activeCustomizerSlot.value?.items[idx]
+  if (!item) return
+  const current = getItemStacks(idx, item)
+  target.value = String(current)
 }
 
 const activeCustomizerStats = computed(() => {

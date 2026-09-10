@@ -126,6 +126,7 @@ export const useDDragonStore = defineStore('ddragon', () => {
     spellFormulasData,
     availablePatches,
     currentPatch,
+    latestPatchVersion,
     isLoading,
     isPatchLoading,
     error,
