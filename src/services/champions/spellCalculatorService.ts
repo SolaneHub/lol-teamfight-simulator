@@ -34,6 +34,11 @@ export interface SpellDamageInput {
     hasCoupDeGrace?: boolean
     hasLastStand?: boolean
     hasCutDown?: boolean
+    hasInfinityEdge?: boolean
+    hasRanduins?: boolean
+    isGuaranteedCrit?: boolean
+    shojinMultiplier?: number
+    hasBloodsong?: boolean
   }
 }
 
@@ -108,7 +113,8 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
       (attacker.lethality || 0),
   )
   const horizonMult = options?.hasHorizonFocus ? 1.1 : 1.0
-  const physMult = (100 / (100 + effArmor)) * runeMultiplier * horizonMult
+  const bloodsongMult = options?.hasBloodsong ? 1.1 : 1.0
+  const physMult = (100 / (100 + effArmor)) * runeMultiplier * horizonMult * bloodsongMult
 
   const effMr = Math.max(
     0,
@@ -118,7 +124,11 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
       (attacker.magicPenFlat || 0),
   )
   const magicMult =
-    (100 / (100 + effMr)) * (options?.hasAbyssalMask ? 1.12 : 1.0) * runeMultiplier * horizonMult
+    (100 / (100 + effMr)) *
+    (options?.hasAbyssalMask ? 1.12 : 1.0) *
+    runeMultiplier *
+    horizonMult *
+    bloodsongMult
 
   // Default spell ranks
   const qRank =
@@ -140,7 +150,13 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
 
   // 1. Auto Attack
   if (action === 'AA') {
-    rawDmg = attAd * (attacker.crit > 0 ? 1.75 : 1.0)
+    const isCrit = attacker.crit > 0 || Boolean(options?.isGuaranteedCrit)
+    const critMult = options?.hasInfinityEdge ? 2.15 : 1.75
+    let attackDmg = attAd * (isCrit ? critMult : 1.0)
+    if (isCrit && options?.hasRanduins) {
+      attackDmg = attAd + (attackDmg - attAd) * 0.7
+    }
+    rawDmg = attackDmg
     dmgType = 'physical'
     hitMult = physMult
     return {
@@ -357,6 +373,14 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
     rawDmg = isApAttacker ? 140 + attAp * 0.6 : 130 + attAd * 0.65
     dmgType = isApAttacker ? 'magic' : 'physical'
     hitMult = isApAttacker ? magicMult : physMult
+  }
+
+  if (
+    options?.shojinMultiplier &&
+    options.shojinMultiplier > 1 &&
+    ['Q', 'W', 'E', 'R', 'P'].includes(action)
+  ) {
+    rawDmg = rawDmg * options.shojinMultiplier
   }
 
   return {

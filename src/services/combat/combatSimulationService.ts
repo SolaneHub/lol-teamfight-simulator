@@ -32,6 +32,8 @@ export type DoTType =
   | 'cassiopeia_poison'
   | 'twitch_venom'
   | 'malzahar_visions'
+  | 'yun_tal'
+  | 'zekes'
 
 export interface ActiveDoT {
   id: string
@@ -196,7 +198,29 @@ interface InternalParticipantState {
   lastSpellCastTime: number
   lifelineTriggered?: boolean
   bansheesActive?: boolean
+  edgeOfNightActive?: boolean
+  celestialOppositionActive?: boolean
+  celestialOppositionEndTime?: number
+  forceOfNatureStacks?: number
+  hullbreakerHitCount?: Record<number, number>
+  hexplateBuffEndTime?: number
+  deathsDanceBleedPool?: number
+  deadMansDischarged?: boolean
+  stormrazorDischarged?: boolean
+  alternatorDischarged?: boolean
+  stridebreakerUsed?: boolean
+  redemptionUsed?: boolean
+  mikaelsUsed?: boolean
   grievousWoundsDuration?: number
+  baseHp: number
+  baseBonusArmor: number
+  sunderedSkyCooldowns: Record<number, number>
+  eclipseHitCount: Record<number, { count: number; windowEndTime: number; cooldownEndTime: number }>
+  bloodsongActiveTargets: Record<number, number>
+  bloodsongReady: boolean
+  heartsteelReady: Record<number, boolean>
+  nextUnendingDespairTime: number
+  guardianAngelUsed: boolean
 }
 
 /**
@@ -215,8 +239,32 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
     enableAutoAttacks = false,
     autoCastSpells = false,
     enforceCooldowns = false,
-    attackerBuffs,
-    defenderBuffs,
+    attackerBuffs = {
+      red: false,
+      blue: false,
+      baron: false,
+      elder: false,
+      infernal: 0,
+      mountain: 0,
+      ocean: 0,
+      cloud: 0,
+      hextech: 0,
+      chemtech: 0,
+      soul: 'none',
+    },
+    defenderBuffs = {
+      red: false,
+      blue: false,
+      baron: false,
+      elder: false,
+      infernal: 0,
+      mountain: 0,
+      ocean: 0,
+      cloud: 0,
+      hextech: 0,
+      chemtech: 0,
+      soul: 'none',
+    },
   } = input
 
   const clampedDuration = Math.max(0.5, Math.min(30, duration))
@@ -248,6 +296,15 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
     const keystoneName = (slot.primaryKeystone?.name || '').toLowerCase()
     const hasHob = keystoneName.includes('hail of blades') || keystoneName.includes('hailofblades')
 
+    const initialPassives = detectItemPassives(slot.items)
+    let initialShield = 0
+    if (initialPassives.hasKaenicRookern) {
+      initialShield += Math.round(hp * 0.18)
+    }
+    if (initialPassives.hasLocket) {
+      initialShield += Math.round(200 + ((slot.level || 1) - 1) * (160 / 17))
+    }
+
     participants[slotId] = {
       slot,
       side,
@@ -257,7 +314,7 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       role: slot.role,
       maxHp: hp,
       currentHp: hp,
-      currentShield: 0,
+      currentShield: initialShield,
       baseArmor: armor,
       baseMr: mr,
       blackCleaverStacks: 0,
@@ -295,7 +352,29 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       bansheesActive: (slot.items || []).some(
         (i) => i && (i.name.toLowerCase().includes('banshee') || i.id === '3102'),
       ),
+      edgeOfNightActive: initialPassives.hasEdgeOfNight,
+      celestialOppositionActive: false,
+      celestialOppositionEndTime: 0,
+      forceOfNatureStacks: 0,
+      hullbreakerHitCount: {},
+      hexplateBuffEndTime: 0,
+      deathsDanceBleedPool: 0,
+      deadMansDischarged: false,
+      stormrazorDischarged: false,
+      alternatorDischarged: false,
+      stridebreakerUsed: false,
+      redemptionUsed: false,
+      mikaelsUsed: false,
       grievousWoundsDuration: 0,
+      baseHp: baseStats?.hp?.base || 600,
+      baseBonusArmor: Math.max(0, armor - (slot.champion?.stats?.armor || 30)),
+      sunderedSkyCooldowns: {},
+      eclipseHitCount: {},
+      bloodsongActiveTargets: {},
+      bloodsongReady: false,
+      heartsteelReady: {},
+      nextUnendingDespairTime: 5.0,
+      guardianAngelUsed: false,
     }
   })
 
@@ -334,9 +413,9 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
 
     // Check Blackfire Torch active bonus AP (4% AP per burning enemy)
     const activeItems = detectItemPassives(part.slot.items)
+    const oppTargets = getOpposingAliveTargets(part.slotId)
     let extraApPct = 0
     if (activeItems.hasBlackfireTorch) {
-      const oppTargets = getOpposingAliveTargets(part.slotId)
       const burningCount = oppTargets.filter((t) =>
         t.activeDoTs.some((d) => d.type === 'blackfire' && d.sourceSlotId === part.slotId),
       ).length
@@ -352,7 +431,13 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
     const totalApMultiplier = existingApMultiplier + (mStats.apMultiplier - 1) + extraApPct
     const totalAp = Math.round(rawAp * totalApMultiplier)
 
-    const attackSpeed = Math.max(0.2, Math.min(3.5, dynamicStats?.as?.total || 0.65))
+    // Frozen Heart aura reduces enemy AS by 20%
+    const enemyHasFrozenHeart = oppTargets.some((t) => {
+      const p = detectItemPassives(t.slot.items)
+      return p.hasFrozenHeart
+    })
+    const asMult = enemyHasFrozenHeart ? 0.8 : 1.0
+    const attackSpeed = Math.max(0.2, Math.min(3.5, (dynamicStats?.as?.total || 0.65) * asMult))
 
     return {
       ad: totalAd,
@@ -367,7 +452,7 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       magicPenFlat: dynamicStats?.magicPenFlat?.total || 0,
       magicPenPercent: dynamicStats?.magicPenPercent?.total || 0,
       mana: dynamicStats?.mp?.total || 600,
-      bonusHp: Math.max(0, part.maxHp - (part.slot.champion?.stats?.hp || 600)),
+      bonusHp: dynamicStats?.hp?.bonus || 0,
       abilityHaste: Math.round((dynamicStats?.abilityHaste?.total || 0) + mStats.bonusAH),
       healShieldPower: dynamicStats?.healShieldPower?.total || 0,
       itemPassives: activeItems,
@@ -390,12 +475,104 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
     let effectiveDamage = amount
     let isBlocked = false
 
+    const actorPassives = detectItemPassives(actor.slot.items)
+    const targetPassives = detectItemPassives(target.slot.items)
+    const isActorMelee = (actor.slot.champion?.stats?.attackrange || 125) <= 225
+
+    // Serpent's Fang: cuts target shield before absorption
+    if (actorPassives.hasSerpentsFang && target.currentShield > 0) {
+      const shieldCutPct = isActorMelee ? 0.5 : 0.35
+      const shieldCut = Math.round(target.currentShield * shieldCutPct)
+      target.currentShield = Math.max(0, target.currentShield - shieldCut)
+      badges.push(`Serpent's Fang (-${shieldCut})`)
+    }
+
     // Banshee's Veil spell shield blocks first hostile magic spell
     if (target.bansheesActive && dmgType === 'magic' && !isDot) {
       target.bansheesActive = false
       badges.push('🛡️ Banshee Blocked')
       effectiveDamage = 0
       isBlocked = true
+    }
+
+    // Edge of Night spell shield blocks first hostile ability
+    const isHostileAbility =
+      actionName !== 'AA' &&
+      !actionName.includes('Burn') &&
+      !actionName.includes('Reflect') &&
+      !actionName.includes('Immolate') &&
+      !isDot
+    if (target.edgeOfNightActive && isHostileAbility) {
+      target.edgeOfNightActive = false
+      badges.push('Edge of Night Blocked')
+      effectiveDamage = 0
+      isBlocked = true
+    }
+
+    // Celestial Opposition Exalted damage reduction
+    if (targetPassives.hasCelestialOpposition && !isBlocked) {
+      if (
+        !target.celestialOppositionActive &&
+        (!target.celestialOppositionEndTime || currentTime >= target.celestialOppositionEndTime)
+      ) {
+        target.celestialOppositionActive = true
+        target.celestialOppositionEndTime = currentTime + 2.5
+        badges.push('Celestial Exalted (-35%)')
+      }
+      if (
+        target.celestialOppositionActive &&
+        currentTime <= (target.celestialOppositionEndTime ?? 0)
+      ) {
+        const redPct = isActorMelee ? 0.35 : 0.25
+        effectiveDamage = Math.round(effectiveDamage * (1 - redPct))
+      }
+    }
+
+    // Warden's Mail / Rock Solid flat damage reduction on basic attacks
+    if (targetPassives.hasWardensMail && actionName === 'AA' && effectiveDamage > 0) {
+      const flatReduction = Math.min(effectiveDamage * 0.2, (target.maxHp / 1000) * 5)
+      effectiveDamage = Math.max(1, Math.round(effectiveDamage - flatReduction))
+    }
+
+    // Force of Nature Steadfast (builds MR stacks upon taking magic damage)
+    if (targetPassives.hasForceOfNature && dmgType === 'magic' && !isBlocked) {
+      target.forceOfNatureStacks = Math.min(8, (target.forceOfNatureStacks || 0) + 1)
+      if (target.forceOfNatureStacks === 8) {
+        badges.push('Force of Nature (+70 MR)')
+      }
+    }
+
+    // Knight's Vow damage redirection (12% redirected to partner)
+    const alliesWithVow = Object.values(participants).filter(
+      (p) =>
+        p.side === target.side &&
+        p.slotId !== target.slotId &&
+        !p.isKo &&
+        detectItemPassives(p.slot.items).hasKnightsVow,
+    )
+    if (alliesWithVow.length > 0 && effectiveDamage > 0) {
+      const redirected = Math.round(effectiveDamage * 0.12)
+      effectiveDamage -= redirected
+      const partner = alliesWithVow[0]
+      if (partner) {
+        partner.currentHp = Math.max(1, partner.currentHp - redirected)
+        partner.damageTaken += redirected
+        badges.push(`Knight's Vow (-${redirected})`)
+      }
+    }
+
+    // Death's Dance Ignore Pain (stores 30% melee / 10% ranged damage as true bleed)
+    if (
+      targetPassives.hasDeathsDance &&
+      (dmgType === 'physical' || dmgType === 'magic') &&
+      effectiveDamage > 0
+    ) {
+      const isTargetMelee = (target.slot.champion?.stats?.attackrange || 125) <= 225
+      const storePct = isTargetMelee ? 0.3 : 0.1
+      const storedDamage = Math.round(effectiveDamage * storePct)
+      effectiveDamage -= storedDamage
+      target.deathsDanceBleedPool = (target.deathsDanceBleedPool || 0) + storedDamage
+      badges.push(`Ignore Pain (-${storedDamage})`)
     }
 
     if (target.currentShield > 0 && effectiveDamage > 0) {
@@ -411,6 +588,64 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       }
     }
 
+    // Proactive Lifeline: Triggers when incoming damage would reduce health below 30% max HP
+    const hasLifelineItem =
+      targetPassives.hasSeraphs ||
+      targetPassives.hasSteraksGage ||
+      targetPassives.hasMawOfMalmortius ||
+      targetPassives.hasImmortalShieldbow ||
+      targetPassives.hasHexdrinker
+
+    if (
+      !target.lifelineTriggered &&
+      hasLifelineItem &&
+      effectiveDamage > 0 &&
+      target.currentHp - effectiveDamage < target.maxHp * 0.3
+    ) {
+      target.lifelineTriggered = true
+      const shieldMult = targetPassives.hasSpiritVisage ? 1.25 : 1.0
+      let lifelineShield = 0
+      let lifelineBadge = ''
+
+      if (targetPassives.hasSeraphs) {
+        lifelineShield = Math.round(
+          (250 + (target.slot.champion?.stats?.mp || 1000) * 0.2) * shieldMult,
+        )
+        lifelineBadge = `Lifeline (+${lifelineShield})`
+      } else if (targetPassives.hasSteraksGage) {
+        const bonusHp = Math.max(0, target.maxHp - (target.slot.champion?.stats?.hp || 600))
+        lifelineShield = Math.round(bonusHp * 0.8 * shieldMult)
+        lifelineBadge = `Sterak's Shield (+${lifelineShield})`
+      } else if (targetPassives.hasMawOfMalmortius) {
+        const tStats = getLiveStats(target)
+        const bonusAd = Math.max(0, tStats.ad - tStats.baseAd)
+        lifelineShield = Math.round((200 + bonusAd * 2.25) * shieldMult)
+        lifelineBadge = `Maw Shield (+${lifelineShield})`
+      } else if (targetPassives.hasImmortalShieldbow) {
+        lifelineShield = Math.round((320 + (target.level - 1) * (210 / 17)) * shieldMult)
+        lifelineBadge = `Shieldbow (+${lifelineShield})`
+      } else if (targetPassives.hasHexdrinker) {
+        lifelineShield = Math.round((110 + ((target.level || 1) - 1) * (170 / 17)) * shieldMult)
+        lifelineBadge = `Hexdrinker (+${lifelineShield})`
+      }
+
+      if (lifelineShield > 0) {
+        target.currentShield += lifelineShield
+        badges.push(lifelineBadge)
+
+        if (effectiveDamage <= target.currentShield) {
+          target.currentShield -= effectiveDamage
+          badges.push(`Absorbed (${effectiveDamage})`)
+          effectiveDamage = 0
+        } else {
+          const absorbed = target.currentShield
+          effectiveDamage -= target.currentShield
+          target.currentShield = 0
+          badges.push(`Shield Broken (-${absorbed})`)
+        }
+      }
+    }
+
     target.currentHp = Math.max(0, target.currentHp - effectiveDamage)
     const dealtDmg = isBlocked ? 0 : amount
     target.damageTaken += dealtDmg
@@ -423,32 +658,75 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
 
     lastDamageTime = Math.max(lastDamageTime, Math.round(currentTime * 10) / 10)
 
-    const actorPassives = detectItemPassives(actor.slot.items)
-    if (actorPassives.hasMorellonomicon && dmgType === 'magic') {
+    // Grievous Wounds application (Morello on magic, Mortal Reminder / Chempunk on physical)
+    if (
+      (actorPassives.hasMorellonomicon && dmgType === 'magic') ||
+      ((actorPassives.hasMortalReminder || actorPassives.hasChempunkChainsword) &&
+        dmgType === 'physical')
+    ) {
       target.grievousWoundsDuration = 3.0
       badges.push('🩸 Grievous Wounds')
     }
 
     if (target.currentHp === 0) {
-      target.isKo = true
-      if (actorPassives.hasCryptbloom) {
-        const actorLive = getLiveStats(actor)
-        const novaHeal = Math.round(50 + actorLive.ap * 0.5)
-        const allies = Object.values(participants).filter((p) => p.side === actor.side && !p.isKo)
-        allies.forEach((ally) => {
-          const healMult =
-            ally.grievousWoundsDuration && ally.grievousWoundsDuration > 0 ? 0.6 : 1.0
-          ally.currentHp = Math.min(ally.maxHp, ally.currentHp + Math.round(novaHeal * healMult))
-        })
-        badges.push('🌸 Cryptbloom Nova')
+      if (targetPassives.hasGuardianAngel && !target.guardianAngelUsed) {
+        target.guardianAngelUsed = true
+        target.currentHp = Math.round(target.baseHp * 0.5)
+        target.isKo = false
+        badges.push('Guardian Angel')
+      } else {
+        target.isKo = true
+        if (actorPassives.hasCryptbloom) {
+          const actorLive = getLiveStats(actor)
+          const novaHeal = Math.round(50 + actorLive.ap * 0.5)
+          const allies = Object.values(participants).filter((p) => p.side === actor.side && !p.isKo)
+          allies.forEach((ally) => {
+            const healMult =
+              ally.grievousWoundsDuration && ally.grievousWoundsDuration > 0 ? 0.6 : 1.0
+            ally.currentHp = Math.min(ally.maxHp, ally.currentHp + Math.round(novaHeal * healMult))
+          })
+          badges.push('Cryptbloom Nova')
+        }
+        if (actorPassives.hasDeathsDance) {
+          actor.deathsDanceBleedPool = 0
+          const aLive = getLiveStats(actor)
+          const bonusAd = Math.max(0, aLive.ad - aLive.baseAd)
+          const defyHeal = Math.round(bonusAd * 1.2)
+          actor.currentHp = Math.min(actor.maxHp, actor.currentHp + defyHeal)
+          badges.push(`DD Defy (+${defyHeal})`)
+        }
+        if (actorPassives.hasAxiomArc) {
+          actor.spellCooldowns.R = 0
+          badges.push('Axiom Arc (R Reset)')
+        }
       }
     } else if (target.currentHp / target.maxHp < 0.3 && !target.lifelineTriggered) {
-      const targetPassives = detectItemPassives(target.slot.items)
+      const shieldMult = targetPassives.hasSpiritVisage ? 1.25 : 1.0
       if (targetPassives.hasSeraphs) {
         target.lifelineTriggered = true
-        const lifelineShield = Math.round(250 + (target.slot.champion?.stats?.mp || 1000) * 0.2)
+        const lifelineShield = Math.round(
+          (250 + (target.slot.champion?.stats?.mp || 1000) * 0.2) * shieldMult,
+        )
         target.currentShield += lifelineShield
-        badges.push(`🛡️ Lifeline (+${lifelineShield})`)
+        badges.push(`Lifeline (+${lifelineShield})`)
+      } else if (targetPassives.hasSteraksGage) {
+        target.lifelineTriggered = true
+        const bonusHp = Math.max(0, target.maxHp - (target.slot.champion?.stats?.hp || 600))
+        const lifelineShield = Math.round(bonusHp * 0.8 * shieldMult)
+        target.currentShield += lifelineShield
+        badges.push(`Sterak's Shield (+${lifelineShield})`)
+      } else if (targetPassives.hasMawOfMalmortius) {
+        target.lifelineTriggered = true
+        const tStats = getLiveStats(target)
+        const bonusAd = Math.max(0, tStats.ad - tStats.baseAd)
+        const lifelineShield = Math.round((200 + bonusAd * 2.25) * shieldMult)
+        target.currentShield += lifelineShield
+        badges.push(`Maw Shield (+${lifelineShield})`)
+      } else if (targetPassives.hasImmortalShieldbow) {
+        target.lifelineTriggered = true
+        const lifelineShield = Math.round((320 + (target.level - 1) * (210 / 17)) * shieldMult)
+        target.currentShield += lifelineShield
+        badges.push(`Shieldbow (+${lifelineShield})`)
       }
     }
 
@@ -470,10 +748,103 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       badges: badges.length > 0 ? badges : undefined,
     })
 
+    // The Collector execute threshold (< 5% max HP or lethal blow)
+    if (actorPassives.hasTheCollector && !target.guardianAngelUsed) {
+      if (!target.isKo && target.currentHp > 0 && target.currentHp / target.maxHp < 0.05) {
+        const execDmg = target.currentHp
+        target.currentHp = 0
+        target.currentShield = 0
+        target.isKo = true
+        actor.totalDamageDealt += execDmg
+        actor.damageDealtByType.true += execDmg
+        target.damageTaken += execDmg
+
+        events.push({
+          timestamp: Math.round(currentTime * 10) / 10,
+          actorSlotId: actor.slotId,
+          actorName: actor.championName,
+          actorSide: actor.side,
+          action: '💀 The Collector EXECUTE',
+          targetSlotId: target.slotId,
+          targetName: target.championName,
+          targetSide: target.side,
+          amount: execDmg,
+          dmgType: 'true',
+          isDot: false,
+          remainingHp: 0,
+          remainingShield: 0,
+          isKo: true,
+          badges: ['5% HP Execute'],
+        })
+      } else if (
+        target.isKo &&
+        target.currentHp === 0 &&
+        !events.some(
+          (e) => e.targetSlotId === target.slotId && e.action.includes('The Collector EXECUTE'),
+        )
+      ) {
+        events.push({
+          timestamp: Math.round(currentTime * 10) / 10,
+          actorSlotId: actor.slotId,
+          actorName: actor.championName,
+          actorSide: actor.side,
+          action: '💀 The Collector EXECUTE',
+          targetSlotId: target.slotId,
+          targetName: target.championName,
+          targetSide: target.side,
+          amount: 9999,
+          dmgType: 'true',
+          isDot: false,
+          remainingHp: 0,
+          remainingShield: 0,
+          isKo: true,
+          badges: ['5% HP Execute'],
+        })
+      }
+    }
+
+    // Thornmail / Bramble Vest reflect on basic attacks (AA)
+    if (
+      actionName === 'AA' &&
+      (targetPassives.hasThornmail || targetPassives.hasBrambleVest) &&
+      !actor.isKo &&
+      !isDot
+    ) {
+      const thornBase = targetPassives.hasThornmail ? 15 : 6
+      const thornRatio = targetPassives.hasThornmail ? 0.25 : 0.1
+      const thornRaw = thornBase + target.baseBonusArmor * thornRatio
+      const actorEffMr = Math.max(0, actor.baseMr - (getLiveStats(actor).magicPenFlat || 0))
+      const actorMagicMult = 100 / (100 + actorEffMr)
+      const thornDmg = Math.max(1, Math.round(thornRaw * actorMagicMult))
+      actor.currentHp = Math.max(0, actor.currentHp - thornDmg)
+      actor.damageTaken += thornDmg
+      target.totalDamageDealt += thornDmg
+      target.damageDealtByType.magic += thornDmg
+      actor.grievousWoundsDuration = 3.0
+      if (actor.currentHp === 0) actor.isKo = true
+      events.push({
+        timestamp: Math.round(currentTime * 10) / 10,
+        actorSlotId: target.slotId,
+        actorName: target.championName,
+        actorSide: target.side,
+        action: '🌵 Thornmail Reflect',
+        targetSlotId: actor.slotId,
+        targetName: actor.championName,
+        targetSide: actor.side,
+        amount: thornDmg,
+        dmgType: 'magic',
+        isDot: false,
+        remainingHp: actor.currentHp,
+        remainingShield: actor.currentShield,
+        isKo: actor.isKo,
+        badges: ['Thornmail Reflect', '🩸 Grievous Wounds'],
+      })
+    }
+
     // Elder Dragon execute threshold check: target below 20% max HP
     const buffs = actor.side === 'blue' ? attackerBuffs : defenderBuffs
     if (
-      buffs.elder &&
+      buffs?.elder &&
       !target.isKo &&
       target.currentHp > 0 &&
       target.currentHp / target.maxHp < 0.2
@@ -779,6 +1150,29 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
           badges.push('🎯 PtA +8%')
         }
 
+        const targetPassives = detectItemPassives(target.slot.items)
+        const isSunderedSkyReady =
+          action === 'AA' &&
+          actorStats.itemPassives.hasSunderedSky &&
+          (!actor.sunderedSkyCooldowns[target.slotId] ||
+            currentTime >= (actor.sunderedSkyCooldowns[target.slotId] ?? 0))
+
+        let shojinMultiplier = 1.0
+        if (actorStats.itemPassives.hasSpearOfShojin) {
+          const shojinIdx = (actor.slot.items || []).findIndex(
+            (it) =>
+              it &&
+              (it.name.toLowerCase().includes('shojin') || it.id === '3161' || it.id === '223161'),
+          )
+          const currentStacks =
+            shojinIdx !== -1 && actor.slot.itemStacks?.[shojinIdx] !== undefined
+              ? actor.slot.itemStacks[shojinIdx]!
+              : 4
+          shojinMultiplier = 1 + currentStacks * 0.03
+        }
+
+        const isBloodsongActive = (actor.bloodsongActiveTargets[target.slotId] ?? 0) > currentTime
+
         // Calculate spell / attack damage via spellCalculatorService
         const spellRes = calculateSpellDamage({
           champion: actor.slot.champion,
@@ -797,7 +1191,11 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
             lethality: actorStats.lethality,
             magicPenPercent: actorStats.magicPenPercent,
             magicPenFlat: actorStats.magicPenFlat,
-            adaptiveType: actor.slot.champion?.tags?.includes('Mage') ? 'AP' : 'AD',
+            adaptiveType:
+              actorStats.ap > Math.max(0, actorStats.ad - actorStats.baseAd) ||
+              actor.slot.champion?.tags?.includes('Mage')
+                ? 'AP'
+                : 'AD',
           },
           defender: {
             currentHp: target.currentHp,
@@ -813,8 +1211,20 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
             hasCoupDeGrace,
             hasLastStand,
             hasCutDown,
+            hasInfinityEdge: actorStats.itemPassives.hasInfinityEdge,
+            hasRanduins: targetPassives.hasRanduinsOmen,
+            isGuaranteedCrit: isSunderedSkyReady,
+            shojinMultiplier,
+            hasBloodsong: Boolean(isBloodsongActive),
           },
         })
+
+        if (isAbility && shojinMultiplier > 1) {
+          badges.push(`Shojin (+${Math.round((shojinMultiplier - 1) * 100)}%)`)
+        }
+        if (isBloodsongActive) {
+          badges.push('Bloodsong (+10%)')
+        }
 
         if (spellRes.isCoupDeGraceProc) badges.push('🗡️ CdG (+8%)')
         if (spellRes.isCutDownProc) badges.push('🩸 Cut Down (+8%)')
@@ -956,6 +1366,347 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         // Rylai's Crystal Scepter Slow
         if (isAbility && actorStats.itemPassives.hasRylais) {
           badges.push('❄️ Rylai Slow')
+        }
+
+        // Sundered Sky Critical Strike & Heal
+        if (isSunderedSkyReady) {
+          actor.sunderedSkyCooldowns[target.slotId] = currentTime + 6.0
+          const healMult = targetPassives.hasSpiritVisage ? 1.25 : 1.0
+          const healAmt = Math.round(
+            (actorStats.baseAd * 1.4 + (actor.maxHp - actor.currentHp) * 0.06) * healMult,
+          )
+          actor.currentHp = Math.min(actor.maxHp, actor.currentHp + healAmt)
+          badges.push('Sundered Sky')
+        }
+
+        // Heartsteel Colossus Strike
+        if (
+          action === 'AA' &&
+          actorStats.itemPassives.hasHeartsteel &&
+          !actor.heartsteelReady[target.slotId]
+        ) {
+          actor.heartsteelReady[target.slotId] = true
+          const hsRaw = 80 + actorStats.bonusHp * 0.1
+          const hsDmg = Math.round(hsRaw * spellRes.physMult)
+          finalHitDmg += hsDmg
+          badges.push(`Heartsteel (+${hsDmg})`)
+        }
+
+        // Titanic Hydra Cleave
+        if (action === 'AA' && actorStats.itemPassives.hasTitanicHydra) {
+          const titanicRaw = actorStats.maxHp * 0.015
+          const titanicDmg = Math.round(titanicRaw * spellRes.physMult)
+          finalHitDmg += titanicDmg
+          badges.push('Titanic Hydra')
+        }
+
+        // Statikk Shiv Electrospark
+        if (action === 'AA' && actorStats.itemPassives.hasStatikk) {
+          const statikkDmg = Math.round(90 * spellRes.magicMult)
+          finalHitDmg += statikkDmg
+          badges.push('Statikk Shiv')
+        }
+
+        // Rapid Firecannon Energized
+        if (action === 'AA' && actorStats.itemPassives.hasRapidFirecannon) {
+          const rfcDmg = Math.round(60 * spellRes.magicMult)
+          finalHitDmg += rfcDmg
+          badges.push('Rapid Firecannon')
+        }
+
+        // Wit's End Fray
+        if (action === 'AA' && actorStats.itemPassives.hasWitsEnd) {
+          const witsDmg = Math.round(45 * spellRes.magicMult)
+          finalHitDmg += witsDmg
+          badges.push("Wit's End")
+        }
+
+        // Runaan's Hurricane Wind's Fury
+        if (action === 'AA' && actorStats.itemPassives.hasRunaans) {
+          const secTargets = oppAlive.filter((o) => o.slotId !== target.slotId).slice(0, 2)
+          secTargets.forEach((sec) => {
+            const secDmg = Math.round(actorStats.ad * 0.55 * spellRes.physMult)
+            applyDamageToTarget(
+              actor,
+              sec,
+              secDmg,
+              'physical',
+              "Runaan's Bolts",
+              currentTime,
+              false,
+              ["Runaan's Bolts"],
+            )
+          })
+        }
+
+        // Navori Flickerblade Transcendence
+        if (action === 'AA' && actorStats.itemPassives.hasNavori) {
+          ;(['Q', 'W', 'E'] as const).forEach((spk) => {
+            if (actor.spellCooldowns[spk] > currentTime) {
+              const rem = actor.spellCooldowns[spk] - currentTime
+              actor.spellCooldowns[spk] = currentTime + rem * 0.85
+            }
+          })
+        }
+
+        // Yun Tal Wildarrows Bleed on Crit
+        if (
+          action === 'AA' &&
+          actorStats.itemPassives.hasYunTal &&
+          (actorStats.crit > 0 || isSunderedSkyReady)
+        ) {
+          applyOrRefreshDoT(
+            actor,
+            target,
+            'yun_tal',
+            'Yun Tal Bleed',
+            'physical',
+            2.0,
+            0.5,
+            17.5,
+            currentTime,
+          )
+        }
+
+        // Eclipse Ever Rising Moon (2 hits within 1.5s)
+        if (actorStats.itemPassives.hasEclipse) {
+          if (!actor.eclipseHitCount[target.slotId]) {
+            actor.eclipseHitCount[target.slotId] = {
+              count: 0,
+              windowEndTime: 0,
+              cooldownEndTime: 0,
+            }
+          }
+          const ecl = actor.eclipseHitCount[target.slotId]!
+          if (currentTime >= ecl.cooldownEndTime) {
+            if (currentTime > ecl.windowEndTime) {
+              ecl.count = 1
+              ecl.windowEndTime = currentTime + 1.5
+            } else {
+              ecl.count++
+              if (ecl.count >= 2) {
+                ecl.cooldownEndTime = currentTime + 6.0
+                ecl.count = 0
+                const eclRaw = target.maxHp * (isMelee ? 0.06 : 0.04)
+                const eclDmg = Math.round(eclRaw * spellRes.physMult)
+                finalHitDmg += eclDmg
+                const bonusAd = Math.max(0, actorStats.ad - actorStats.baseAd)
+                const shieldRaw = isMelee ? 160 + bonusAd * 0.4 : 80 + bonusAd * 0.2
+                const shieldMult = actorStats.itemPassives.hasSpiritVisage ? 1.25 : 1.0
+                const eclShield = Math.round(shieldRaw * shieldMult)
+                actor.currentShield += eclShield
+                badges.push(`Eclipse (+${eclShield})`)
+              }
+            }
+          }
+        }
+
+        // Bloodsong Spellblade
+        if (actorStats.itemPassives.hasBloodsong) {
+          if (['Q', 'W', 'E', 'R'].includes(action)) {
+            actor.bloodsongReady = true
+          } else if (action === 'AA' && actor.bloodsongReady) {
+            actor.bloodsongReady = false
+            const bsRaw = actorStats.baseAd * 1.5
+            const bsDmg = Math.round(bsRaw * spellRes.physMult)
+            finalHitDmg += bsDmg
+            actor.bloodsongActiveTargets[target.slotId] = currentTime + 6.0
+            badges.push('Bloodsong')
+          }
+        }
+
+        // Zaz'Zak's Realmspike Void Explosion
+        if (isAbility && actorStats.itemPassives.hasZazZaks) {
+          const zazRaw = 70 + actorStats.ap * 0.2 + target.maxHp * 0.04
+          const zazDmg = Math.round(zazRaw * spellRes.magicMult)
+          finalHitDmg += zazDmg
+          badges.push("Zaz'Zak")
+        }
+
+        // Zeke's Convergence on Ultimate R
+        if (action === 'R' && actorStats.itemPassives.hasZekes) {
+          const zekePerSec = 50 + actorStats.bonusHp * 0.03
+          applyOrRefreshDoT(
+            actor,
+            target,
+            'zekes',
+            "Zeke's Tempest",
+            'magic',
+            5.0,
+            1.0,
+            zekePerSec,
+            currentTime,
+          )
+        }
+
+        // Essence Reaver Mana Refund on AA
+        if (action === 'AA' && actorStats.itemPassives.hasEssenceReaver) {
+          const bonusAd = Math.max(0, actorStats.ad - actorStats.baseAd)
+          const manaRefund = Math.round(15 + bonusAd * 0.1)
+          actorStats.mana += manaRefund
+          badges.push(`Essence Reaver (+${manaRefund})`)
+        }
+
+        // Hullbreaker Boarding Party (every 5th AA)
+        if (action === 'AA' && actorStats.itemPassives.hasHullbreaker) {
+          if (!actor.hullbreakerHitCount) actor.hullbreakerHitCount = {}
+          actor.hullbreakerHitCount[target.slotId] =
+            ((actor.hullbreakerHitCount[target.slotId] || 0) + 1) % 5
+          if (actor.hullbreakerHitCount[target.slotId] === 0) {
+            const bMult = isMelee ? 1.4 : 0.7
+            const hpMult = isMelee ? 0.035 : 0.0175
+            const hbRaw = actorStats.baseAd * bMult + actorStats.maxHp * hpMult
+            const hbDmg = Math.round(hbRaw * spellRes.physMult)
+            finalHitDmg += hbDmg
+            badges.push(`⚓ Hullbreaker (+${hbDmg})`)
+          }
+        }
+
+        // Dead Man's Plate Shipwrecker on AA
+        if (
+          action === 'AA' &&
+          actorStats.itemPassives.hasDeadMansPlate &&
+          !actor.deadMansDischarged
+        ) {
+          actor.deadMansDischarged = true
+          const dmpRaw = 150 + actorStats.baseAd * 1.0
+          const dmpDmg = Math.round(dmpRaw * spellRes.physMult)
+          finalHitDmg += dmpDmg
+          badges.push(`Shipwrecker (+${dmpDmg})`)
+        }
+
+        // Stormrazor Bolt on AA
+        if (
+          action === 'AA' &&
+          actorStats.itemPassives.hasStormrazor &&
+          !actor.stormrazorDischarged
+        ) {
+          actor.stormrazorDischarged = true
+          const srDmg = Math.round(100 * spellRes.magicMult)
+          finalHitDmg += srDmg
+          badges.push(`Stormrazor (+${srDmg})`)
+        }
+
+        // Recurve Bow Steadfast on-hit
+        if (action === 'AA' && actorStats.itemPassives.hasRecurveBow) {
+          const rbDmg = Math.round(15 * spellRes.physMult)
+          finalHitDmg += rbDmg
+          badges.push('Recurve Bow (+15)')
+        }
+
+        // Hextech Alternator Revved on ability
+        if (
+          isAbility &&
+          actorStats.itemPassives.hasHextechAlternator &&
+          !actor.alternatorDischarged
+        ) {
+          actor.alternatorDischarged = true
+          const altRaw = 50 + (actor.level - 1) * (75 / 17)
+          const altDmg = Math.round(altRaw * spellRes.magicMult)
+          finalHitDmg += altDmg
+          badges.push(`Alternator (+${altDmg})`)
+        }
+
+        // Tiamat Cleave on AA
+        if (action === 'AA' && actorStats.itemPassives.hasTiamat) {
+          const cleaveMult = isMelee ? 0.4 : 0.2
+          const tiamatDmg = Math.round(actorStats.ad * cleaveMult * spellRes.physMult)
+          finalHitDmg += tiamatDmg
+          badges.push(`Tiamat Cleave (+${tiamatDmg})`)
+        }
+
+        // Stridebreaker Breaking Shockwave
+        if (
+          action === 'AA' &&
+          actorStats.itemPassives.hasStridebreaker &&
+          !actor.stridebreakerUsed
+        ) {
+          actor.stridebreakerUsed = true
+          const sbDmg = Math.round(actorStats.ad * 0.8 * spellRes.physMult)
+          finalHitDmg += sbDmg
+          badges.push(`Stridebreaker (+${sbDmg})`)
+        }
+
+        // Experimental Hexplate Overdrive on R
+        if (action === 'R' && actorStats.itemPassives.hasExperimentalHexplate) {
+          actor.hexplateBuffEndTime = currentTime + 8.0
+          badges.push('Hexplate Overdrive')
+        }
+
+        // Haunting Guise Madness combat ramp
+        if (actorStats.itemPassives.hasHauntingGuise) {
+          const madnessBonus = Math.min(0.06, currentTime * 0.02)
+          finalHitDmg = Math.round(finalHitDmg * (1 + madnessBonus))
+          if (madnessBonus > 0) badges.push(`Madness (+${Math.round(madnessBonus * 100)}%)`)
+        }
+
+        // Redemption Intervention
+        if (isAbility && actorStats.itemPassives.hasRedemption && !actor.redemptionUsed) {
+          actor.redemptionUsed = true
+          const sameSide = Object.values(participants).filter(
+            (p) => p.side === actor.side && !p.isKo,
+          )
+          const rHeal = Math.round(200 + (actor.level - 1) * (200 / 17))
+          sameSide.forEach((ally) => {
+            ally.currentHp = Math.min(ally.maxHp, ally.currentHp + rHeal)
+          })
+          const rTrueDmg = Math.round(target.maxHp * 0.1)
+          finalHitDmg += rTrueDmg
+          badges.push(`Redemption (+${rHeal} Heal / ${rTrueDmg} True Dmg)`)
+        }
+
+        // Mikael's Blessing Cleanse & Heal
+        if (isAbility && actorStats.itemPassives.hasMikaelsBlessing && !actor.mikaelsUsed) {
+          actor.mikaelsUsed = true
+          const sameSide = Object.values(participants).filter(
+            (p) => p.side === actor.side && !p.isKo,
+          )
+          const lowestAlly = sameSide.sort(
+            (a, b) => a.currentHp / a.maxHp - b.currentHp / b.maxHp,
+          )[0]
+          if (lowestAlly) {
+            const mHeal = Math.round(100 + (actor.level - 1) * (100 / 17) + lowestAlly.maxHp * 0.1)
+            lowestAlly.currentHp = Math.min(lowestAlly.maxHp, lowestAlly.currentHp + mHeal)
+            lowestAlly.grievousWoundsDuration = 0
+            badges.push(`Mikael's Cleanse (+${mHeal})`)
+          }
+        }
+
+        // Solstice Sleigh
+        if (isAbility && actorStats.itemPassives.hasSolsticeSleigh) {
+          const sleighBonusHp = Math.round(50 + (actor.level - 1) * (180 / 17))
+          actor.currentHp = Math.min(actor.maxHp, actor.currentHp + sleighBonusHp)
+          badges.push(`Solstice Sleigh (+${sleighBonusHp} HP)`)
+        }
+
+        // Dream Maker
+        if (isAbility && actorStats.itemPassives.hasDreamMaker) {
+          const bubbleShield = Math.round(75 + (actor.level - 1) * (180 / 17))
+          actor.currentShield += bubbleShield
+          badges.push(`Dream Maker (+${bubbleShield} Shield)`)
+        }
+
+        // Trailblazer
+        if (action === 'AA' && actorStats.itemPassives.hasTrailblazer) {
+          badges.push('Lead the Way (Slow 50%)')
+        }
+
+        // Arena Items
+        if (action === 'AA' && actorStats.itemPassives.hasEndlessHunger) {
+          const hungerHeal = Math.round(actor.maxHp * 0.02)
+          actor.currentHp = Math.min(actor.maxHp, actor.currentHp + hungerHeal)
+          badges.push(`Endless Hunger (+${hungerHeal})`)
+        }
+        if (action === 'AA' && actorStats.itemPassives.hasBastionbreaker) {
+          badges.push('Bastionbreaker')
+        }
+        if (action === 'AA' && actorStats.itemPassives.hasFiendhunterBolts) {
+          finalHitDmg += Math.round(actorStats.ad * 0.3 * spellRes.physMult)
+          badges.push('Fiendhunter Bolt')
+        }
+        if (action === 'AA' && actorStats.itemPassives.hasHexopticsC44) {
+          finalHitDmg += Math.round(40 * spellRes.magicMult)
+          badges.push('Hexoptics (+40)')
         }
 
         // Electrocute Proc
@@ -1176,7 +1927,7 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
 
         // 4. Red Buff Burn (on AA, 3s true damage)
         const buffs = actor.side === 'blue' ? attackerBuffs : defenderBuffs
-        if (action === 'AA' && buffs.red) {
+        if (action === 'AA' && buffs?.red) {
           const totalBurn = calculateRedBuffBurn(actor.level)
           const tickDmg = totalBurn / 3
           applyOrRefreshDoT(
@@ -1193,7 +1944,7 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
         }
 
         // 5. Elder Dragon Burn (on any hit, 3s true damage)
-        if (buffs.elder) {
+        if (buffs?.elder) {
           const totalBurn = calculateElderBurn(actor.level)
           const tickDmg = totalBurn / 3
           applyOrRefreshDoT(
@@ -1607,11 +2358,63 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
           }
         })
       }
+
+      // Unending Despair Anguish pulse (every 5.0s)
+      if (stats.itemPassives.hasUnendingDespair && t >= actor.nextUnendingDespairTime - 0.01) {
+        actor.nextUnendingDespairTime = t + 5.0
+        const oppAlive = getOpposingAliveTargets(actor.slotId)
+        let totalHeal = 0
+        oppAlive.forEach((target) => {
+          const despairRaw = 20 + (actor.level - 1) * 1.5 + stats.bonusHp * 0.03
+          const effMr = Math.max(
+            0,
+            target.baseMr * (1 - target.vileDecayStacks * 0.075) - stats.magicPenFlat,
+          )
+          const magicMult = 100 / (100 + effMr)
+          const despairDmg = Math.max(1, Math.round(despairRaw * magicMult))
+          applyDamageToTarget(
+            actor,
+            target,
+            despairDmg,
+            'magic',
+            'Unending Despair (Anguish)',
+            t,
+            true,
+            ['Anguish'],
+          )
+          totalHeal += Math.round(despairDmg * 2.5)
+        })
+        const healMult = stats.itemPassives.hasSpiritVisage ? 1.25 : 1.0
+        const finalHeal = Math.round(totalHeal * healMult)
+        actor.currentHp = Math.min(actor.maxHp, actor.currentHp + finalHeal)
+      }
     })
 
     // D. Active DoT / Burn Ticks Processing
     Object.values(participants).forEach((target) => {
       if (target.isKo) return
+
+      // Process Death's Dance stored true damage bleed
+      if (target.deathsDanceBleedPool && target.deathsDanceBleedPool > 0) {
+        const bleedTick = Math.max(1, Math.round(target.deathsDanceBleedPool * (timeStep / 3.0)))
+        target.deathsDanceBleedPool = Math.max(0, target.deathsDanceBleedPool - bleedTick)
+        target.currentHp = Math.max(0, target.currentHp - bleedTick)
+        if (target.currentHp === 0) {
+          target.isKo = true
+        }
+      }
+
+      // Process Warmog's Armor Heart out-of-combat regeneration
+      const targetStats = getLiveStats(target)
+      if (
+        targetStats.itemPassives.hasWarmogsArmor &&
+        targetStats.bonusHp >= 1300 &&
+        t - lastDamageTime >= 6.0 &&
+        target.currentHp < target.maxHp
+      ) {
+        const warmogTick = Math.round(target.maxHp * 0.05 * timeStep)
+        target.currentHp = Math.min(target.maxHp, target.currentHp + warmogTick)
+      }
 
       // Update Malignance MR shred duration
       if (target.malignanceShredDuration > 0) {
@@ -1705,7 +2508,11 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       const hasOngoingAura = Object.values(participants).some((p) => {
         if (p.isKo) return false
         const st = getLiveStats(p)
-        return st.itemPassives.hasSunfire || st.itemPassives.hasHollowRadiance
+        return (
+          st.itemPassives.hasSunfire ||
+          st.itemPassives.hasHollowRadiance ||
+          (st.itemPassives.hasWarmogsArmor && st.bonusHp >= 1300 && p.currentHp < p.maxHp)
+        )
       })
       if (!remainingActions && !hasActiveDots && !hasOngoingAura && t >= lastActionTime) {
         terminationReason = 'combo_complete'

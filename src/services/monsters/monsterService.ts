@@ -41,7 +41,21 @@ export interface CalculatedMonsterBuffStats {
 /**
  * Calculates raw stat bonuses and percentage multipliers from active monster buffs
  */
-export function calculateMonsterBuffStats(buffs: SideBuffs): CalculatedMonsterBuffStats {
+export function calculateMonsterBuffStats(buffs?: SideBuffs): CalculatedMonsterBuffStats {
+  if (!buffs) {
+    return {
+      bonusAD: 0,
+      bonusAP: 0,
+      adMultiplier: 1.0,
+      apMultiplier: 1.0,
+      armorMultiplier: 1.0,
+      mrMultiplier: 1.0,
+      bonusAH: 0,
+      bonusTenacity: 0,
+      bonusShield: 0,
+    }
+  }
+
   let bonusAD = 0
   let bonusAP = 0
   let adMultiplier = 1.0

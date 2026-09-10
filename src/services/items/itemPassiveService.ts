@@ -47,6 +47,77 @@ export interface ItemPassiveState {
   hasMoonstone: boolean
   hasShurelyas: boolean
   hasDawncore: boolean
+  hasInfinityEdge: boolean
+  hasLordDominik: boolean
+  hasMortalReminder: boolean
+  hasTheCollector: boolean
+  hasYunTal: boolean
+  hasStatikk: boolean
+  hasRapidFirecannon: boolean
+  hasRunaans: boolean
+  hasNavori: boolean
+  hasSunderedSky: boolean
+  hasSteraksGage: boolean
+  hasEclipse: boolean
+  hasTitanicHydra: boolean
+  hasRavenousHydra: boolean
+  hasProfaneHydra: boolean
+  hasDeathsDance: boolean
+  hasMawOfMalmortius: boolean
+  hasImmortalShieldbow: boolean
+  hasSpearOfShojin: boolean
+  hasHeartsteel: boolean
+  hasHubris: boolean
+  hasHullbreaker: boolean
+  hasVoltaicCyclosword: boolean
+  hasWitsEnd: boolean
+  hasGuardianAngel: boolean
+  hasThornmail: boolean
+  hasBrambleVest: boolean
+  hasFrozenHeart: boolean
+  hasRanduinsOmen: boolean
+  hasSpiritVisage: boolean
+  hasKaenicRookern: boolean
+  hasUnendingDespair: boolean
+  hasFimbulwinter: boolean
+  hasLocket: boolean
+  hasZekes: boolean
+  hasBloodsong: boolean
+  hasZazZaks: boolean
+  hasCelestialOpposition: boolean
+  hasDreamMaker: boolean
+  hasSolsticeSleigh: boolean
+  hasSerpentsFang: boolean
+  hasChempunkChainsword: boolean
+  hasKnightsVow: boolean
+  hasRedemption: boolean
+  hasMikaelsBlessing: boolean
+  hasTrailblazer: boolean
+  hasEssenceReaver: boolean
+  hasStridebreaker: boolean
+  hasAxiomArc: boolean
+  hasEdgeOfNight: boolean
+  hasExperimentalHexplate: boolean
+  hasPhantomDancer: boolean
+  hasStormrazor: boolean
+  hasDeadMansPlate: boolean
+  hasMercurialScimitar: boolean
+  hasYoumuusGhostblade: boolean
+  hasUmbralGlaive: boolean
+  hasWarmogsArmor: boolean
+  hasForceOfNature: boolean
+  hasTiamat: boolean
+  hasHexdrinker: boolean
+  hasHextechAlternator: boolean
+  hasHauntingGuise: boolean
+  hasWardensMail: boolean
+  hasRecurveBow: boolean
+  hasBandlepipes: boolean
+  hasBastionbreaker: boolean
+  hasEndlessHunger: boolean
+  hasProtoplasmHarness: boolean
+  hasFiendhunterBolts: boolean
+  hasHexopticsC44: boolean
 }
 
 export interface ItemDamageResult {
@@ -135,6 +206,131 @@ export function detectItemPassives(items: (Item | null | undefined)[]): ItemPass
       ['2065', '222065'],
     ),
     hasDawncore: check(['dawncore', "nucleo dell'aurora"], ['6621', '226621']),
+    hasInfinityEdge: check(['infinity edge', "frammento dell'infinito"], ['3031', '223031']),
+    hasLordDominik: check(['lord dominik', 'saluti di lord dominik'], ['3036', '223036']),
+    hasMortalReminder: check(['mortal reminder', 'promemoria mortale'], ['3033', '223033']),
+    hasTheCollector: check(['collector', 'il collezionista'], ['6676', '226676']),
+    hasYunTal: check(
+      ['yun tal', 'frecce selvagge di yun tal', 'yuntal'],
+      ['6677', '226677', '3032', '223032'],
+    ),
+    hasStatikk: check(['statikk', 'pugnale di statikk'], ['3087', '223087']),
+    hasRapidFirecannon: check(
+      ['rapid firecannon', 'cannone a ripetizione', 'fuoco rapido'],
+      ['3094', '223094'],
+    ),
+    hasRunaans: check(['runaan', 'uragano di runaan'], ['3085', '223085']),
+    hasNavori: check(['navori', 'lame rapide dei navori', 'flickerblade'], ['6675', '226675']),
+    hasSunderedSky: check(['sundered sky', 'cielo infranto'], ['6610', '226610']),
+    hasSteraksGage: check(['sterak', 'furia di sterak', 'guanto di sterak'], ['3053', '223053']),
+    hasEclipse: check(['eclipse', 'eclissi'], ['6692', '226692']),
+    hasTitanicHydra: check(['titanic hydra', 'idra titanica'], ['3748', '223748']),
+    hasRavenousHydra: check(['ravenous hydra', 'idra famelica'], ['3074', '223074']),
+    hasProfaneHydra: check(['profane hydra', 'idra profana'], ['6698', '226698']),
+    hasDeathsDance: check(
+      ["death's dance", 'danza della morte'],
+      ['3060', '223060', '6333', '226333'],
+    ),
+    hasMawOfMalmortius: check(['maw of malmortius', 'fauce di malmortius'], ['3156', '223156']),
+    hasImmortalShieldbow: check(
+      ['immortal shieldbow', 'arco scudo immortale', 'shieldbow'],
+      ['6673', '226673'],
+    ),
+    hasSpearOfShojin: check(['spear of shojin', 'lancia di shojin', 'shojin'], ['3161', '223161']),
+    hasHeartsteel: check(['heartsteel', "cuore d'acciaio"], ['3084', '223084']),
+    hasHubris: check(['hubris', 'superbia'], ['6697', '226697']),
+    hasHullbreaker: check(['hullbreaker', 'demolitore di scafi'], ['3181', '223181']),
+    hasVoltaicCyclosword: check(
+      ['voltaic cyclosword', 'ciclospada voltaica', 'cyclosword'],
+      ['6699', '226699'],
+    ),
+    hasWitsEnd: check(["wit's end", 'fine del limite'], ['3091', '223091']),
+    hasGuardianAngel: check(['guardian angel', 'angelo custode'], ['3026', '223026']),
+    hasThornmail: check(['thornmail', 'corazza spinata'], ['3075', '223075']),
+    hasBrambleVest: check(['bramble vest', 'gilet di rovi'], ['3076', '223076']),
+    hasFrozenHeart: check(['frozen heart', 'cuore ghiacciato'], ['3110', '223110']),
+    hasRanduinsOmen: check(
+      ["randuin's omen", 'presagio di randuin', 'randuin'],
+      ['3143', '223143'],
+    ),
+    hasSpiritVisage: check(['spirit visage', 'corazza spirituale'], ['3065', '223065']),
+    hasKaenicRookern: check(
+      ['kaenic rookern', 'rookern kaenico'],
+      ['6701', '226701', '2504', '222504'],
+    ),
+    hasUnendingDespair: check(
+      ['unending despair', 'disperazione infinita'],
+      ['6664', '226664', '2502', '222502'],
+    ),
+    hasFimbulwinter: check(['fimbulwinter'], ['3121', '223121']),
+    hasLocket: check(
+      ['locket of the iron solari', 'medaglione dei solari di ferro', 'solari'],
+      ['3190', '223190'],
+    ),
+    hasZekes: check(["zeke's convergence", 'convergenza di zeke', 'zeke'], ['3050', '223050']),
+    hasBloodsong: check(['bloodsong', 'canto di sangue'], ['3877', '223877']),
+    hasZazZaks: check(
+      ["zaz'zak's realmspike", "puntaspina di zaz'zak", 'zazzak'],
+      ['3871', '223871'],
+    ),
+    hasCelestialOpposition: check(
+      ['celestial opposition', 'opposizione celeste'],
+      ['3869', '223869'],
+    ),
+    hasDreamMaker: check(['dream maker', 'creatore di sogni'], ['3870', '223870']),
+    hasSolsticeSleigh: check(['solstice sleigh', 'slitta del solstizio'], ['3876', '223876']),
+    hasSerpentsFang: check(["serpent's fang", 'zanna del serpente'], ['6695', '226695']),
+    hasChempunkChainsword: check(
+      ['chempunk chainsword', 'spada a catena chempunk', 'chempunk'],
+      ['6609', '226609'],
+    ),
+    hasKnightsVow: check(["knight's vow", 'promessa del cavaliere'], ['3109', '223109', '323109']),
+    hasRedemption: check(['redemption', 'redenzione'], ['3107', '223107', '323107']),
+    hasMikaelsBlessing: check(
+      ["mikael's blessing", 'crogiolo di mikael', 'mikael'],
+      ['3222', '223222', '323222', '773222'],
+    ),
+    hasTrailblazer: check(['trailblazer', 'pioniere'], ['3002', '223002', '323002']),
+    hasEssenceReaver: check(['essence reaver', "predatore d'essenza"], ['3508', '223508']),
+    hasStridebreaker: check(['stridebreaker', 'spezzapassi'], ['6631', '226631']),
+    hasAxiomArc: check(['axiom arc', 'arco assiomatico'], ['6696', '226696']),
+    hasEdgeOfNight: check(['edge of night', 'lama della notte'], ['3814', '223814']),
+    hasExperimentalHexplate: check(
+      ['experimental hexplate', 'corazza hextech sperimentale', 'hexplate'],
+      ['3073', '223073'],
+    ),
+    hasPhantomDancer: check(['phantom dancer', 'danzatore fantasma'], ['3046', '223046', '773046']),
+    hasStormrazor: check(['stormrazor', 'rasoio della tempesta'], ['3095', '223095']),
+    hasDeadMansPlate: check(["dead man's plate", 'corazza del morto'], ['3742', '223742']),
+    hasMercurialScimitar: check(
+      ['mercurial scimitar', 'scimitarra di mercurio', 'quicksilver sash', "fascia d'argento vivo"],
+      ['3139', '223139', '773139', '3140'],
+    ),
+    hasYoumuusGhostblade: check(
+      ["youmuu's ghostblade", 'lama spettrale di youmuu', 'youmuu'],
+      ['3142', '223142', '773142'],
+    ),
+    hasUmbralGlaive: check(['umbral glaive', 'falce oscura'], ['3179', '223179']),
+    hasWarmogsArmor: check(
+      ["warmog's armor", 'armatura di warmog', 'warmog'],
+      ['3083', '443083', '773083'],
+    ),
+    hasForceOfNature: check(
+      ['force of nature', 'forza della natura'],
+      ['4401', '224401', '773064'],
+    ),
+    hasTiamat: check(['tiamat'], ['3077', '773077']),
+    hasHexdrinker: check(['hexdrinker', 'bevitore di magia'], ['3155', '223155', '773155']),
+    hasHextechAlternator: check(['hextech alternator', 'alternatore hextech'], ['3145', '223145']),
+    hasHauntingGuise: check(['haunting guise', 'maschera stregata'], ['3147', '773136']),
+    hasWardensMail: check(["warden's mail", 'maglia del custode'], ['3082', '773082']),
+    hasRecurveBow: check(['recurve bow', 'arco ricurvo'], ['1043', '221043', '771043']),
+    hasBandlepipes: check(['bandlepipes'], ['2524', '222524']),
+    hasBastionbreaker: check(['bastionbreaker'], ['2520']),
+    hasEndlessHunger: check(['endless hunger'], ['2517', '222517']),
+    hasProtoplasmHarness: check(['protoplasm harness'], ['2525', '222525']),
+    hasFiendhunterBolts: check(['fiendhunter bolts'], ['2512', '222512']),
+    hasHexopticsC44: check(['hexoptics c44', 'hexoptics'], ['2523', '222523']),
   }
 }
 
@@ -321,6 +517,173 @@ export function calculateItemDamagePassives(input: {
       name: 'Ardent Censer (Sanctify)',
       rawDmg: 20,
       dmgType: 'magic',
+    })
+  }
+
+  // 16. Heartsteel (Colossus: 80 + 10% bonus HP physical damage on AA)
+  if (passives.hasHeartsteel && action === 'AA') {
+    const bonusHp = Math.max(0, attacker.maxHp - 600)
+    results.push({
+      name: 'Heartsteel (Colossus)',
+      rawDmg: 80 + bonusHp * 0.1,
+      dmgType: 'physical',
+    })
+  }
+
+  // 17. Titanic Hydra (Cleave: 1.5% max HP physical damage on AA)
+  if (passives.hasTitanicHydra && action === 'AA') {
+    results.push({
+      name: 'Titanic Hydra (Cleave)',
+      rawDmg: attacker.maxHp * 0.015,
+      dmgType: 'physical',
+    })
+  }
+
+  // 18. Statikk Shiv (Electrospark: 90 magic damage on AA)
+  if (passives.hasStatikk && action === 'AA') {
+    results.push({
+      name: 'Statikk Shiv (Electrospark)',
+      rawDmg: 90,
+      dmgType: 'magic',
+    })
+  }
+
+  // 19. Rapid Firecannon (Energized: 60 magic damage on AA)
+  if (passives.hasRapidFirecannon && action === 'AA') {
+    results.push({
+      name: 'Rapid Firecannon (Energized)',
+      rawDmg: 60,
+      dmgType: 'magic',
+    })
+  }
+
+  // 20. Wit's End (Fray: 45 magic damage on AA)
+  if (passives.hasWitsEnd && action === 'AA') {
+    results.push({
+      name: "Wit's End (Fray)",
+      rawDmg: 45,
+      dmgType: 'magic',
+    })
+  }
+
+  // 21. Voltaic Cyclosword (Energized: 100 physical damage on AA)
+  if (passives.hasVoltaicCyclosword && action === 'AA') {
+    results.push({
+      name: 'Voltaic Cyclosword (Energized)',
+      rawDmg: 100,
+      dmgType: 'physical',
+    })
+  }
+
+  // 22. Bloodsong (Spellblade: 150% base AD on AA)
+  if (passives.hasBloodsong && action === 'AA') {
+    results.push({
+      name: 'Bloodsong (Spellblade)',
+      rawDmg: attacker.baseAd * 1.5,
+      dmgType: 'physical',
+    })
+  }
+
+  // 23. Zaz'Zak's Realmspike (Void Explosion: 70 + 20% AP + 4% max HP magic damage on ability)
+  if (passives.hasZazZaks && isAbility) {
+    results.push({
+      name: "Zaz'Zak's Realmspike (Void Explosion)",
+      rawDmg: 70 + attacker.ap * 0.2 + defender.maxHp * 0.04,
+      dmgType: 'magic',
+    })
+  }
+
+  // 24. Profane Hydra (Heretic Cleave on spell cast)
+  if (passives.hasProfaneHydra && isSpellCast) {
+    const isLow = defender.currentHp / defender.maxHp < 0.5
+    results.push({
+      name: isLow ? 'Profane Hydra (Heretic Cleave Empowered)' : 'Profane Hydra (Heretic Cleave)',
+      rawDmg: attacker.ad * (isLow ? 1.2 : 0.8),
+      dmgType: 'physical',
+    })
+  }
+
+  // 25. Ravenous Hydra (Crescent on spell cast)
+  if (passives.hasRavenousHydra && isSpellCast) {
+    results.push({
+      name: 'Ravenous Hydra (Crescent)',
+      rawDmg: attacker.ad * 1.0,
+      dmgType: 'physical',
+    })
+  }
+
+  // 26. Recurve Bow (Steadfast on-hit)
+  if (passives.hasRecurveBow && action === 'AA') {
+    results.push({
+      name: 'Recurve Bow (On-Hit)',
+      rawDmg: 15,
+      dmgType: 'physical',
+    })
+  }
+
+  // 27. Hextech Alternator (Revved on ability)
+  if (passives.hasHextechAlternator && isAbility) {
+    results.push({
+      name: 'Hextech Alternator (Revved)',
+      rawDmg: 50 + ((attacker.level || 1) - 1) * (75 / 17),
+      dmgType: 'magic',
+    })
+  }
+
+  // 28. Tiamat (Cleave on-hit)
+  if (passives.hasTiamat && action === 'AA') {
+    const cleaveMult = attacker.isRanged ? 0.2 : 0.4
+    results.push({
+      name: 'Tiamat (Cleave)',
+      rawDmg: attacker.ad * cleaveMult,
+      dmgType: 'physical',
+    })
+  }
+
+  // 29. Stridebreaker (Breaking Shockwave on spell cast)
+  if (passives.hasStridebreaker && isSpellCast) {
+    results.push({
+      name: 'Stridebreaker (Breaking Shockwave)',
+      rawDmg: attacker.ad * 0.8,
+      dmgType: 'physical',
+    })
+  }
+
+  // 30. Dead Man's Plate (Shipwrecker on AA)
+  if (passives.hasDeadMansPlate && action === 'AA') {
+    results.push({
+      name: "Dead Man's Plate (Shipwrecker)",
+      rawDmg: 150 + attacker.baseAd * 1.0,
+      dmgType: 'physical',
+    })
+  }
+
+  // 31. Stormrazor (Bolt on AA)
+  if (passives.hasStormrazor && action === 'AA') {
+    results.push({
+      name: 'Stormrazor (Bolt)',
+      rawDmg: 100,
+      dmgType: 'magic',
+    })
+  }
+
+  // 32. Hullbreaker (Boarding Party on AA)
+  if (passives.hasHullbreaker && action === 'AA') {
+    const bMult = attacker.isRanged ? 0.7 : 1.4
+    const hpMult = attacker.isRanged ? 0.0175 : 0.035
+    results.push({
+      name: 'Hullbreaker (Boarding Party)',
+      rawDmg: attacker.baseAd * bMult + attacker.maxHp * hpMult,
+      dmgType: 'physical',
+    })
+  }
+
+  // 33. Redemption (Intervention on spell cast)
+  if (passives.hasRedemption && isSpellCast) {
+    results.push({
+      name: 'Redemption (Intervention)',
+      rawDmg: defender.maxHp * 0.1,
+      dmgType: 'true',
     })
   }
 
