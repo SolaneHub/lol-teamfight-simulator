@@ -449,7 +449,20 @@ export const useDraftStore = defineStore('draft', () => {
     }
     const item = activeCustomizerSlot.value.items[itemIndex]
     const name = item?.name.toLowerCase() || ''
-    const maxStacks = name.includes('mejai') ? 25 : name.includes('dark seal') ? 10 : 0
+    const itemId = String(item?.id || '')
+    const isMejai = name.includes('mejai') || itemId === '3041' || itemId === '223041'
+    const isDarkSeal =
+      name.includes('dark seal') ||
+      name.includes('sigillo oscuro') ||
+      itemId === '1082' ||
+      itemId === '221082'
+    const isRoA =
+      name.includes('rod of ages') ||
+      name.includes('bastone delle ere') ||
+      itemId === '6657' ||
+      itemId === '226657'
+
+    const maxStacks = isMejai ? 25 : isDarkSeal || isRoA ? 10 : 0
     const clamped = Math.min(maxStacks, Math.max(0, isNaN(stacks) ? 0 : stacks))
     activeCustomizerSlot.value.itemStacks[itemIndex] = clamped
   }
@@ -463,9 +476,22 @@ export const useDraftStore = defineStore('draft', () => {
         )
       }
       const name = item.name.toLowerCase()
-      if (name.includes('mejai')) {
+      const itemId = String(item.id || '')
+      const isMejai = name.includes('mejai') || itemId === '3041' || itemId === '223041'
+      const isDarkSeal =
+        name.includes('dark seal') ||
+        name.includes('sigillo oscuro') ||
+        itemId === '1082' ||
+        itemId === '221082'
+      const isRoA =
+        name.includes('rod of ages') ||
+        name.includes('bastone delle ere') ||
+        itemId === '6657' ||
+        itemId === '226657'
+
+      if (isMejai) {
         activeCustomizerSlot.value.itemStacks[idx] = 25
-      } else if (name.includes('dark seal')) {
+      } else if (isDarkSeal || isRoA) {
         activeCustomizerSlot.value.itemStacks[idx] = 10
       } else {
         activeCustomizerSlot.value.itemStacks[idx] = undefined

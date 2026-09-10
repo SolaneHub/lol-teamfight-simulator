@@ -130,8 +130,20 @@ export const calculateStats = (slot: DraftSlot) => {
 
     // Dark Seal / Mejai's Soulstealer Stacks calculation
     const name = item.name.toLowerCase()
-    if (name.includes('dark seal') || name.includes('mejai')) {
-      const isMejai = name.includes('mejai')
+    const itemId = String(item.id || '')
+    const isDarkSeal =
+      name.includes('dark seal') ||
+      name.includes('sigillo oscuro') ||
+      itemId === '1082' ||
+      itemId === '221082'
+    const isMejai = name.includes('mejai') || itemId === '3041' || itemId === '223041'
+    const isRoA =
+      name.includes('rod of ages') ||
+      name.includes('bastone delle ere') ||
+      itemId === '6657' ||
+      itemId === '226657'
+
+    if (isDarkSeal || isMejai) {
       const defaultStacks = isMejai ? 25 : 10
       const currentStacks =
         slot.itemStacks && slot.itemStacks[i] !== undefined
@@ -145,13 +157,37 @@ export const calculateStats = (slot: DraftSlot) => {
       }
     }
 
+    // Rod of Ages (Timeless: +10 HP, +30 Mana, +3 AP per stack, up to 10 stacks)
+    if (isRoA) {
+      const defaultStacks = 10
+      const currentStacks =
+        slot.itemStacks && slot.itemStacks[i] !== undefined
+          ? Math.min(defaultStacks, Math.max(0, slot.itemStacks[i]!))
+          : defaultStacks
+      bonusHp += currentStacks * 10
+      if (usesMana) {
+        bonusMp += currentStacks * 30
+      }
+      bonusAp += currentStacks * 3
+    }
+
     // Parse advanced stats from description
     const parsed = parseStatsFromDescription(item.description)
     bonusCrit += s.FlatCritChanceMod ? s.FlatCritChanceMod * 100 : parsed.critChance
-    bonusLethality += parsed.lethality
-    bonusArmorPen += parsed.armorPenPercent
-    bonusMagicPenFlat += parsed.magicPenFlat
-    bonusMagicPenPercent += parsed.magicPenPercent
+    bonusLethality += s.rFlatArmorPenetrationMod ? s.rFlatArmorPenetrationMod : parsed.lethality
+    bonusArmorPen += s.rPercentArmorPenetrationMod
+      ? s.rPercentArmorPenetrationMod <= 1
+        ? s.rPercentArmorPenetrationMod * 100
+        : s.rPercentArmorPenetrationMod
+      : parsed.armorPenPercent
+    bonusMagicPenFlat += s.rFlatMagicPenetrationMod
+      ? s.rFlatMagicPenetrationMod
+      : parsed.magicPenFlat
+    bonusMagicPenPercent += s.rPercentMagicPenetrationMod
+      ? s.rPercentMagicPenetrationMod <= 1
+        ? s.rPercentMagicPenetrationMod * 100
+        : s.rPercentMagicPenetrationMod
+      : parsed.magicPenPercent
     bonusHaste += parsed.abilityHaste + (isMasterwork && parsed.abilityHaste > 0 ? 10 : 0)
     bonusLifeSteal += s.PercentLifeStealMod ? s.PercentLifeStealMod * 100 : parsed.lifeSteal
     bonusOmnivamp += parsed.omnivamp

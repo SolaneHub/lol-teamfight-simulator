@@ -194,6 +194,9 @@ interface InternalParticipantState {
   noxianMight: boolean
   spellCooldowns: Record<'Q' | 'W' | 'E' | 'R', number>
   lastSpellCastTime: number
+  lifelineTriggered?: boolean
+  bansheesActive?: boolean
+  grievousWoundsDuration?: number
 }
 
 /**
@@ -288,6 +291,11 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       noxianMight: false,
       spellCooldowns: { Q: 0.0, W: 0.0, E: 0.0, R: 0.0 },
       lastSpellCastTime: -1.0,
+      lifelineTriggered: false,
+      bansheesActive: (slot.items || []).some(
+        (i) => i && (i.name.toLowerCase().includes('banshee') || i.id === '3102'),
+      ),
+      grievousWoundsDuration: 0,
     }
   })
 
@@ -380,7 +388,17 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
     if (target.isKo || amount <= 0) return
 
     let effectiveDamage = amount
-    if (target.currentShield > 0) {
+    let isBlocked = false
+
+    // Banshee's Veil spell shield blocks first hostile magic spell
+    if (target.bansheesActive && dmgType === 'magic' && !isDot) {
+      target.bansheesActive = false
+      badges.push('🛡️ Banshee Blocked')
+      effectiveDamage = 0
+      isBlocked = true
+    }
+
+    if (target.currentShield > 0 && effectiveDamage > 0) {
       if (effectiveDamage <= target.currentShield) {
         target.currentShield -= effectiveDamage
         badges.push(`🛡️ Absorbed (${effectiveDamage})`)
@@ -394,18 +412,44 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
     }
 
     target.currentHp = Math.max(0, target.currentHp - effectiveDamage)
-    target.damageTaken += amount
+    const dealtDmg = isBlocked ? 0 : amount
+    target.damageTaken += dealtDmg
 
-    actor.totalDamageDealt += amount
-    actor.damageDealtByType[dmgType] += amount
+    actor.totalDamageDealt += dealtDmg
+    actor.damageDealtByType[dmgType] += dealtDmg
     if (isDot) {
-      actor.damageDealtByType.dot += amount
+      actor.damageDealtByType.dot += dealtDmg
     }
 
     lastDamageTime = Math.max(lastDamageTime, Math.round(currentTime * 10) / 10)
 
+    const actorPassives = detectItemPassives(actor.slot.items)
+    if (actorPassives.hasMorellonomicon && dmgType === 'magic') {
+      target.grievousWoundsDuration = 3.0
+      badges.push('🩸 Grievous Wounds')
+    }
+
     if (target.currentHp === 0) {
       target.isKo = true
+      if (actorPassives.hasCryptbloom) {
+        const actorLive = getLiveStats(actor)
+        const novaHeal = Math.round(50 + actorLive.ap * 0.5)
+        const allies = Object.values(participants).filter((p) => p.side === actor.side && !p.isKo)
+        allies.forEach((ally) => {
+          const healMult =
+            ally.grievousWoundsDuration && ally.grievousWoundsDuration > 0 ? 0.6 : 1.0
+          ally.currentHp = Math.min(ally.maxHp, ally.currentHp + Math.round(novaHeal * healMult))
+        })
+        badges.push('🌸 Cryptbloom Nova')
+      }
+    } else if (target.currentHp / target.maxHp < 0.3 && !target.lifelineTriggered) {
+      const targetPassives = detectItemPassives(target.slot.items)
+      if (targetPassives.hasSeraphs) {
+        target.lifelineTriggered = true
+        const lifelineShield = Math.round(250 + (target.slot.champion?.stats?.mp || 1000) * 0.2)
+        target.currentShield += lifelineShield
+        badges.push(`🛡️ Lifeline (+${lifelineShield})`)
+      }
     }
 
     events.push({
@@ -417,7 +461,7 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
       targetSlotId: target.slotId,
       targetName: target.championName,
       targetSide: target.side,
-      amount,
+      amount: isBlocked ? 0 : amount,
       dmgType,
       isDot,
       remainingHp: target.currentHp,
@@ -831,6 +875,87 @@ export function runCombatSimulation(input: CombatSimulationInput): CombatSimulat
           const ludenDmg = Math.round(ludenRaw * spellRes.magicMult)
           finalHitDmg += ludenDmg
           badges.push("💥 Luden's")
+        }
+
+        // Nashor's Tooth On-Hit
+        if (action === 'AA' && actorStats.itemPassives.hasNashors) {
+          const nashorRaw = 15 + actorStats.ap * 0.15
+          const nashorDmg = Math.round(nashorRaw * spellRes.magicMult)
+          finalHitDmg += nashorDmg
+          badges.push('🦷 Nashor')
+        }
+
+        // Guinsoo's Rageblade On-Hit
+        if (action === 'AA' && actorStats.itemPassives.hasGuinsoo) {
+          const guinsooRaw = 30
+          const guinsooDmg = Math.round(guinsooRaw * spellRes.magicMult)
+          finalHitDmg += guinsooDmg
+          badges.push('⚔️ Guinsoo')
+        }
+
+        // Hextech Gunblade Lightning Bolt
+        if (isAbility && actorStats.itemPassives.hasGunblade) {
+          const gunbladeRaw = 150 + actor.level * 5 + actorStats.ap * 0.3
+          const gunbladeDmg = Math.round(gunbladeRaw * spellRes.magicMult)
+          finalHitDmg += gunbladeDmg
+          badges.push('⚡ Gunblade')
+        }
+
+        // Hextech Rocketbelt Supersonic
+        if (isAbility && actorStats.itemPassives.hasRocketbelt) {
+          const rocketRaw = 125 + actorStats.ap * 0.15
+          const rocketDmg = Math.round(rocketRaw * spellRes.magicMult)
+          finalHitDmg += rocketDmg
+          badges.push('🚀 Rocketbelt')
+        }
+
+        // Dusk and Dawn Spellblade
+        if (action === 'AA' && actorStats.itemPassives.hasDuskAndDawn) {
+          const ddRaw = actorStats.baseAd * 1.0 + actorStats.ap * 0.5
+          const ddDmg = Math.round(ddRaw * spellRes.magicMult)
+          finalHitDmg += ddDmg
+          badges.push('🌅 Dusk & Dawn')
+        }
+
+        // Imperial Mandate Command
+        if (isAbility && actorStats.itemPassives.hasImperialMandate) {
+          const mandateRaw = 60 + actor.level * 3.5
+          const mandateDmg = Math.round(mandateRaw * spellRes.magicMult)
+          finalHitDmg += mandateDmg
+          badges.push('👑 Mandate')
+        }
+
+        // Ardent Censer Sanctify On-Hit
+        if (action === 'AA' && actorStats.itemPassives.hasArdentCenser) {
+          const ardentRaw = 20
+          const ardentDmg = Math.round(ardentRaw * spellRes.magicMult)
+          finalHitDmg += ardentDmg
+          badges.push('✨ Ardent')
+        }
+
+        // Echoes of Helia Soul Siphon
+        if (isAbility && actorStats.itemPassives.hasEchoesOfHelia) {
+          const heliaRaw = 60 + actor.level * 3
+          const heliaDmg = Math.round(heliaRaw * spellRes.magicMult)
+          finalHitDmg += heliaDmg
+          badges.push('🌟 Helia')
+        }
+
+        // Horizon Focus +10% damage amplification
+        if (actorStats.itemPassives.hasHorizonFocus) {
+          finalHitDmg = Math.round(finalHitDmg * 1.1)
+          badges.push('🎯 Horizon (+10%)')
+        }
+
+        // Actualizer +15% spell damage amplification
+        if (isAbility && actorStats.itemPassives.hasActualizer) {
+          finalHitDmg = Math.round(finalHitDmg * 1.15)
+          badges.push('⚡ Actualizer (+15%)')
+        }
+
+        // Rylai's Crystal Scepter Slow
+        if (isAbility && actorStats.itemPassives.hasRylais) {
+          badges.push('❄️ Rylai Slow')
         }
 
         // Electrocute Proc

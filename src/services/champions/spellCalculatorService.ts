@@ -30,6 +30,7 @@ export interface SpellDamageInput {
   options?: {
     aatroxQSeq?: number
     hasAbyssalMask?: boolean
+    hasHorizonFocus?: boolean
     hasCoupDeGrace?: boolean
     hasLastStand?: boolean
     hasCutDown?: boolean
@@ -106,7 +107,8 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
       (1 - (attacker.armorPen || 0) / 100) -
       (attacker.lethality || 0),
   )
-  const physMult = (100 / (100 + effArmor)) * runeMultiplier
+  const horizonMult = options?.hasHorizonFocus ? 1.1 : 1.0
+  const physMult = (100 / (100 + effArmor)) * runeMultiplier * horizonMult
 
   const effMr = Math.max(
     0,
@@ -115,7 +117,8 @@ export function calculateSpellDamage(input: SpellDamageInput): SpellDamageResult
       (1 - (attacker.magicPenPercent || 0) / 100) -
       (attacker.magicPenFlat || 0),
   )
-  const magicMult = (100 / (100 + effMr)) * (options?.hasAbyssalMask ? 1.12 : 1.0) * runeMultiplier
+  const magicMult =
+    (100 / (100 + effMr)) * (options?.hasAbyssalMask ? 1.12 : 1.0) * runeMultiplier * horizonMult
 
   // Default spell ranks
   const qRank =

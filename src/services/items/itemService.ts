@@ -46,6 +46,16 @@ export const parseItemStatsFromDescription = (description: string): ItemStats =>
       stats.FlatCritChanceMod = val / 100
     } else if (nameStr.includes('life steal')) {
       stats.PercentLifeStealMod = val / 100
+    } else if (nameStr.includes('magic penetration')) {
+      if (isPercent) {
+        stats.rPercentMagicPenetrationMod = val / 100
+      } else {
+        stats.rFlatMagicPenetrationMod = val
+      }
+    } else if (nameStr.includes('armor penetration')) {
+      stats.rPercentArmorPenetrationMod = isPercent ? val / 100 : val
+    } else if (nameStr.includes('lethality')) {
+      stats.rFlatArmorPenetrationMod = val
     }
   }
 
@@ -145,9 +155,12 @@ export const mapItem = (id: string, raw: Record<string, unknown> | null | undefi
       purchasable: (rawGold.purchasable as boolean) ?? (inStore && priceTotal > 0),
     },
     tags: (raw?.categories as string[]) || (raw?.tags as string[]) || [],
-    stats:
-      (raw?.stats as Record<string, number>) ||
-      parseItemStatsFromDescription((raw?.description as string) || ''),
+    stats: {
+      ...parseItemStatsFromDescription((raw?.description as string) || ''),
+      ...Object.fromEntries(
+        Object.entries((raw?.stats as Record<string, number>) || {}).filter(([, val]) => val !== 0),
+      ),
+    },
     maps: (raw?.maps as Record<string, boolean>) || {},
     inStore,
     requiredChampion: (raw?.requiredChampion as string) || '',
