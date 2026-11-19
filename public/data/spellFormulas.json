@@ -2675,16 +2675,6 @@
         ],
         "type": "status"
       },
-      "rbuffduration": {
-        "base": [
-          3.5,
-          4.25,
-          5,
-          5.75,
-          6.5
-        ],
-        "type": "status"
-      },
       "exitslowpercent*-100": {
         "base": [
           50
@@ -18125,67 +18115,13 @@
       }
     },
     "MelQ": {
-      "explosioncount": {
-        "base": [
-          6,
-          7,
-          8,
-          9,
-          10
-        ],
-        "type": "status"
-      },
-      "initialexplosiondamage": {
+      "initialdamage": {
         "base": [
           60,
-          85,
-          110,
-          135,
-          160
-        ],
-        "scalings": [
-          {
-            "ratio": 0.55,
-            "stat": "totalAp"
-          }
-        ],
-        "type": "magic"
-      },
-      "totalexplosiondamage": {
-        "base": [
-          5,
-          7,
-          9,
-          11,
-          13
-        ],
-        "scalings": [
-          {
-            "ratio": 0.05,
-            "stat": "totalAp"
-          }
-        ],
-        "type": "magic"
-      },
-      "alldamagehit": {
-        "base": [
-          5,
-          6,
-          7,
-          8,
-          9
-        ],
-        "type": "magic"
-      }
-    },
-    "MelW": {
-      "shieldamount": {
-        "base": [
-          80,
-          110,
-          140,
-          170,
-          200
+          105,
+          150,
+          195,
+          240
         ],
         "scalings": [
           {
@@ -18195,48 +18131,74 @@
         ],
         "type": "magic"
       },
-      "duration": {
+      "subsequentdamage": {
         "base": [
-          0.75
-        ],
-        "type": "status"
-      },
-      "movespeed*100": {
-        "base": [
-          40.000001
-        ],
-        "type": "status"
-      },
-      "movespeedduration": {
-        "base": [
-          0.75
-        ],
-        "type": "status"
-      },
-      "damagepercent": {
-        "base": [
-          40.000001,
-          44.999999,
-          50,
-          55.000001,
-          60.000002
+          60,
+          105,
+          150,
+          195,
+          240
         ],
         "scalings": [
           {
-            "ratio": 0.0005,
+            "ratio": 0.7,
             "stat": "totalAp"
           }
         ],
-        "type": "status"
+        "type": "magic"
+      },
+      "totaldamagett": {
+        "base": [
+          60,
+          105,
+          150,
+          195,
+          240
+        ],
+        "scalings": [
+          {
+            "ratio": 0.7,
+            "stat": "totalAp"
+          }
+        ],
+        "type": "magic"
+      }
+    },
+    "MelW": {
+      "initialdamage": {
+        "base": [
+          60,
+          105,
+          150,
+          195,
+          240
+        ],
+        "scalings": [
+          {
+            "ratio": 0.7,
+            "stat": "totalAp"
+          }
+        ],
+        "type": "magic"
+      },
+      "subsequentdamage": {
+        "base": [
+          60,
+          105,
+          150,
+          195,
+          240
+        ],
+        "scalings": [
+          {
+            "ratio": 0.7,
+            "stat": "totalAp"
+          }
+        ],
+        "type": "magic"
       }
     },
     "MelE": {
-      "rootduration": {
-        "base": [
-          1.5
-        ],
-        "type": "status"
-      },
       "damage": {
         "base": [
           60,
@@ -21834,27 +21796,21 @@
       }
     },
     "OrianaIzunaCommand": {
-      "totaldamagetooltip": {
+      "totaldamage": {
         "base": [
-          60,
-          90,
-          120,
-          150,
-          180
+          225,
+          350,
+          475,
+          600,
+          725
         ],
         "scalings": [
           {
-            "ratio": 0.55,
+            "ratio": 1.1,
             "stat": "totalAp"
           }
         ],
         "type": "magic"
-      },
-      "reduceddamagepercent": {
-        "base": [
-          30
-        ],
-        "type": "status"
       }
     },
     "OrianaDissonanceCommand": {
@@ -31161,9 +31117,9 @@
     "ThreshRPenta": {
       "totaldamage": {
         "base": [
-          250,
-          400,
-          550
+          0,
+          0,
+          0
         ],
         "scalings": [
           {
@@ -33056,7 +33012,7 @@
         ],
         "type": "status"
       },
-      "totaldamagemintooltip": {
+      "totaldamagemin": {
         "base": [
           53.333602,
           100.000504,
@@ -33081,12 +33037,6 @@
       "mindamagepercent*100": {
         "base": [
           33.000001
-        ],
-        "type": "status"
-      },
-      "maxchargeamp*100": {
-        "base": [
-          50
         ],
         "type": "status"
       },
@@ -33680,7 +33630,7 @@
         "base": [
           450,
           700,
-          925
+          950
         ],
         "scalings": [
           {

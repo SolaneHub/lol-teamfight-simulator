@@ -1,7 +1,7 @@
 {
   "type": "champion",
   "format": "full",
-  "version": "16.18.1",
+  "version": "16.23.1",
   "data": {
     "Aatrox": {
       "id": "Aatrox",
@@ -500,13 +500,13 @@
           },
           "maxrank": 5,
           "cooldown": [
-            20,
             18,
-            16,
-            14,
+            16.5,
+            15,
+            13.5,
             12
           ],
-          "cooldownBurn": "20/18/16/14/12",
+          "cooldownBurn": "18/16.5/15/13.5/12",
           "cost": [
             0,
             0,
@@ -1555,6 +1555,75 @@
           "name": "Spirit Blossom Springs Ahri (Pearl)",
           "chromas": false,
           "parentSkin": 88
+        },
+        {
+          "id": "103096",
+          "num": 96,
+          "name": "Coven Ahri (Pristine)",
+          "chromas": false,
+          "parentSkin": 42
+        },
+        {
+          "id": "103097",
+          "num": 97,
+          "name": "K/DA FIRESTARTER Ahri",
+          "chromas": false
+        },
+        {
+          "id": "103098",
+          "num": 98,
+          "name": "K/DA FIRESTARTER Ahri (Ruby)",
+          "chromas": true,
+          "parentSkin": 97
+        },
+        {
+          "id": "103099",
+          "num": 99,
+          "name": "K/DA FIRESTARTER Ahri (Sapphire)",
+          "chromas": false,
+          "parentSkin": 97
+        },
+        {
+          "id": "103100",
+          "num": 100,
+          "name": "K/DA FIRESTARTER Ahri (Emerald)",
+          "chromas": false,
+          "parentSkin": 97
+        },
+        {
+          "id": "103101",
+          "num": 101,
+          "name": "K/DA FIRESTARTER Ahri (Turquoise)",
+          "chromas": false,
+          "parentSkin": 97
+        },
+        {
+          "id": "103102",
+          "num": 102,
+          "name": "K/DA FIRESTARTER Ahri (Catseye)",
+          "chromas": false,
+          "parentSkin": 97
+        },
+        {
+          "id": "103103",
+          "num": 103,
+          "name": "K/DA FIRESTARTER Ahri (Amethyst)",
+          "chromas": false,
+          "parentSkin": 97
+        },
+        {
+          "id": "103104",
+          "num": 104,
+          "name": "K/DA FIRESTARTER Ahri (Pearl)",
+          "chromas": false,
+          "parentSkin": 97
+        },
+        {
+          "id": "103105",
+          "num": 105,
+          "name": "K/DA FIRESTARTER Ahri (Obsidian)",
+          "chromas": false,
+          "parentSkin": 97
         }
       ],
       "lore": "Innately connected to the magic of the spirit realm, Ahri is a fox-like vastaya who can manipulate her prey's emotions and consume their essence—receiving flashes of their memory and insight from each soul she consumes. Once a powerful yet wayward predator, Ahri is now traveling the world in search of remnants of her ancestors while also trying to replace her stolen memories with ones of her own making.",
@@ -2857,11 +2926,65 @@
           "parentSkin": 92
         },
         {
+          "id": "84102",
+          "num": 102,
+          "name": "K/DA FIRESTARTER Ignition Akali",
+          "chromas": false
+        },
+        {
+          "id": "84103",
+          "num": 103,
+          "name": "True Damage Know My Name Akali",
+          "chromas": false
+        },
+        {
           "id": "84104",
           "num": 104,
           "name": "Empyrean Akali (Paragon)",
-          "chromas": false,
+          "chromas": true,
           "parentSkin": 82
+        },
+        {
+          "id": "84105",
+          "num": 105,
+          "name": "True Damage Know My Name Akali (Ruby)",
+          "chromas": false,
+          "parentSkin": 103
+        },
+        {
+          "id": "84106",
+          "num": 106,
+          "name": "True Damage Know My Name Akali (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 103
+        },
+        {
+          "id": "84107",
+          "num": 107,
+          "name": "True Damage Know My Name Akali (Sapphire)",
+          "chromas": false,
+          "parentSkin": 103
+        },
+        {
+          "id": "84108",
+          "num": 108,
+          "name": "True Damage Know My Name Akali (Catseye)",
+          "chromas": false,
+          "parentSkin": 103
+        },
+        {
+          "id": "84109",
+          "num": 109,
+          "name": "True Damage Know My Name Akali (Pearl)",
+          "chromas": false,
+          "parentSkin": 103
+        },
+        {
+          "id": "84110",
+          "num": 110,
+          "name": "True Damage Know My Name Akali (Obsidian)",
+          "chromas": false,
+          "parentSkin": 103
         }
       ],
       "lore": "Abandoning the Kinkou Order and her title of the Fist of Shadow, Akali now strikes alone, ready to be the deadly weapon her people need. Though she holds onto all she learned from her master Shen, she has pledged to defend Ionia from its enemies, one kill at a time. Akali may strike in silence, but her message will be heard loud and clear: fear the assassin with no master.",
@@ -7368,6 +7491,68 @@
           "name": "Victorious Anivia (Challenger)",
           "chromas": false,
           "parentSkin": 46
+        },
+        {
+          "id": "34056",
+          "num": 56,
+          "name": "Old God Anivia",
+          "chromas": false
+        },
+        {
+          "id": "34057",
+          "num": 57,
+          "name": "Old God Anivia (Ruby)",
+          "chromas": true,
+          "parentSkin": 56
+        },
+        {
+          "id": "34058",
+          "num": 58,
+          "name": "Old God Anivia (Emerald)",
+          "chromas": false,
+          "parentSkin": 56
+        },
+        {
+          "id": "34059",
+          "num": 59,
+          "name": "Old God Anivia (Citrine)",
+          "chromas": false,
+          "parentSkin": 56
+        },
+        {
+          "id": "34060",
+          "num": 60,
+          "name": "Old God Anivia (Pearl)",
+          "chromas": false,
+          "parentSkin": 56
+        },
+        {
+          "id": "34061",
+          "num": 61,
+          "name": "Old God Anivia (Sapphire)",
+          "chromas": false,
+          "parentSkin": 56
+        },
+        {
+          "id": "34062",
+          "num": 62,
+          "name": "Old God Anivia (Obsidian)",
+          "chromas": false,
+          "parentSkin": 56
+        },
+        {
+          "id": "34063",
+          "num": 63,
+          "name": "Old God Anivia (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 56
+        },
+        {
+          "id": "34064",
+          "num": 64,
+          "name": "Old God Anivia (Tanzanite)",
+          "chromas": false,
+          "parentSkin": 56
         }
       ],
       "lore": "Anivia is a benevolent winged spirit who endures endless cycles of life, death, and rebirth to protect the Freljord. A demigod born of unforgiving ice and bitter winds, she wields those elemental powers to thwart any who dare disturb her homeland. Anivia guides and protects the tribes of the harsh north, who revere her as a symbol of hope, and a portent of great change. She fights with every ounce of her being, knowing that through her sacrifice, her memory will endure, and she will be reborn into a new tomorrow.",
@@ -9290,6 +9475,68 @@
           "num": 40,
           "name": "Prestige Spirit Blossom Springs Aphelios",
           "chromas": false
+        },
+        {
+          "id": "523041",
+          "num": 41,
+          "name": "HEARTSTEEL Live My Life Aphelios",
+          "chromas": false
+        },
+        {
+          "id": "523042",
+          "num": 42,
+          "name": "HEARTSTEEL Live My Life Aphelios (Ruby)",
+          "chromas": true,
+          "parentSkin": 41
+        },
+        {
+          "id": "523043",
+          "num": 43,
+          "name": "HEARTSTEEL Live My Life Aphelios (Tanzanite)",
+          "chromas": false,
+          "parentSkin": 41
+        },
+        {
+          "id": "523044",
+          "num": 44,
+          "name": "HEARTSTEEL Live My Life Aphelios (Pearl)",
+          "chromas": false,
+          "parentSkin": 41
+        },
+        {
+          "id": "523045",
+          "num": 45,
+          "name": "HEARTSTEEL Live My Life Aphelios (Catseye)",
+          "chromas": false,
+          "parentSkin": 41
+        },
+        {
+          "id": "523046",
+          "num": 46,
+          "name": "HEARTSTEEL Live My Life Aphelios (Peridot)",
+          "chromas": false,
+          "parentSkin": 41
+        },
+        {
+          "id": "523047",
+          "num": 47,
+          "name": "HEARTSTEEL Live My Life Aphelios (Obsidian)",
+          "chromas": false,
+          "parentSkin": 41
+        },
+        {
+          "id": "523048",
+          "num": 48,
+          "name": "HEARTSTEEL Live My Life Aphelios (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 41
+        },
+        {
+          "id": "523049",
+          "num": 49,
+          "name": "HEARTSTEEL Live My Life Aphelios (Aquamarine)",
+          "chromas": false,
+          "parentSkin": 41
         }
       ],
       "lore": "Emerging from moonlight's shadow with weapons drawn, Aphelios kills the enemies of his faith in brooding silence—speaking only through the certainty of his aim, and the firing of each gun. Though fueled by a poison that renders him mute, he is guided by his sister Alune. From her distant temple sanctuary, she pushes an arsenal of moonstone weapons into his hands. For as long as the moon shines overhead, Aphelios will never be alone.",
@@ -10556,6 +10803,13 @@
           "name": "Firecracker Ashe (Pearl)",
           "chromas": false,
           "parentSkin": 84
+        },
+        {
+          "id": "22093",
+          "num": 93,
+          "name": "Coven Ashe (Pristine)",
+          "chromas": false,
+          "parentSkin": 32
         }
       ],
       "lore": "Iceborn warmother of the Avarosan tribe, Ashe commands the most populous horde in the north. Stoic, intelligent, and idealistic, yet uncomfortable with her role as leader, she taps into the ancestral magics of her lineage to wield a bow of True Ice. With her people's belief that she is the mythological hero Avarosa reincarnated, Ashe hopes to unify the Freljord once more by retaking their ancient, tribal lands.",
@@ -11766,10 +12020,12 @@
           "tooltip": "Aurelion Sol summons a black hole, dealing <magicDamage>{{ damagepersecond }} magic damage</magicDamage> per second and <status>Dragging</status> enemies towards the center for {{ duration }} seconds. Enemies in the center below <scaleHealth>{{ currentexecutionthreshold }}% max Health</scaleHealth> die instantly.<br /><br />The black hole absorbs <span class=\"color3458eb\">Stardust</span> when enemies die within it and each second an enemy champion is inside.{{ spellmodifierdescriptionappend }}",
           "leveltip": {
             "label": [
-              "Damage Per Second"
+              "Damage Per Second",
+              "Total AP Ratio"
             ],
             "effect": [
-              "{{ basedamagepersecond }} -> {{ basedamagepersecondNL }}"
+              "{{ basedamagepersecond }} -> {{ basedamagepersecondNL }}",
+              "{{ damageapratiott*100.000000 }}% -> {{ damageapratiottnl*100.000000 }}%"
             ]
           },
           "maxrank": 5,
@@ -12715,7 +12971,7 @@
           "id": "AuroraR",
           "name": "Between Worlds",
           "description": "Aurora leaps in a direction of her choosing, releasing a shockwave that damages and slows any enemies it hits. Afterward, she creates an area that slows enemies within it and allows Aurora to teleport from one side of the area to the other.",
-          "tooltip": "Leap in a direction. Upon landing, Aurora converges the realms, sending out a pulse of spirit energy that deals <magicDamage>{{ damagecalc }} magic damage</magicDamage> and <status>Slows</status> enemies hit by {{ slowpercent*-100 }}% for 2 seconds.<br /><br />The area of convergence stays active for {{ areaduration }} seconds, granting Aurora <keywordMajor>Realm Hopper</keywordMajor> for {{ rbuffduration }} seconds, allowing her to jump from one edge of the area to another.<br /><br />Enemies attempting to enter or leave the area are <status>Slowed</status> by {{ exitslowpercent*-100 }}% for {{ stunduration }} seconds.<br /><br />Aurora can <recast>Recast</recast> this Ability to end the effect early.{{ spellmodifierdescriptionappend }}",
+          "tooltip": "Leap in a direction. Upon landing, Aurora converges the realms, sending out a pulse of spirit energy that deals <magicDamage>{{ damagecalc }} magic damage</magicDamage> and <status>Slows</status> enemies hit by {{ slowpercent*-100 }}% for 2 seconds.<br /><br />The area of convergence stays active for {{ areaduration }} seconds, granting Aurora <keywordMajor>Realm Hopper</keywordMajor> for {{ areaduration }} seconds, allowing her to jump from one edge of the area to another.<br /><br />Enemies attempting to enter or leave the area are <status>Slowed</status> by {{ exitslowpercent*-100 }}% for {{ stunduration }} seconds.<br /><br />Aurora can <recast>Recast</recast> this Ability to end the effect early.{{ spellmodifierdescriptionappend }}",
           "leveltip": {
             "label": [
               "Cooldown",
@@ -13076,13 +13332,13 @@
         "hp": 575,
         "hpperlevel": 108,
         "mp": 320,
-        "mpperlevel": 40,
+        "mpperlevel": 50,
         "movespeed": 330,
         "armor": 25,
         "armorperlevel": 5,
         "spellblock": 30,
         "spellblockperlevel": 1.3,
-        "attackrange": 525,
+        "attackrange": 550,
         "hpregen": 7,
         "hpregenperlevel": 0.75,
         "mpregen": 8,
@@ -21774,9 +22030,9 @@
         "difficulty": 10
       },
       "stats": {
-        "hp": 630,
+        "hp": 610,
         "hpperlevel": 98,
-        "mp": 480,
+        "mp": 450,
         "mpperlevel": 40,
         "movespeed": 335,
         "armor": 18,
@@ -24766,12 +25022,12 @@
           "maxrank": 5,
           "cooldown": [
             9,
-            8,
-            7,
-            6,
-            5
+            7.75,
+            6.5,
+            5.25,
+            4
           ],
-          "cooldownBurn": "9/8/7/6/5",
+          "cooldownBurn": "9/7.75/6.5/5.25/4",
           "cost": [
             25,
             30,
@@ -27074,7 +27330,7 @@
         "mpregenperlevel": 0.65,
         "crit": 0,
         "critperlevel": 0,
-        "attackdamage": 62,
+        "attackdamage": 64,
         "attackdamageperlevel": 0,
         "attackspeedperlevel": 2.7,
         "attackspeed": 0.679
@@ -28881,6 +29137,19 @@
           "name": "Arcane Last Stand Ekko (Paragon)",
           "chromas": false,
           "parentSkin": 57
+        },
+        {
+          "id": "245059",
+          "num": 59,
+          "name": "Prestige True Damage Know My Name Ekko",
+          "chromas": true
+        },
+        {
+          "id": "245060",
+          "num": 60,
+          "name": "Prestige True Damage Know My Name Ekko (Vivid)",
+          "chromas": false,
+          "parentSkin": 59
         }
       ],
       "lore": "A prodigy from the rough streets of Zaun, Ekko is able to manipulate time to twist any situation to his advantage. He uses his own invention, the Z-Drive, to explore the branching possibilities of reality, crafting the perfect moment to seemingly achieve the impossible the first time, every time. Though Ekko revels in this freedom, when there's a threat to those he cares about, he and the Firelights will do anything to defend them.",
@@ -30276,10 +30545,10 @@
               0
             ],
             [
-              12,
-              22,
-              32,
-              42
+              14,
+              24,
+              34,
+              44
             ],
             [
               25,
@@ -30333,7 +30602,7 @@
           "effectBurn": [
             null,
             "0",
-            "12/22/32/42",
+            "14/24/34/44",
             "25",
             "25",
             "2/3/4/5",
@@ -30832,6 +31101,60 @@
           "num": 64,
           "name": "Nightbringer Evelynn",
           "chromas": false
+        },
+        {
+          "id": "28065",
+          "num": 65,
+          "name": "K/DA FIRESTARTER Evelynn",
+          "chromas": true
+        },
+        {
+          "id": "28066",
+          "num": 66,
+          "name": "K/DA Hitmaker Evelynn",
+          "chromas": false
+        },
+        {
+          "id": "28067",
+          "num": 67,
+          "name": "K/DA FIRESTARTER Evelynn (Obsidian)",
+          "chromas": false,
+          "parentSkin": 65
+        },
+        {
+          "id": "28068",
+          "num": 68,
+          "name": "K/DA FIRESTARTER Evelynn (Ruby)",
+          "chromas": false,
+          "parentSkin": 65
+        },
+        {
+          "id": "28069",
+          "num": 69,
+          "name": "K/DA FIRESTARTER Evelynn (Catseye)",
+          "chromas": false,
+          "parentSkin": 65
+        },
+        {
+          "id": "28070",
+          "num": 70,
+          "name": "K/DA FIRESTARTER Evelynn (Sapphire)",
+          "chromas": false,
+          "parentSkin": 65
+        },
+        {
+          "id": "28071",
+          "num": 71,
+          "name": "K/DA FIRESTARTER Evelynn (Tanzanite)",
+          "chromas": false,
+          "parentSkin": 65
+        },
+        {
+          "id": "28072",
+          "num": 72,
+          "name": "K/DA FIRESTARTER Evelynn (Pearl)",
+          "chromas": false,
+          "parentSkin": 65
         }
       ],
       "lore": "Within the dark seams of Runeterra, the demon Evelynn searches for her next victim. She lures in prey with the voluptuous façade of a human female, but once a person succumbs to her charms, Evelynn's true form is unleashed. She then subjects her victim to unspeakable torment, gratifying herself with their pain. To the demon, these liaisons are innocent flings. To the rest of Runeterra, they are ghoulish tales of lust gone awry and horrific reminders of the cost of wanton desire.",
@@ -31981,6 +32304,68 @@
           "name": "Porcelain Protector Ezreal (Lustrous)",
           "chromas": false,
           "parentSkin": 25
+        },
+        {
+          "id": "81078",
+          "num": 78,
+          "name": "HEARTSTEEL Live My Life Ezreal",
+          "chromas": false
+        },
+        {
+          "id": "81079",
+          "num": 79,
+          "name": "HEARTSTEEL Live My Life Ezreal (Ruby)",
+          "chromas": true,
+          "parentSkin": 78
+        },
+        {
+          "id": "81080",
+          "num": 80,
+          "name": "HEARTSTEEL Live My Life Ezreal (Sapphire)",
+          "chromas": false,
+          "parentSkin": 78
+        },
+        {
+          "id": "81081",
+          "num": 81,
+          "name": "HEARTSTEEL Live My Life Ezreal (Catseye)",
+          "chromas": false,
+          "parentSkin": 78
+        },
+        {
+          "id": "81082",
+          "num": 82,
+          "name": "HEARTSTEEL Live My Life Ezreal (Tanzanite)",
+          "chromas": false,
+          "parentSkin": 78
+        },
+        {
+          "id": "81083",
+          "num": 83,
+          "name": "HEARTSTEEL Live My Life Ezreal (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 78
+        },
+        {
+          "id": "81084",
+          "num": 84,
+          "name": "HEARTSTEEL Live My Life Ezreal (Obsidian)",
+          "chromas": false,
+          "parentSkin": 78
+        },
+        {
+          "id": "81085",
+          "num": 85,
+          "name": "HEARTSTEEL Live My Life Ezreal (Pearl)",
+          "chromas": false,
+          "parentSkin": 78
+        },
+        {
+          "id": "81086",
+          "num": 86,
+          "name": "HEARTSTEEL Live My Life Ezreal (Peridot)",
+          "chromas": false,
+          "parentSkin": 78
         }
       ],
       "lore": "A dashing adventurer, unknowingly gifted in the magical arts, Ezreal raids long-lost catacombs, tangles with ancient curses, and overcomes seemingly impossible odds with ease. His courage and bravado knowing no bounds, he prefers to improvise his way out of any situation, relying partially on his wits, but mostly on his mystical Shuriman gauntlet, which he uses to unleash devastating arcane blasts. One thing is for sure—whenever Ezreal is around, trouble isn't too far behind. Or ahead. Probably everywhere.",
@@ -34297,7 +34682,7 @@
       },
       "stats": {
         "hp": 620,
-        "hpperlevel": 99,
+        "hpperlevel": 105,
         "mp": 300,
         "mpperlevel": 60,
         "movespeed": 345,
@@ -39946,6 +40331,13 @@
           "id": "79047",
           "num": 47,
           "name": "Music Fan Gragas (Pearl)",
+          "chromas": false,
+          "parentSkin": 39
+        },
+        {
+          "id": "79049",
+          "num": 49,
+          "name": "Music Fan Gragas (FIRESTARTER)",
           "chromas": false,
           "parentSkin": 39
         }
@@ -48522,6 +48914,54 @@
           "num": 66,
           "name": "Dawnbringer Janna",
           "chromas": false
+        },
+        {
+          "id": "40067",
+          "num": 67,
+          "name": "Coven Janna",
+          "chromas": true
+        },
+        {
+          "id": "40068",
+          "num": 68,
+          "name": "Coven Janna (Ruby)",
+          "chromas": false,
+          "parentSkin": 67
+        },
+        {
+          "id": "40069",
+          "num": 69,
+          "name": "Coven Janna (Sapphire)",
+          "chromas": false,
+          "parentSkin": 67
+        },
+        {
+          "id": "40070",
+          "num": 70,
+          "name": "Coven Janna (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 67
+        },
+        {
+          "id": "40071",
+          "num": 71,
+          "name": "Coven Janna (Catseye)",
+          "chromas": false,
+          "parentSkin": 67
+        },
+        {
+          "id": "40072",
+          "num": 72,
+          "name": "Coven Janna (Obsidian)",
+          "chromas": false,
+          "parentSkin": 67
+        },
+        {
+          "id": "40073",
+          "num": 73,
+          "name": "Coven Janna (Pearl)",
+          "chromas": false,
+          "parentSkin": 67
         }
       ],
       "lore": "Armed with the power of Runeterra's gales, Janna is a mysterious, elemental wind spirit who protects the dispossessed of Zaun. Some believe she was brought into existence by the pleas of Runeterra's sailors who prayed for fair winds as they navigated treacherous waters and braved rough tempests. Her favor and protection has since been called into the depths of Zaun, where Janna has become a beacon of hope to those in need. No one knows where or when she will appear, but more often than not, she's come to help.",
@@ -50195,7 +50635,7 @@
           "id": "24008",
           "num": 8,
           "name": "SKT T1 Jax",
-          "chromas": false
+          "chromas": true
         },
         {
           "id": "24009",
@@ -50432,6 +50872,13 @@
           "name": "Prestige Magma Chamber Jax (Vivid)",
           "chromas": false,
           "parentSkin": 42
+        },
+        {
+          "id": "24044",
+          "num": 44,
+          "name": "SKT T1 Jax (Elite)",
+          "chromas": false,
+          "parentSkin": 8
         }
       ],
       "lore": "Unmatched in both his skill with unique armaments and his biting sarcasm, Jax is the last known weapons master of Icathia. After his homeland was laid low by its own hubris in unleashing the Void, Jax and his kind vowed to protect what little remained. As magic now rises in the world, this slumbering threat stirs once more, and Jax roams Valoran, wielding the last light of Icathia and testing all warriors he meets to see if any are strong enough to stand beside him...",
@@ -53565,7 +54012,7 @@
         "difficulty": 6
       },
       "stats": {
-        "hp": 630,
+        "hp": 610,
         "hpperlevel": 105,
         "mp": 260,
         "mpperlevel": 50,
@@ -54700,6 +55147,68 @@
           "name": "Heavenscale Kai'Sa (Beacon)",
           "chromas": false,
           "parentSkin": 59
+        },
+        {
+          "id": "145083",
+          "num": 83,
+          "name": "K/DA FIRESTARTER Kai'Sa",
+          "chromas": false
+        },
+        {
+          "id": "145084",
+          "num": 84,
+          "name": "K/DA FIRESTARTER Kai'Sa (Ruby)",
+          "chromas": false,
+          "parentSkin": 83
+        },
+        {
+          "id": "145085",
+          "num": 85,
+          "name": "K/DA FIRESTARTER Kai'Sa (Tanzanite)",
+          "chromas": false,
+          "parentSkin": 83
+        },
+        {
+          "id": "145086",
+          "num": 86,
+          "name": "K/DA FIRESTARTER Kai'Sa (Sapphire)",
+          "chromas": false,
+          "parentSkin": 83
+        },
+        {
+          "id": "145087",
+          "num": 87,
+          "name": "K/DA FIRESTARTER Kai'Sa (Emerald)",
+          "chromas": true,
+          "parentSkin": 83
+        },
+        {
+          "id": "145088",
+          "num": 88,
+          "name": "K/DA FIRESTARTER Kai'Sa (Citrine)",
+          "chromas": false,
+          "parentSkin": 83
+        },
+        {
+          "id": "145089",
+          "num": 89,
+          "name": "K/DA FIRESTARTER Kai'Sa (Turquoise)",
+          "chromas": false,
+          "parentSkin": 83
+        },
+        {
+          "id": "145090",
+          "num": 90,
+          "name": "K/DA FIRESTARTER Kai'Sa (Pearl)",
+          "chromas": false,
+          "parentSkin": 83
+        },
+        {
+          "id": "145091",
+          "num": 91,
+          "name": "K/DA FIRESTARTER Kai'Sa (Obsidian)",
+          "chromas": false,
+          "parentSkin": 83
         }
       ],
       "lore": "Claimed by the Void when she was only a child, Kai'Sa managed to survive through sheer tenacity and strength of will. Her experiences have made her a deadly hunter and, to some, the harbinger of a future they would rather not live to see. Having entered into an uneasy symbiosis with a living Void carapace, the time will soon come when she must decide whether to forgive those mortals who would call her a monster, and defeat the coming darkness together… or simply to forget, as the Void consumes the world that left her behind.",
@@ -60900,13 +61409,13 @@
           },
           "maxrank": 5,
           "cooldown": [
-            12,
-            11,
             10,
+            9.5,
             9,
+            8.5,
             8
           ],
-          "cooldownBurn": "12/11/10/9/8",
+          "cooldownBurn": "10/9.5/9/8.5/8",
           "cost": [
             60,
             70,
@@ -61331,11 +61840,11 @@
           },
           "maxrank": 3,
           "cooldown": [
-            160,
-            120,
+            140,
+            110,
             80
           ],
-          "cooldownBurn": "160/120/80",
+          "cooldownBurn": "140/110/80",
           "cost": [
             100,
             50,
@@ -61668,6 +62177,40 @@
           "name": "Battle Academia Kayn (Emerald)",
           "chromas": false,
           "parentSkin": 26
+        },
+        {
+          "id": "141032",
+          "num": 32,
+          "name": "HEARTSTEEL Live My Life Kayn",
+          "chromas": false
+        },
+        {
+          "id": "141033",
+          "num": 33,
+          "name": "HEARTSTEEL Live My Life Kayn (Ruby)",
+          "chromas": true,
+          "parentSkin": 32
+        },
+        {
+          "id": "141034",
+          "num": 34,
+          "name": "HEARTSTEEL Live My Life Kayn (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 32
+        },
+        {
+          "id": "141035",
+          "num": 35,
+          "name": "HEARTSTEEL Live My Life Kayn (Catseye)",
+          "chromas": false,
+          "parentSkin": 32
+        },
+        {
+          "id": "141036",
+          "num": 36,
+          "name": "HEARTSTEEL Live My Life Kayn (Tanzanite)",
+          "chromas": false,
+          "parentSkin": 32
         }
       ],
       "lore": "A peerless practitioner of lethal shadow magic, Shieda Kayn battles to achieve his true destiny—to one day lead the Order of Shadow into a new era of Ionian supremacy. He wields the sentient darkin weapon Rhaast, undeterred by its creeping corruption of his body and mind. There are only two possible outcomes: either Kayn bends the weapon to his will... or the malevolent blade consumes him completely, paving the way for the destruction of all Runeterra.",
@@ -63781,11 +64324,11 @@
               40
             ],
             [
-              2,
-              2,
-              2,
-              2,
-              2
+              2.25,
+              2.25,
+              2.25,
+              2.25,
+              2.25
             ],
             [
               0,
@@ -63795,11 +64338,11 @@
               0
             ],
             [
-              2,
-              2,
-              2,
-              2,
-              2
+              2.25,
+              2.25,
+              2.25,
+              2.25,
+              2.25
             ],
             [
               60,
@@ -63835,9 +64378,9 @@
             "75/105/135/165/195",
             "55/75/95/115/135",
             "40",
-            "2",
+            "2.25",
             "0",
-            "2",
+            "2.25",
             "60",
             "0",
             "0",
@@ -63868,7 +64411,7 @@
         {
           "id": "KhazixE",
           "name": "Leap",
-          "description": "Kha'Zix leaps to an area, dealing physical damage upon landing. If he chooses to <font color='#00DD33'>Evolve Wings</font>, Leap's range increases by 200 and the cooldown resets on champion kill or assist.",
+          "description": "Kha'Zix leaps to an area, dealing physical damage upon landing. If he chooses to <font color='#00DD33'>Evolve Wings</font>, Leap's range increases and the cooldown resets on champion kill or assist.",
           "tooltip": "Kha'Zix leaps, dealing <physicalDamage>{{ totaldamage }} physical damage</physicalDamage> upon landing.{{ spellmodifierdescriptionappend }}",
           "leveltip": {
             "label": [
@@ -66312,6 +66855,19 @@
           "name": "Victorious Kog'Maw (Challenger)",
           "chromas": false,
           "parentSkin": 55
+        },
+        {
+          "id": "96065",
+          "num": 65,
+          "name": "Prestige Classic Baron Kog'Maw",
+          "chromas": true
+        },
+        {
+          "id": "96066",
+          "num": 66,
+          "name": "Prestige Classic Baron Kog'Maw (Vivid)",
+          "chromas": false,
+          "parentSkin": 65
         }
       ],
       "lore": "Belched forth from a rotting Void incursion deep in the wastelands of Icathia, Kog'Maw is an inquisitive yet putrid creature with a caustic, gaping mouth. This particular Void-spawn needs to gnaw and drool on anything within reach to truly understand it. Though not inherently evil, Kog'Maw's beguiling naiveté is dangerous, as it often precedes a feeding frenzy—not for sustenance, but to satisfy its unending curiosity.",
@@ -67059,6 +67615,68 @@
           "name": "HEARTSTEEL K'Sante (Rockstar)",
           "chromas": false,
           "parentSkin": 8
+        },
+        {
+          "id": "897018",
+          "num": 18,
+          "name": "HEARTSTEEL Live My Life K'Sante",
+          "chromas": true
+        },
+        {
+          "id": "897019",
+          "num": 19,
+          "name": "HEARTSTEEL Live My Life K'Sante (Ruby)",
+          "chromas": false,
+          "parentSkin": 18
+        },
+        {
+          "id": "897020",
+          "num": 20,
+          "name": "HEARTSTEEL Live My Life K'Sante (Sapphire)",
+          "chromas": false,
+          "parentSkin": 18
+        },
+        {
+          "id": "897021",
+          "num": 21,
+          "name": "HEARTSTEEL Live My Life K'Sante (Turquoise)",
+          "chromas": false,
+          "parentSkin": 18
+        },
+        {
+          "id": "897022",
+          "num": 22,
+          "name": "HEARTSTEEL Live My Life K'Sante (Tanzanite)",
+          "chromas": false,
+          "parentSkin": 18
+        },
+        {
+          "id": "897023",
+          "num": 23,
+          "name": "HEARTSTEEL Live My Life K'Sante (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 18
+        },
+        {
+          "id": "897024",
+          "num": 24,
+          "name": "HEARTSTEEL Live My Life K'Sante (Obsidian)",
+          "chromas": false,
+          "parentSkin": 18
+        },
+        {
+          "id": "897025",
+          "num": 25,
+          "name": "HEARTSTEEL Live My Life K'Sante (Pearl)",
+          "chromas": false,
+          "parentSkin": 18
+        },
+        {
+          "id": "897026",
+          "num": 26,
+          "name": "HEARTSTEEL Live My Life K'Sante (Catseye)",
+          "chromas": false,
+          "parentSkin": 18
         }
       ],
       "lore": "Defiant and courageous, K'Sante battles colossal beasts and ruthless Ascended to protect his home of Nazumah, a coveted oasis amid the sands of Shurima. But after a falling-out with his former partner, K'Sante realizes that in order to become a warrior worthy of leading his city, he must temper his single-minded drive for success. Only then can he avoid falling prey to his own pride and find the wisdom he needs to defeat the vicious monsters threatening his people.",
@@ -67254,13 +67872,11 @@
           "leveltip": {
             "label": [
               "Damage",
-              "Cooldown",
-              "@AbilityResourceName@ Cost"
+              "Cooldown"
             ],
             "effect": [
               "{{ basedamage }} -> {{ basedamageNL }}",
-              "{{ cooldown }} -> {{ cooldownNL }}",
-              "{{ cost }} -> {{ costNL }}"
+              "{{ cooldown }} -> {{ cooldownNL }}"
             ]
           },
           "maxrank": 5,
@@ -67273,13 +67889,13 @@
           ],
           "cooldownBurn": "14/13/12/11/10",
           "cost": [
-            40,
             45,
-            50,
-            55,
-            60
+            45,
+            45,
+            45,
+            45
           ],
-          "costBurn": "40/45/50/55/60",
+          "costBurn": "45",
           "datavalues": {},
           "effect": [
             null,
@@ -68766,7 +69382,7 @@
           "id": "64006",
           "num": 6,
           "name": "SKT T1 Lee Sin",
-          "chromas": false
+          "chromas": true
         },
         {
           "id": "64007",
@@ -69265,6 +69881,13 @@
           "name": "Storm Dragon Lee Sin (Beacon)",
           "chromas": false,
           "parentSkin": 31
+        },
+        {
+          "id": "64082",
+          "num": 82,
+          "name": "SKT T1 Lee Sin (Elite)",
+          "chromas": false,
+          "parentSkin": 6
         }
       ],
       "lore": "A master of Ionia's ancient martial arts, Lee Sin is a principled fighter who channels the essence of the dragon spirit to face any challenge. Though he lost his sight many years ago, the warrior-monk has devoted his life to protecting his homeland against any who would dare upset its sacred balance. Enemies who underestimate his meditative demeanor will endure his fabled burning fists and blazing roundhouse kicks.",
@@ -69475,13 +70098,13 @@
           },
           "maxrank": 5,
           "cooldown": [
-            7,
-            7,
-            7,
-            7,
-            7
+            8,
+            8,
+            8,
+            8,
+            8
           ],
-          "cooldownBurn": "7",
+          "cooldownBurn": "8",
           "cost": [
             50,
             50,
@@ -71373,7 +71996,7 @@
         "mp": 410,
         "mpperlevel": 50,
         "movespeed": 330,
-        "armor": 22,
+        "armor": 24,
         "armorperlevel": 4.5,
         "spellblock": 32,
         "spellblockperlevel": 1.55,
@@ -71825,11 +72448,13 @@
           "leveltip": {
             "label": [
               "Cooldown",
-              "Break Damage"
+              "Break Damage",
+              "Duration"
             ],
             "effect": [
               "{{ cooldown }} -> {{ cooldownNL }}",
-              "{{ breakdamagebase }} -> {{ breakdamagebaseNL }}"
+              "{{ breakdamagebase }} -> {{ breakdamagebaseNL }}",
+              "{{ sleepduration }} -> {{ sleepdurationNL }}"
             ]
           },
           "maxrank": 3,
@@ -73039,7 +73664,7 @@
         "hp": 620,
         "hpperlevel": 109,
         "mp": 280,
-        "mpperlevel": 70,
+        "mpperlevel": 60,
         "movespeed": 340,
         "armor": 32,
         "armorperlevel": 4.2,
@@ -73228,13 +73853,13 @@
           ],
           "cooldownBurn": "18/17/16/15/14",
           "cost": [
-            50,
-            55,
             60,
             65,
-            70
+            70,
+            75,
+            80
           ],
-          "costBurn": "50/55/60/65/70",
+          "costBurn": "60/65/70/75/80",
           "datavalues": {},
           "effect": [
             null,
@@ -81184,16 +81809,78 @@
           "name": "Prestige Winterblessed Mel (Vivid)",
           "chromas": false,
           "parentSkin": 10
+        },
+        {
+          "id": "800012",
+          "num": 12,
+          "name": "Coven Mel",
+          "chromas": true
+        },
+        {
+          "id": "800013",
+          "num": 13,
+          "name": "Coven Mel (Ruby)",
+          "chromas": false,
+          "parentSkin": 12
+        },
+        {
+          "id": "800014",
+          "num": 14,
+          "name": "Coven Mel (Aquamarine)",
+          "chromas": false,
+          "parentSkin": 12
+        },
+        {
+          "id": "800015",
+          "num": 15,
+          "name": "Coven Mel (Turquoise)",
+          "chromas": false,
+          "parentSkin": 12
+        },
+        {
+          "id": "800016",
+          "num": 16,
+          "name": "Coven Mel (Obsidian)",
+          "chromas": false,
+          "parentSkin": 12
+        },
+        {
+          "id": "800017",
+          "num": 17,
+          "name": "Coven Mel (Catseye)",
+          "chromas": false,
+          "parentSkin": 12
+        },
+        {
+          "id": "800018",
+          "num": 18,
+          "name": "Coven Mel (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 12
+        },
+        {
+          "id": "800019",
+          "num": 19,
+          "name": "Coven Mel (Tanzanite)",
+          "chromas": false,
+          "parentSkin": 12
+        },
+        {
+          "id": "800020",
+          "num": 20,
+          "name": "Coven Mel (Pearl)",
+          "chromas": false,
+          "parentSkin": 12
         }
       ],
       "lore": "Mel Medarda is the presumed heir of the Medarda family, once one of the most powerful in Noxus. In appearance she is a graceful aristocrat, but beneath the surface lies a skilled politician who makes it her business to know everything about everyone she meets. After an encounter with the mysterious Black Rose, Mel discovered the depths of her mother's deception and, for once, faced a situation potentially beyond her control. With newly awakened magical abilities, she sailed home in search of answers—and though many still seek to temper the light within her, Mel's soul remains forever defiant.",
       "blurb": "Mel Medarda is the presumed heir of the Medarda family, once one of the most powerful in Noxus. In appearance she is a graceful aristocrat, but beneath the surface lies a skilled politician who makes it her business to know everything about everyone she...",
       "allytips": [
-        "Mel can reflect enemy projectiles, including powerful spells. Wait until she casts Rebuttal before throwing powerful projectiles her way.",
+        "Mel can destroy enemy projectiles, including powerful spells. Wait until she casts Rebuttal before throwing powerful projectiles her way.",
         "The more Mel hits you, the more Overwhelm stacks she applies. If your health drops too low her next hit will kill you, so back off for a couple seconds to let the Overwhelm stacks fall off."
       ],
       "enemytips": [
-        "Mel can reflect enemy projectiles, including powerful spells. Wait until she casts Rebuttal before throwing powerful projectiles her way.",
+        "Mel can destroy enemy projectiles, including powerful spells. Wait until she casts Rebuttal before throwing powerful projectiles her way.",
         "The more Mel hits you, the more Overwhelm stacks she applies. If your health drops too low her next hit will kill you, so back off for a couple seconds to let the Overwhelm stacks fall off."
       ],
       "tags": [
@@ -81208,13 +81895,13 @@
         "difficulty": 5
       },
       "stats": {
-        "hp": 630,
-        "hpperlevel": 99,
-        "mp": 480,
-        "mpperlevel": 28,
+        "hp": 590,
+        "hpperlevel": 107,
+        "mp": 455,
+        "mpperlevel": 38,
         "movespeed": 330,
         "armor": 21,
-        "armorperlevel": 5.2,
+        "armorperlevel": 5.4,
         "spellblock": 30,
         "spellblockperlevel": 1.3,
         "attackrange": 550,
@@ -81224,29 +81911,27 @@
         "mpregenperlevel": 0.9,
         "crit": 0,
         "critperlevel": 0,
-        "attackdamage": 54,
+        "attackdamage": 52,
         "attackdamageperlevel": 0,
-        "attackspeedperlevel": 2.5,
+        "attackspeedperlevel": 2.75,
         "attackspeed": 0.625
       },
       "spells": [
         {
           "id": "MelQ",
-          "name": "Radiant Volley",
-          "description": "Mel fires a barrage of projectiles that explode around a target location, dealing damage repeatedly to enemies within the area.",
-          "tooltip": "Mel unleashes a barrage of {{ explosioncount }} projectiles that explode in the area around a target location.<br /><br />The first explosion hit deals <magicDamage>{{ initialexplosiondamage }} magic damage</magicDamage> and each subsequent explosion deals <magicDamage>{{ totalexplosiondamage }} magic damage</magicDamage>, adding up to <magicDamage>{{ alldamagehit }} magic damage</magicDamage> total.{{ spellmodifierdescriptionappend }}",
+          "name": "Radiant Barrage",
+          "description": "Mel unleashes a volley of projectiles that deal magic damage. Hitting an enemy champion reduces this ability's cooldown.",
+          "tooltip": "Mel unleashes a barrage of {{ count }} missiles that explode at the target location. The first time an enemy is struck, they take <magicDamage>{{ initialdamage }} magic damage</magicDamage>, with subsequent hits dealing <magicDamage>{{ subsequentdamage }} magic damage</magicDamage> each, for a maximum of <magicDamage>{{ totaldamagett }} magic damage</magicDamage>.<br /><br />If the volley hits an enemy champion at least once, this ability's cooldown is reduced by {{ cdrefundchamphit }} seconds.{{ spellmodifierdescriptionappend }}",
           "leveltip": {
             "label": [
-              "Initial Damage",
-              "Explosion Damage",
-              "Explosion Count",
+              "Subsequent Damage",
+              "Missile Count",
               "Cooldown",
-              "Mana Cost"
+              "@AbilityResourceName@ Cost"
             ],
             "effect": [
-              "{{ initialdamage }} -> {{ initialdamageNL }}",
-              "{{ explosiondamage }} -> {{ explosiondamageNL }}",
-              "{{ explosioncount }} -> {{ explosioncountNL }}",
+              "{{ basedamagesubsequent }} -> {{ basedamagesubsequentNL }}",
+              "{{ count }} -> {{ countNL }}",
               "{{ cooldown }} -> {{ cooldownNL }}",
               "{{ cost }} -> {{ costNL }}"
             ]
@@ -81261,13 +81946,13 @@
           ],
           "cooldownBurn": "10/9/8/7/6",
           "cost": [
+            60,
+            65,
             70,
             75,
-            80,
-            85,
-            90
+            80
           ],
-          "costBurn": "70/75/80/85/90",
+          "costBurn": "60/65/70/75/80",
           "datavalues": {},
           "effect": [
             null,
@@ -81380,39 +82065,41 @@
         {
           "id": "MelW",
           "name": "Rebuttal",
-          "description": "Mel forms a barrier around herself that reflects enemy projectiles back at the attacker, prevents her from taking damage, and grants her movement speed.",
-          "tooltip": "Mel forms a barrier around herself that reflects projectiles from enemy champions, gaining <shield>{{ shieldamount }} Shields</shield> for {{ duration }} seconds and <speed>{{ movespeed*100 }}% decaying Move Speed</speed> for {{ movespeedduration }} seconds.<br /><br />Reflected projectiles deal <magicDamage>{{ damagepercent }} original damage as magic damage</magicDamage>.{{ spellmodifierdescriptionappend }}",
+          "description": "Mel unleashes a refraction nova that destroys enemy projectiles it collides with, retaliating with magic missiles.<br><br>The nova also shields and grants move speed to Mel and her allies.",
+          "tooltip": "Mel unleashes a refraction nova that destroys enemy projectiles it collides with, retaliating for <magicDamage>{{ initialdamage }} magic damage</magicDamage>. Subsequent retaliations against the same enemy deal <magicDamage>{{ subsequentdamage }} magic damage</magicDamage> instead.<br /><br />The nova also grants <shield>{{ totalshield }} Shield</shield> and <speed>{{ totalms }} Move Speed</speed> for {{ buffduration }} seconds to Mel and her allies.{{ spellmodifierdescriptionappend }}",
           "leveltip": {
             "label": [
-              "Reflected Damage",
-              "Shield Amount",
               "Cooldown",
-              "Mana Cost"
+              "Mana Cost",
+              "Shield Amount",
+              "Initial Damage",
+              "Subsequent Damage"
             ],
             "effect": [
-              "{{ basedamagepercent*100.000000 }}% -> {{ basedamagepercentnl*100.000000 }}%",
-              "{{ baseshieldamount }} -> {{ baseshieldamountNL }}",
               "{{ cooldown }} -> {{ cooldownNL }}",
-              "{{ cost }} -> {{ costNL }}"
+              "{{ cost }} -> {{ costNL }}",
+              "{{ baseshield }} -> {{ baseshieldNL }}",
+              "{{ basedamageinitial }} -> {{ basedamageinitialNL }}",
+              "{{ basedamagesubsequent }} -> {{ basedamagesubsequentNL }}"
             ]
           },
           "maxrank": 5,
           "cooldown": [
-            38,
-            35,
-            33,
-            29,
-            26
+            30,
+            28.5,
+            27,
+            25.5,
+            24
           ],
-          "cooldownBurn": "38/35/33/29/26",
+          "cooldownBurn": "30/28.5/27/25.5/24",
           "cost": [
-            80,
-            60,
-            40,
-            20,
+            100,
+            75,
+            50,
+            25,
             0
           ],
-          "costBurn": "80/60/40/20/0",
+          "costBurn": "100/75/50/25/0",
           "datavalues": {},
           "effect": [
             null,
@@ -81504,13 +82191,13 @@
           "costType": " {{ abilityresourcename }}",
           "maxammo": "-1",
           "range": [
-            250,
-            250,
-            250,
-            250,
-            250
+            400,
+            400,
+            400,
+            400,
+            400
           ],
-          "rangeBurn": "250",
+          "rangeBurn": "400",
           "image": {
             "full": "MelW.png",
             "sprite": "spell9.png",
@@ -81526,19 +82213,23 @@
           "id": "MelE",
           "name": "Solar Snare",
           "description": "Mel fires a radiant orb forward, rooting those at its center while the area around it slows enemies and deals damage over time.",
-          "tooltip": "Mel fires a radiating orb, <status>Rooting</status> enemies at its center for {{ rootduration }} seconds and dealing <magicDamage>{{ damage }} magic damage</magicDamage>.<br /><br />The orb builds up a hostile area around it that <status>Slows</status> enemies by {{ areaslowamount*100 }}% and deals <magicDamage>{{ areadamagepersecond }} magic damage per second</magicDamage>.{{ spellmodifierdescriptionappend }}",
+          "tooltip": "Mel fires a radiating orb, <status>Rooting</status> enemies at its center for {{ rootdurationmin }} to {{ rootdurationmax }} seconds (based on distance travelled) and dealing <magicDamage>{{ damage }} magic damage</magicDamage>.<br /><br />The orb builds up a hostile area around it that <status>Slows</status> enemies by {{ areaslowamount*100 }}% and deals <magicDamage>{{ areadamagepersecond }} magic damage per second</magicDamage>.{{ spellmodifierdescriptionappend }}",
           "leveltip": {
             "label": [
               "Damage",
               "Damage Per Second",
               "Cooldown",
-              "Mana Cost"
+              "Mana Cost",
+              "Slow",
+              "Max Root Duration"
             ],
             "effect": [
               "{{ basedamage }} -> {{ basedamageNL }}",
               "{{ baseareadamage }} -> {{ baseareadamageNL }}",
               "{{ cooldown }} -> {{ cooldownNL }}",
-              "{{ cost }} -> {{ costNL }}"
+              "{{ cost }} -> {{ costNL }}",
+              "{{ areaslowamount*100.000000 }}% -> {{ areaslowamountnl*100.000000 }}%",
+              "{{ rootdurationmax }} -> {{ rootdurationmaxNL }}"
             ]
           },
           "maxrank": 5,
@@ -81551,13 +82242,13 @@
           ],
           "cooldownBurn": "11/10.5/10/9.5/9",
           "cost": [
+            40,
             50,
             60,
             70,
-            80,
-            90
+            80
           ],
-          "costBurn": "50/60/70/80/90",
+          "costBurn": "40/50/60/70/80",
           "datavalues": {},
           "effect": [
             null,
@@ -81691,10 +82382,10 @@
           "maxrank": 3,
           "cooldown": [
             120,
-            100,
-            80
+            90,
+            60
           ],
-          "cooldownBurn": "120/100/80",
+          "cooldownBurn": "120/90/60",
           "cost": [
             100,
             100,
@@ -84044,7 +84735,7 @@
         "spellblock": 28,
         "spellblockperlevel": 2.05,
         "attackrange": 175,
-        "hpregen": 3.5,
+        "hpregen": 5.5,
         "hpregenperlevel": 0.65,
         "mpregen": 8,
         "mpregenperlevel": 0.8,
@@ -85509,11 +86200,11 @@
           },
           "maxrank": 3,
           "cooldown": [
-            140,
             120,
+            110,
             100
           ],
-          "cooldownBurn": "140/120/100",
+          "cooldownBurn": "120/110/100",
           "cost": [
             0,
             0,
@@ -86193,6 +86884,13 @@
           "name": "Prestige Veiled Lady Morgana (Vivid)",
           "chromas": true,
           "parentSkin": 81
+        },
+        {
+          "id": "25083",
+          "num": 83,
+          "name": "Coven Morgana (Pristine)",
+          "chromas": false,
+          "parentSkin": 26
         }
       ],
       "lore": "Conflicted between her celestial and mortal natures, Morgana bound her wings to embrace humanity, and inflicts her pain and bitterness upon the dishonest and the corrupt. She rejects laws and traditions she believes are unjust, and fights for truth from the shadows of Demacia—even as others seek to repress it—by casting shields and chains of dark fire. More than anything else, Morgana truly believes that even the banished and outcast may one day rise again.",
@@ -91106,6 +91804,68 @@
           "num": 49,
           "name": "Beeko",
           "chromas": false
+        },
+        {
+          "id": "518050",
+          "num": 50,
+          "name": "Cafe Cuties Neeko",
+          "chromas": true
+        },
+        {
+          "id": "518051",
+          "num": 51,
+          "name": "Cafe Cuties Neeko (Ruby)",
+          "chromas": false,
+          "parentSkin": 50
+        },
+        {
+          "id": "518052",
+          "num": 52,
+          "name": "Cafe Cuties Neeko (Aquamarine)",
+          "chromas": false,
+          "parentSkin": 50
+        },
+        {
+          "id": "518053",
+          "num": 53,
+          "name": "Cafe Cuties Neeko (Obsidian)",
+          "chromas": false,
+          "parentSkin": 50
+        },
+        {
+          "id": "518054",
+          "num": 54,
+          "name": "Cafe Cuties Neeko (Pearl)",
+          "chromas": false,
+          "parentSkin": 50
+        },
+        {
+          "id": "518055",
+          "num": 55,
+          "name": "Cafe Cuties Neeko (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 50
+        },
+        {
+          "id": "518056",
+          "num": 56,
+          "name": "Cafe Cuties Neeko (Catseye)",
+          "chromas": false,
+          "parentSkin": 50
+        },
+        {
+          "id": "518057",
+          "num": 57,
+          "name": "Cafe Cuties Neeko (Jasper)",
+          "chromas": false,
+          "parentSkin": 50
+        },
+        {
+          "id": "518058",
+          "num": 58,
+          "name": "Cafe Cuties Neeko (Peridot)",
+          "chromas": false,
+          "parentSkin": 50
         }
       ],
       "lore": "Hailing from a long lost tribe of vastaya, Neeko can blend into any crowd by borrowing the appearances of others, even absorbing something of their emotional state to tell friend from foe in an instant. No one is ever sure where—or who—Neeko might be, but those who intend to do her harm will soon witness her true colors revealed, and feel the full power of her primordial spirit magic unleashed upon them.",
@@ -94383,11 +95143,11 @@
           },
           "maxrank": 3,
           "cooldown": [
-            140,
-            115,
-            90
+            160,
+            130,
+            100
           ],
-          "cooldownBurn": "140/115/90",
+          "cooldownBurn": "160/130/100",
           "cost": [
             100,
             100,
@@ -96824,7 +97584,7 @@
           "id": "OrianaIzunaCommand",
           "name": "Command: Attack",
           "description": "Orianna commands her Ball to fire toward a target location, dealing magic damage to targets along the way (deals less damage to subsequent targets). Her Ball remains at the target location after.",
-          "tooltip": "Orianna commands her <keywordMajor>Ball</keywordMajor> to move to an area, dealing <magicDamage>{{ totaldamagetooltip }} magic damage</magicDamage> to surrounding enemies and to enemies it passes through. Deals {{ reduceddamagepercent }}% less damage to all enemies after the first.{{ spellmodifierdescriptionappend }}",
+          "tooltip": "Orianna commands her <keywordMajor>Ball</keywordMajor> to move to an area, dealing <magicDamage>{{ totaldamage }} magic damage</magicDamage> to enemies it passes through and nearby enemies at the destination.<br /><br />Damage is reduced to <magicDamage>{{ reduceddamage }} magic damage</magicDamage> for enemies after the first hit.{{ spellmodifierdescriptionappend }}",
           "leveltip": {
             "label": [
               "Damage",
@@ -96856,25 +97616,25 @@
           "effect": [
             null,
             [
-              60,
-              90,
-              120,
-              150,
-              180
+              0,
+              0,
+              0,
+              0,
+              0
             ],
             [
-              30,
-              30,
-              30,
-              30,
-              30
+              0,
+              0,
+              0,
+              0,
+              0
             ],
             [
-              70,
-              70,
-              70,
-              70,
-              70
+              0,
+              0,
+              0,
+              0,
+              0
             ],
             [
               0,
@@ -96928,9 +97688,9 @@
           ],
           "effectBurn": [
             null,
-            "60/90/120/150/180",
-            "30",
-            "70",
+            "0",
+            "0",
+            "0",
             "0",
             "0",
             "0",
@@ -101729,6 +102489,68 @@
           "num": 50,
           "name": "Prestige Battle Academia Qiyana",
           "chromas": false
+        },
+        {
+          "id": "246051",
+          "num": 51,
+          "name": "True Damage Know My Name Qiyana",
+          "chromas": true
+        },
+        {
+          "id": "246052",
+          "num": 52,
+          "name": "True Damage Know My Name Qiyana (Ruby)",
+          "chromas": false,
+          "parentSkin": 51
+        },
+        {
+          "id": "246053",
+          "num": 53,
+          "name": "True Damage Know My Name Qiyana (Tanzanite)",
+          "chromas": false,
+          "parentSkin": 51
+        },
+        {
+          "id": "246054",
+          "num": 54,
+          "name": "True Damage Know My Name Qiyana (Pearl)",
+          "chromas": false,
+          "parentSkin": 51
+        },
+        {
+          "id": "246055",
+          "num": 55,
+          "name": "True Damage Know My Name Qiyana (Catseye)",
+          "chromas": false,
+          "parentSkin": 51
+        },
+        {
+          "id": "246056",
+          "num": 56,
+          "name": "True Damage Know My Name Qiyana (Turquoise)",
+          "chromas": false,
+          "parentSkin": 51
+        },
+        {
+          "id": "246057",
+          "num": 57,
+          "name": "True Damage Know My Name Qiyana (Obsidian)",
+          "chromas": false,
+          "parentSkin": 51
+        },
+        {
+          "id": "246058",
+          "num": 58,
+          "name": "True Damage Know My Name Qiyana (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 51
+        },
+        {
+          "id": "246059",
+          "num": 59,
+          "name": "True Damage Know My Name Qiyana (Sapphire)",
+          "chromas": false,
+          "parentSkin": 51
         }
       ],
       "lore": "In the jungle city of Ixaocan, Qiyana plots her own ruthless path to the high seat of the Yun Tal. Last in line to succeed her parents, she faces those who stand in her way with brash confidence and unprecedented mastery over elemental magic. With the land itself obeying her every command, Qiyana sees herself as the greatest elementalist in the history of Ixaocan—and by that right, deserving of not only a city, but an empire.",
@@ -111861,7 +112683,7 @@
         "mpperlevel": 70,
         "movespeed": 340,
         "armor": 22,
-        "armorperlevel": 4.2,
+        "armorperlevel": 4.7,
         "spellblock": 32,
         "spellblockperlevel": 1.3,
         "attackrange": 550,
@@ -112190,13 +113012,13 @@
           ],
           "cooldownBurn": "3.5/3.25/3/2.75/2.5",
           "cost": [
-            35,
-            45,
-            55,
-            65,
-            75
+            40,
+            50,
+            60,
+            70,
+            80
           ],
-          "costBurn": "35/45/55/65/75",
+          "costBurn": "40/50/60/70/80",
           "datavalues": {},
           "effect": [
             null,
@@ -114898,6 +115720,68 @@
           "name": "Warhound Senna (Fearless Fang)",
           "chromas": false,
           "parentSkin": 72
+        },
+        {
+          "id": "235081",
+          "num": 81,
+          "name": "True Damage Know My Name Senna",
+          "chromas": false
+        },
+        {
+          "id": "235082",
+          "num": 82,
+          "name": "True Damage Know My Name Senna (Ruby)",
+          "chromas": true,
+          "parentSkin": 81
+        },
+        {
+          "id": "235083",
+          "num": 83,
+          "name": "True Damage Know My Name Senna (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 81
+        },
+        {
+          "id": "235084",
+          "num": 84,
+          "name": "True Damage Know My Name Senna (Sapphire)",
+          "chromas": false,
+          "parentSkin": 81
+        },
+        {
+          "id": "235085",
+          "num": 85,
+          "name": "True Damage Know My Name Senna (Catseye)",
+          "chromas": false,
+          "parentSkin": 81
+        },
+        {
+          "id": "235086",
+          "num": 86,
+          "name": "True Damage Know My Name Senna (Turquoise)",
+          "chromas": false,
+          "parentSkin": 81
+        },
+        {
+          "id": "235087",
+          "num": 87,
+          "name": "True Damage Know My Name Senna (Tanzanite)",
+          "chromas": false,
+          "parentSkin": 81
+        },
+        {
+          "id": "235088",
+          "num": 88,
+          "name": "True Damage Know My Name Senna (Pearl)",
+          "chromas": false,
+          "parentSkin": 81
+        },
+        {
+          "id": "235089",
+          "num": 89,
+          "name": "True Damage Know My Name Senna (Obsidian)",
+          "chromas": false,
+          "parentSkin": 81
         }
       ],
       "lore": "Cursed from childhood to be haunted by the supernatural Black Mist, Senna joined a sacred order known as the Sentinels of Light, and fiercely fought back—only to be killed, her soul imprisoned in a lantern by the cruel specter Thresh. But refusing to lose hope, within the lantern Senna learned to use the Mist, and reemerged to new life, forever changed. Now wielding darkness along with light, Senna seeks to end the Black Mist by turning it against itself—with every blast of her relic weapon, redeeming the souls lost within.",
@@ -117209,6 +118093,19 @@
           "name": "Spirit Blossom Springs Sett (Rose Quartz)",
           "chromas": false,
           "parentSkin": 67
+        },
+        {
+          "id": "875076",
+          "num": 76,
+          "name": "Prestige HEARTSTEEL Live My Life Sett",
+          "chromas": true
+        },
+        {
+          "id": "875077",
+          "num": 77,
+          "name": "Prestige HEARTSTEEL Live My Life Sett (Vivid)",
+          "chromas": false,
+          "parentSkin": 76
         }
       ],
       "lore": "A leader of Ionia's growing criminal underworld, Sett rose to prominence in the wake of the war with Noxus. Though he began as a humble challenger in the fighting pits of Navori, he quickly gained notoriety for his savage strength, and his ability to take seemingly endless amounts of punishment. Now, having climbed through the ranks of local combatants, Sett has muscled to the top, reigning over the pits he once fought in.",
@@ -122015,7 +122912,7 @@
       },
       "stats": {
         "hp": 655,
-        "hpperlevel": 87,
+        "hpperlevel": 95,
         "mp": 400,
         "mpperlevel": 52,
         "movespeed": 345,
@@ -125794,6 +126691,12 @@
           "name": "Prestige Requiem Sona (Vivid)",
           "chromas": false,
           "parentSkin": 75
+        },
+        {
+          "id": "37077",
+          "num": 77,
+          "name": "DJ Sona Ultimate Remix",
+          "chromas": false
         }
       ],
       "lore": "Sona is Demacia's foremost virtuoso of the stringed etwahl, speaking only through her graceful chords and vibrant arias. This genteel manner has endeared her to the highborn, though others suspect her spellbinding melodies to actually emanate magic—a Demacian taboo. Silent to outsiders but somehow understood by close companions, Sona plucks her harmonies not only to soothe injured allies, but also to strike down unsuspecting enemies.",
@@ -127904,9 +128807,9 @@
         "mp": 400,
         "mpperlevel": 29,
         "movespeed": 330,
-        "armor": 25,
+        "armor": 23,
         "armorperlevel": 4.7,
-        "spellblock": 31,
+        "spellblock": 34,
         "spellblockperlevel": 1.55,
         "attackrange": 525,
         "hpregen": 3,
@@ -128085,13 +128988,13 @@
           },
           "maxrank": 5,
           "cooldown": [
-            22,
-            21,
             20,
             19,
-            18
+            18,
+            17,
+            16
           ],
-          "cooldownBurn": "22/21/20/19/18",
+          "cooldownBurn": "20/19/18/17/16",
           "cost": [
             60,
             65,
@@ -130330,29 +131233,31 @@
           "tooltip": "Syndra projects a wave of force, <status>Knocking Back</status> enemies and <keywordMajor>Dark Spheres</keywordMajor> and dealing <magicDamage>{{ totaldamage }} magic damage</magicDamage>.<br /><br /><keywordMajor>Dark Spheres</keywordMajor> that are pushed <status>Stun</status> enemies for {{ stunduration }} seconds and deal <magicDamage>{{ totaldamage }} magic damage</magicDamage>.<br /><br /><evolve>{{ spell.syndrapassive:eupgradethreshold }} Splinters of Wrath</evolve>: This Ability's width is increased and <status>Slows</status> enemies by <status>{{ upgradedslowamount*100 }}%</status> for {{ upgradedslowduration }} seconds.{{ spellmodifierdescriptionappend }}",
           "leveltip": {
             "label": [
-              "Damage"
+              "Damage",
+              "Cooldown"
             ],
             "effect": [
-              "{{ basedamage }} -> {{ basedamageNL }}"
+              "{{ basedamage }} -> {{ basedamageNL }}",
+              "{{ cooldown }} -> {{ cooldownNL }}"
             ]
           },
           "maxrank": 5,
           "cooldown": [
-            15,
-            15,
-            15,
-            15,
+            17,
+            16.5,
+            16,
+            15.5,
             15
           ],
-          "cooldownBurn": "15",
+          "cooldownBurn": "17/16.5/16/15.5/15",
           "cost": [
-            50,
-            50,
-            50,
-            50,
-            50
+            60,
+            60,
+            60,
+            60,
+            60
           ],
-          "costBurn": "50",
+          "costBurn": "60",
           "datavalues": {},
           "effect": [
             null,
@@ -135789,7 +136694,7 @@
         "mpregenperlevel": 0.8,
         "crit": 0,
         "critperlevel": 0,
-        "attackdamage": 56,
+        "attackdamage": 54,
         "attackdamageperlevel": 0,
         "attackspeedperlevel": 3.5,
         "attackspeed": 0.625
@@ -136258,9 +137163,9 @@
           "effect": [
             null,
             [
-              250,
-              400,
-              550
+              0,
+              0,
+              0
             ],
             [
               2,
@@ -136310,7 +137215,7 @@
           ],
           "effectBurn": [
             null,
-            "250/400/550",
+            "0",
             "2",
             "99",
             "4",
@@ -142357,6 +143262,68 @@
           "name": "Urgot the Clogfather (Obsidian)",
           "chromas": false,
           "parentSkin": 32
+        },
+        {
+          "id": "6041",
+          "num": 41,
+          "name": "Old God Urgot",
+          "chromas": true
+        },
+        {
+          "id": "6042",
+          "num": 42,
+          "name": "Old God Urgot (Ruby)",
+          "chromas": false,
+          "parentSkin": 41
+        },
+        {
+          "id": "6043",
+          "num": 43,
+          "name": "Old God Urgot (Catseye)",
+          "chromas": false,
+          "parentSkin": 41
+        },
+        {
+          "id": "6044",
+          "num": 44,
+          "name": "Old God Urgot (Emerald)",
+          "chromas": false,
+          "parentSkin": 41
+        },
+        {
+          "id": "6045",
+          "num": 45,
+          "name": "Old God Urgot (Sapphire)",
+          "chromas": false,
+          "parentSkin": 41
+        },
+        {
+          "id": "6046",
+          "num": 46,
+          "name": "Old God Urgot (Tanzanite)",
+          "chromas": false,
+          "parentSkin": 41
+        },
+        {
+          "id": "6047",
+          "num": 47,
+          "name": "Old God Urgot (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 41
+        },
+        {
+          "id": "6048",
+          "num": 48,
+          "name": "Old God Urgot (Pearl)",
+          "chromas": false,
+          "parentSkin": 41
+        },
+        {
+          "id": "6049",
+          "num": 49,
+          "name": "Old God Urgot (Obsidian)",
+          "chromas": false,
+          "parentSkin": 41
         }
       ],
       "lore": "Once a powerful Noxian headsman, Urgot was betrayed by the empire for which he had killed so many. Bound in iron chains, he was forced to learn the true meaning of strength in the Dredge—a prison mine deep beneath Zaun. Emerging in a disaster that spread chaos throughout the city, he now casts an imposing shadow over its criminal underworld. Raising his victims on the very chains that once enslaved him, he will purge his new home of the unworthy, making it a crucible of pain.",
@@ -143514,15 +144481,15 @@
           "id": "VarusQ",
           "name": "Piercing Arrow",
           "description": "Varus readies and then fires a powerful shot that gains extra range and damage the longer he spends preparing to fire.",
-          "tooltip": "<attention>Begin Charging:</attention> Varus draws back his next shot, <status>Slowing</status> himself by {{ movespeedmod*-100 }}%. After {{ maxchannelduration }} seconds, if not fired, Varus will cancel the Ability and refund {{ manarefund*100 }}% of its Mana cost.<br /><br /><attention>Release:</attention> Varus releases the arrow, dealing <physicalDamage>{{ totaldamagemintooltip }} physical damage</physicalDamage>, reduced by {{ falloffpercent*100 }}% per enemy hit (minimum {{ mindamagepercent*100 }}%). Damage and <keywordMajor>Blight</keywordMajor> detonation effects are increased by up to {{ maxchargeamp*100 }}% based on charge time (maximum <physicalDamage>{{ totaldamagemax }}</physicalDamage>) .{{ spellmodifierdescriptionappend }}",
+          "tooltip": "<attention>Begin Charging:</attention> Varus draws back his next shot, <status>Slowing</status> himself by {{ movespeedmod*-100 }}%. After {{ maxchannelduration }} seconds, if not fired, Varus will cancel the Ability and refund {{ manarefund*100 }}% of its Mana cost.<br /><br /><attention>Release:</attention> Varus releases the arrow, dealing <physicalDamage>{{ totaldamagemin }} physical damage</physicalDamage>, reduced by {{ falloffpercent*100 }}% per enemy hit (minimum {{ mindamagepercent*100 }}%). Damage and <keywordMajor>Blight</keywordMajor> detonation effects are increased by up to {{ maxchannelamp*100 }}% based on charge time (up to to <physicalDamage>{{ totaldamagemax }} physical damage</physicalDamage>.{{ spellmodifierdescriptionappend }}",
           "leveltip": {
             "label": [
-              "Maximum Damage",
+              "Damage",
               "Cooldown",
               "Mana Cost"
             ],
             "effect": [
-              "{{ basedamagemax }} -> {{ basedamagemaxNL }}",
+              "{{ basedamagemin }} -> {{ basedamageminNL }}",
               "{{ cooldown }} -> {{ cooldownNL }}",
               "{{ basecost }} -> {{ basecostNL }}"
             ]
@@ -143562,39 +144529,11 @@
               0
             ],
             [
-              0.15,
-              0.15,
-              0.15,
-              0.15,
-              0.15
-            ],
-            [
-              0.5,
-              0.5,
-              0.5,
-              0.5,
-              0.5
-            ],
-            [
-              4,
-              4,
-              4,
-              4,
-              4
-            ],
-            [
-              3,
-              3,
-              3,
-              3,
-              3
-            ],
-            [
-              -0.2,
-              -0.2,
-              -0.2,
-              -0.2,
-              -0.2
+              0,
+              0,
+              0,
+              0,
+              0
             ],
             [
               0,
@@ -143604,11 +144543,39 @@
               0
             ],
             [
-              0.33,
-              0.33,
-              0.33,
-              0.33,
-              0.33
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0
             ],
             [
               0,
@@ -143622,13 +144589,13 @@
             null,
             "0",
             "0",
-            "0.15",
-            "0.5",
-            "4",
-            "3",
-            "-0.2",
             "0",
-            "0.33",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
+            "0",
             "0"
           ],
           "vars": [],
@@ -143698,32 +144665,32 @@
               0
             ],
             [
-              0.03,
-              0.035,
-              0.04,
-              0.045,
-              0.05
+              0,
+              0,
+              0,
+              0,
+              0
             ],
             [
-              6,
-              6,
-              6,
-              6,
-              6
+              0,
+              0,
+              0,
+              0,
+              0
             ],
             [
-              3,
-              3,
-              3,
-              3,
-              3
+              0,
+              0,
+              0,
+              0,
+              0
             ],
             [
-              120,
-              120,
-              120,
-              120,
-              120
+              0,
+              0,
+              0,
+              0,
+              0
             ],
             [
               0,
@@ -143764,10 +144731,10 @@
           "effectBurn": [
             null,
             "0",
-            "0.03/0.035/0.04/0.045/0.05",
-            "6",
-            "3",
-            "120",
+            "0",
+            "0",
+            "0",
+            "0",
             "0",
             "0",
             "0",
@@ -144119,7 +145086,7 @@
           "id": "67005",
           "num": 5,
           "name": "SKT T1 Vayne",
-          "chromas": false
+          "chromas": true
         },
         {
           "id": "67006",
@@ -144582,6 +145549,13 @@
           "name": "Demoncursed Vayne (Pearl)",
           "chromas": false,
           "parentSkin": 67
+        },
+        {
+          "id": "67074",
+          "num": 74,
+          "name": "SKT T1 Vayne (Elite)",
+          "chromas": false,
+          "parentSkin": 5
         }
       ],
       "lore": "Shauna Vayne is a deadly, remorseless Demacian monster hunter, who has dedicated her life to finding and destroying the demon that murdered her family. Armed with a wrist-mounted crossbow and a heart full of vengeance, she is only truly happy when slaying practitioners or creations of the dark arts, striking from the shadows with a flurry of silver bolts.",
@@ -144617,8 +145591,8 @@
         "spellblock": 33,
         "spellblockperlevel": 1.1,
         "attackrange": 550,
-        "hpregen": 4,
-        "hpregenperlevel": 0.5,
+        "hpregen": 5.5,
+        "hpregenperlevel": 0.4,
         "mpregen": 7,
         "mpregenperlevel": 0.4,
         "crit": 0,
@@ -144637,13 +145611,11 @@
           "leveltip": {
             "label": [
               "Cooldown",
-              "AD Ratio %",
-              "@AbilityResourceName@ Cost"
+              "AD Ratio %"
             ],
             "effect": [
               "{{ cooldown }} -> {{ cooldownNL }}",
-              "{{ totaladratio*100.000000 }}% -> {{ totaladrationl*100.000000 }}%",
-              "{{ cost }} -> {{ costNL }}"
+              "{{ totaladratio*100.000000 }}% -> {{ totaladrationl*100.000000 }}%"
             ]
           },
           "maxrank": 5,
@@ -144656,13 +145628,13 @@
           ],
           "cooldownBurn": "6/5/4/3/2",
           "cost": [
-            46,
-            42,
-            38,
-            34,
+            30,
+            30,
+            30,
+            30,
             30
           ],
-          "costBurn": "46/42/38/34/30",
+          "costBurn": "30",
           "datavalues": {},
           "effect": [
             null,
@@ -147053,7 +148025,7 @@
             [
               450,
               700,
-              925
+              950
             ],
             [
               7,
@@ -147103,7 +148075,7 @@
           ],
           "effectBurn": [
             null,
-            "450/700/925",
+            "450/700/950",
             "7",
             "20",
             "40",
@@ -148427,7 +149399,7 @@
         "mpregenperlevel": 0.65,
         "crit": 0,
         "critperlevel": 0,
-        "attackdamage": 63,
+        "attackdamage": 61,
         "attackdamageperlevel": 0,
         "attackspeedperlevel": 2,
         "attackspeed": 0.644
@@ -150165,10 +151137,10 @@
       },
       "stats": {
         "hp": 600,
-        "hpperlevel": 100,
+        "hpperlevel": 105,
         "mp": 405,
         "mpperlevel": 45,
-        "movespeed": 335,
+        "movespeed": 330,
         "armor": 23,
         "armorperlevel": 4.4,
         "spellblock": 30,
@@ -156376,11 +157348,11 @@
               0
             ],
             [
-              250,
-              250,
-              250,
-              250,
-              250
+              0,
+              0,
+              0,
+              0,
+              0
             ],
             [
               0,
@@ -156424,7 +157396,7 @@
             "0",
             "0",
             "0",
-            "250",
+            "0",
             "0",
             "0",
             "0",
@@ -157258,6 +158230,47 @@
           "name": "Petals of Spring Yasuo (Emerald)",
           "chromas": false,
           "parentSkin": 88
+        },
+        {
+          "id": "157097",
+          "num": 97,
+          "name": "True Damage Know My Name Yasuo",
+          "chromas": true
+        },
+        {
+          "id": "157098",
+          "num": 98,
+          "name": "True Damage Know My Name Yasuo (Unlocked)",
+          "chromas": false,
+          "parentSkin": 97
+        },
+        {
+          "id": "157099",
+          "num": 99,
+          "name": "True Damage Know My Name Yasuo (Momentous)",
+          "chromas": false,
+          "parentSkin": 97
+        },
+        {
+          "id": "157100",
+          "num": 100,
+          "name": "True Damage Know My Name Yasuo (Ruby)",
+          "chromas": false,
+          "parentSkin": 97
+        },
+        {
+          "id": "157101",
+          "num": 101,
+          "name": "True Damage Know My Name Yasuo (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 97
+        },
+        {
+          "id": "157102",
+          "num": 102,
+          "name": "True Damage Know My Name Yasuo (Obsidian)",
+          "chromas": false,
+          "parentSkin": 97
         }
       ],
       "lore": "An Ionian of deep resolve, Yasuo is an agile swordsman who wields the air itself against his enemies. As a proud young man, he was falsely accused of murdering his master—unable to prove his innocence, he was forced to slay his own brother in self defense. Even after his master's true killer was revealed, Yasuo still could not forgive himself for all he had done, and now wanders his homeland with only the wind to guide his blade.",
@@ -158395,6 +159408,68 @@
           "name": "Inkshadow Yone (Paragon)",
           "chromas": false,
           "parentSkin": 35
+        },
+        {
+          "id": "777077",
+          "num": 77,
+          "name": "HEARTSTEEL Live My Life Yone",
+          "chromas": false
+        },
+        {
+          "id": "777078",
+          "num": 78,
+          "name": "HEARTSTEEL Live My Life Yone (Ruby)",
+          "chromas": true,
+          "parentSkin": 77
+        },
+        {
+          "id": "777079",
+          "num": 79,
+          "name": "HEARTSTEEL Live My Life Yone (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 77
+        },
+        {
+          "id": "777080",
+          "num": 80,
+          "name": "HEARTSTEEL Live My Life Yone (Catseye)",
+          "chromas": false,
+          "parentSkin": 77
+        },
+        {
+          "id": "777081",
+          "num": 81,
+          "name": "HEARTSTEEL Live My Life Yone (Pearl)",
+          "chromas": false,
+          "parentSkin": 77
+        },
+        {
+          "id": "777082",
+          "num": 82,
+          "name": "HEARTSTEEL Live My Life Yone (Tanzanite)",
+          "chromas": false,
+          "parentSkin": 77
+        },
+        {
+          "id": "777083",
+          "num": 83,
+          "name": "HEARTSTEEL Live My Life Yone (Sapphire)",
+          "chromas": false,
+          "parentSkin": 77
+        },
+        {
+          "id": "777084",
+          "num": 84,
+          "name": "HEARTSTEEL Live My Life Yone (Emerald)",
+          "chromas": false,
+          "parentSkin": 77
+        },
+        {
+          "id": "777085",
+          "num": 85,
+          "name": "HEARTSTEEL Live My Life Yone (Obsidian)",
+          "chromas": false,
+          "parentSkin": 77
         }
       ],
       "lore": "In life, he was Yone—half-brother of Yasuo, and renowned student of his village's sword school. But upon his death at the hands of his brother, he found himself hunted by a malevolent entity of the spirit realm, and was forced to slay it with its own sword. Now, cursed to wear its demonic mask upon his face, Yone tirelessly hunts all such creatures in order to understand what he has become.",
@@ -161769,13 +162844,13 @@
           "costType": " {{ abilityresourcename }}",
           "maxammo": "0",
           "range": [
-            25000,
-            25000,
-            25000,
-            25000,
-            25000
+            500,
+            500,
+            500,
+            500,
+            500
           ],
-          "rangeBurn": "25000",
+          "rangeBurn": "500",
           "image": {
             "full": "YuumiE.png",
             "sprite": "spell17.png",
@@ -162064,13 +163139,13 @@
           },
           "maxrank": 5,
           "cooldown": [
-            10,
-            9,
             8,
+            7.5,
             7,
+            6.5,
             6
           ],
-          "cooldownBurn": "10/9/8/7/6",
+          "cooldownBurn": "8/7.5/7/6.5/6",
           "cost": [
             25,
             25,
@@ -164009,6 +165084,13 @@
           "name": "Prestige Spirit Blossom Zed (Vivid)",
           "chromas": false,
           "parentSkin": 69
+        },
+        {
+          "id": "238071",
+          "num": 71,
+          "name": "SKT T1 Zed (Elite)",
+          "chromas": false,
+          "parentSkin": 2
         }
       ],
       "lore": "Utterly ruthless and without mercy, Zed is the leader of the Order of Shadow, an organization he created with the intent of militarizing Ionia's magical and martial traditions to drive out Noxian invaders. During the war, desperation led him to unlock the secret shadow form—a malevolent spirit magic as dangerous and corrupting as it is powerful. Zed has mastered all of these forbidden techniques to destroy anything he sees as a threat to his nation, or his new order.",
@@ -167691,6 +168773,68 @@
           "name": "Prestige Eternal Aspect Zoe (Vivid)",
           "chromas": false,
           "parentSkin": 43
+        },
+        {
+          "id": "142045",
+          "num": 45,
+          "name": "Cafe Cuties Zoe",
+          "chromas": true
+        },
+        {
+          "id": "142046",
+          "num": 46,
+          "name": "Cafe Cuties Zoe (Ruby)",
+          "chromas": false,
+          "parentSkin": 45
+        },
+        {
+          "id": "142047",
+          "num": 47,
+          "name": "Cafe Cuties Zoe (Catseye)",
+          "chromas": false,
+          "parentSkin": 45
+        },
+        {
+          "id": "142048",
+          "num": 48,
+          "name": "Cafe Cuties Zoe (Emerald)",
+          "chromas": false,
+          "parentSkin": 45
+        },
+        {
+          "id": "142049",
+          "num": 49,
+          "name": "Cafe Cuties Zoe (Amethyst)",
+          "chromas": false,
+          "parentSkin": 45
+        },
+        {
+          "id": "142050",
+          "num": 50,
+          "name": "Cafe Cuties Zoe (Sapphire)",
+          "chromas": false,
+          "parentSkin": 45
+        },
+        {
+          "id": "142051",
+          "num": 51,
+          "name": "Cafe Cuties Zoe (Rose Quartz)",
+          "chromas": false,
+          "parentSkin": 45
+        },
+        {
+          "id": "142052",
+          "num": 52,
+          "name": "Cafe Cuties Zoe (Pearl)",
+          "chromas": false,
+          "parentSkin": 45
+        },
+        {
+          "id": "142053",
+          "num": 53,
+          "name": "Cafe Cuties Zoe (Obsidian)",
+          "chromas": false,
+          "parentSkin": 45
         }
       ],
       "lore": "As the embodiment of mischief, imagination, and change, Zoe acts as the cosmic messenger of Targon, heralding major events that reshape worlds. Her mere presence warps the arcane mathematics governing realities, sometimes causing cataclysms without conscious effort or malice. This perhaps explains the breezy nonchalance with which Zoe approaches her duties, giving her plenty of time to focus on playing games, tricking mortals, or otherwise amusing herself. An encounter with Zoe can be joyous and life affirming, but it is always more than it appears and often extremely dangerous.",
@@ -168335,7 +169479,7 @@
           "id": "143003",
           "num": 3,
           "name": "SKT T1 Zyra",
-          "chromas": false
+          "chromas": true
         },
         {
           "id": "143004",
@@ -168817,6 +169961,13 @@
           "name": "Spirit Blossom Zyra (Obsidian)",
           "chromas": false,
           "parentSkin": 64
+        },
+        {
+          "id": "143074",
+          "num": 74,
+          "name": "SKT T1 Zyra (Elite)",
+          "chromas": false,
+          "parentSkin": 3
         }
       ],
       "lore": "Born in an ancient, sorcerous catastrophe, Zyra is the wrath of nature given form—an alluring hybrid of plant and human, kindling new life with every step. She views the many mortals of Valoran as little more than prey for her seeded progeny, and thinks nothing of slaying them with flurries of deadly spines. Though her true purpose has not been revealed, Zyra wanders the world, indulging her most primal urges to colonize, and strangle all other life from it.",
